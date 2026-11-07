@@ -38,9 +38,9 @@ const copy = {
     title: 'لوحة العمليات',
     intro: 'مركز إدارة وصلي',
     signIn: 'دخول الإدارة التجريبي',
-    name: 'اسم المسؤول',
-    phone: 'رقم الهاتف الدولي',
-    key: 'مفتاح الإدارة المحلي',
+    username: 'اسم المستخدم',
+    password: 'كلمة مرور الإدارة',
+    key: 'كلمة مرور الإدارة المحلية',
     api: 'عنوان API',
     connect: 'دخول',
     logout: 'خروج',
@@ -74,9 +74,9 @@ const copy = {
     title: 'Tableau des opérations',
     intro: 'Centre de gestion Wessali',
     signIn: 'Connexion admin de démonstration',
-    name: 'Nom de l’administrateur',
-    phone: 'Téléphone international',
-    key: 'Clé admin locale',
+    username: 'Nom d’utilisateur',
+    password: 'Mot de passe admin',
+    key: 'Mot de passe admin local',
     api: 'URL API',
     connect: 'Connexion',
     logout: 'Déconnexion',
@@ -110,9 +110,9 @@ const copy = {
     title: 'Operations dashboard',
     intro: 'Wessali administration centre',
     signIn: 'Demo administrator sign-in',
-    name: 'Administrator name',
-    phone: 'International phone',
-    key: 'Local admin key',
+    username: 'Admin username',
+    password: 'Admin password',
+    key: 'Local admin password',
     api: 'API URL',
     connect: 'Sign in',
     logout: 'Sign out',
@@ -143,6 +143,14 @@ const copy = {
     appName: 'Wessali Operations',
   },
 } as const;
+
+function describeRequestError(error: unknown, base: string, fallback: string): string {
+  if (error instanceof TypeError && /fetch|network/i.test(error.message)) {
+    const healthUrl = `${base.trim().replace(/\\/+$/, '')}/health`;
+    return `Cannot reach the Wessali API at ${healthUrl}. Make sure the API is running. If you opened the dashboard using your PC's IP address, set the API URL to that same PC IP instead of localhost.`;
+  }
+  return error instanceof Error ? error.message : fallback;
+}
 
 async function apiRequest<T>(
   base: string,
@@ -176,8 +184,7 @@ export default function DashboardPage() {
   const [apiBase, setApiBase] = useState(
     process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000/v1',
   );
-  const [adminName, setAdminName] = useState('Wessali Admin');
-  const [adminPhone, setAdminPhone] = useState('+213555000001');
+  const [adminUsername, setAdminUsername] = useState('fastx');
   const [adminKey, setAdminKey] = useState('');
   const [session, setSession] = useState<AdminSession | null>(null);
   const [tab, setTab] = useState<'overview' | 'bookings' | 'providers'>('overview');
@@ -206,7 +213,7 @@ export default function DashboardPage() {
       setBookings(bookingRows);
       setProviders(providerRows);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : labels.error);
+      setError(describeRequestError(requestError, apiBase, labels.error));
     } finally {
       setLoading(false);
     }
@@ -223,19 +230,21 @@ export default function DashboardPage() {
     setLoading(true);
     setError('');
     try {
+      await apiRequest<{ status: string }>(apiBase, '/health');
       const result = await apiRequest<AdminSession>(apiBase, '/auth/dev-session', undefined, {
         method: 'POST',
         body: JSON.stringify({
-          phoneE164: adminPhone.trim(),
-          displayName: adminName.trim(),
+          phoneE164: '+213555000001',
+          displayName: adminUsername.trim(),
           role: 'admin',
+          adminUsername: adminUsername.trim(),
           adminKey,
         }),
       });
       setSession(result);
       setNotice('Connected to the Wessali API');
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : labels.error);
+      setError(describeRequestError(requestError, apiBase, labels.error));
     } finally {
       setLoading(false);
     }
@@ -301,25 +310,24 @@ export default function DashboardPage() {
             <input value={apiBase} onChange={(event) => setApiBase(event.target.value)} />
           </label>
           <label>
-            {labels.name}
+            {labels.username}
             <input
-              value={adminName}
-              onChange={(event) => setAdminName(event.target.value)}
+              name="username"
+              autoComplete="username"
+              value={adminUsername}
+              onChange={(event) => setAdminUsername(event.target.value)}
               required
-            />
-          </label>
-          <label>
-            {labels.phone}
-            <input
-              value={adminPhone}
-              onChange={(event) => setAdminPhone(event.target.value)}
-              required
+              minLength={3}
+              maxLength={32}
+              pattern="[A-Za-z0-9._-]+"
             />
           </label>
           <label>
             {labels.key}
             <input
               type="password"
+              name="password"
+              autoComplete="current-password"
               value={adminKey}
               onChange={(event) => setAdminKey(event.target.value)}
               required
