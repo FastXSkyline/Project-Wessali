@@ -3,6 +3,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -18,7 +19,7 @@ import { ProvidersService } from './providers.service.js';
 @Controller('providers')
 @UseGuards(SessionGuard)
 export class ProvidersController {
-  constructor(private readonly providers: ProvidersService) {}
+  constructor(@Inject(ProvidersService) private readonly providers: ProvidersService) {}
 
   @Get('me')
   getMine(@Req() request: AuthenticatedRequest) {
