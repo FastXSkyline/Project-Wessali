@@ -223,7 +223,10 @@ export default function DashboardPage() {
       const saved = localStorage.getItem(ADMIN_SESSION_KEY);
       if (saved) {
         const restored = JSON.parse(saved) as AdminSession;
-        if (restored.accessToken && (!restored.expiresAt || Date.parse(restored.expiresAt) > Date.now())) {
+        if (
+          restored.accessToken &&
+          (!restored.expiresAt || Date.parse(restored.expiresAt) > Date.now())
+        ) {
           setSession(restored);
         } else {
           localStorage.removeItem(ADMIN_SESSION_KEY);
