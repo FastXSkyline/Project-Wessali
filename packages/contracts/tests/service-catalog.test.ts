@@ -1,10 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  CreateWaterBookingSchema,
-  SERVICE_CATEGORIES,
-  SERVICE_KINDS,
-} from '../src/index.js';
+import { CreateWaterBookingSchema, SERVICE_CATEGORIES, SERVICE_KINDS } from '../src/index.js';
 
 test('the first release exposes all three service categories', () => {
   assert.deepEqual(

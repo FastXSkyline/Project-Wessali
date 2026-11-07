@@ -4,15 +4,25 @@ export const SERVICE_KINDS = ['freight', 'roadside', 'water'] as const;
 export type ServiceKind = (typeof SERVICE_KINDS)[number];
 
 export const BOOKING_STATUSES = [
-  'draft', 'submitted', 'matching', 'offer_received', 'accepted',
-  'provider_en_route', 'arrived', 'in_progress', 'completed',
-  'cancelled', 'expired', 'disputed',
+  'draft',
+  'submitted',
+  'matching',
+  'offer_received',
+  'accepted',
+  'provider_en_route',
+  'arrived',
+  'in_progress',
+  'completed',
+  'cancelled',
+  'expired',
+  'disputed',
 ] as const;
 export type BookingStatus = (typeof BOOKING_STATUSES)[number];
 
 export const SERVICE_CATEGORIES = [
   {
-    id: 'freight', code: '01',
+    id: 'freight',
+    code: '01',
     labels: { ar: 'نقل البضائع', fr: 'Transport de marchandises', en: 'Freight transport' },
     descriptions: {
       ar: 'اربط شحنتك بسائقي الشاحنات المناسبين.',
@@ -21,7 +31,8 @@ export const SERVICE_CATEGORIES = [
     },
   },
   {
-    id: 'roadside', code: '02',
+    id: 'roadside',
+    code: '02',
     labels: { ar: 'المساعدة على الطريق', fr: 'Dépannage routier', en: 'Roadside assistance' },
     descriptions: {
       ar: 'اعثر على المساعدة الميدانية عند الحاجة.',
@@ -30,7 +41,8 @@ export const SERVICE_CATEGORIES = [
     },
   },
   {
-    id: 'water', code: '03',
+    id: 'water',
+    code: '03',
     labels: { ar: 'توصيل صهاريج المياه', fr: 'Livraison par citerne', en: 'Water tanker delivery' },
     descriptions: {
       ar: 'اطلب صهريج مياه للمنزل أو للاستغلال الفلاحي.',
@@ -69,45 +81,51 @@ function validateCoordinatePairs(
   }
 }
 
-export const CreateFreightBookingSchema = z.object({
-  serviceType: z.literal('freight'),
-  ...CommonBookingFields,
-  destinationAddress: z.string().trim().min(3).max(300),
-  destinationLatitude: z.number().min(-90).max(90).optional(),
-  destinationLongitude: z.number().min(-180).max(180).optional(),
-  cargoDescription: z.string().trim().min(3).max(1000),
-  weightKg: z.number().positive().max(1000000),
-  truckType: z.enum(['pickup', 'van', 'flatbed', 'box_truck', 'semi_trailer', 'other']),
-  loadingRequirements: z.string().trim().max(500).optional(),
-}).superRefine((value, context) => {
-  validateCoordinatePairs(value, context, [
-    ['pickupLatitude', 'pickupLongitude'],
-    ['destinationLatitude', 'destinationLongitude'],
-  ]);
-});
+export const CreateFreightBookingSchema = z
+  .object({
+    serviceType: z.literal('freight'),
+    ...CommonBookingFields,
+    destinationAddress: z.string().trim().min(3).max(300),
+    destinationLatitude: z.number().min(-90).max(90).optional(),
+    destinationLongitude: z.number().min(-180).max(180).optional(),
+    cargoDescription: z.string().trim().min(3).max(1000),
+    weightKg: z.number().positive().max(1000000),
+    truckType: z.enum(['pickup', 'van', 'flatbed', 'box_truck', 'semi_trailer', 'other']),
+    loadingRequirements: z.string().trim().max(500).optional(),
+  })
+  .superRefine((value, context) => {
+    validateCoordinatePairs(value, context, [
+      ['pickupLatitude', 'pickupLongitude'],
+      ['destinationLatitude', 'destinationLongitude'],
+    ]);
+  });
 
-export const CreateRoadsideBookingSchema = z.object({
-  serviceType: z.literal('roadside'),
-  ...CommonBookingFields,
-  vehicleType: z.enum(['car', 'motorcycle', 'van', 'truck', 'other']),
-  issueCategory: z.enum(['mechanical', 'tyre', 'battery', 'fuel', 'towing', 'other']),
-  needsTowing: z.boolean(),
-  towingDestination: z.string().trim().max(300).optional(),
-  notes: z.string().trim().max(1000).optional(),
-}).superRefine((value, context) => {
-  validateCoordinatePairs(value, context, [['pickupLatitude', 'pickupLongitude']]);
-});
+export const CreateRoadsideBookingSchema = z
+  .object({
+    serviceType: z.literal('roadside'),
+    ...CommonBookingFields,
+    vehicleType: z.enum(['car', 'motorcycle', 'van', 'truck', 'other']),
+    issueCategory: z.enum(['mechanical', 'tyre', 'battery', 'fuel', 'towing', 'other']),
+    needsTowing: z.boolean(),
+    towingDestination: z.string().trim().max(300).optional(),
+    notes: z.string().trim().max(1000).optional(),
+  })
+  .superRefine((value, context) => {
+    validateCoordinatePairs(value, context, [['pickupLatitude', 'pickupLongitude']]);
+  });
 
-export const CreateWaterBookingSchema = z.object({
-  serviceType: z.literal('water'),
-  ...CommonBookingFields,
-  quantityLitres: z.number().int().positive().max(100000),
-  intendedUse: z.enum(['residential', 'agricultural', 'other']),
-  waterCategory: z.enum(['potable', 'non_potable', 'irrigation']),
-  accessNotes: z.string().trim().max(500).optional(),
-}).superRefine((value, context) => {
-  validateCoordinatePairs(value, context, [['pickupLatitude', 'pickupLongitude']]);
-});
+export const CreateWaterBookingSchema = z
+  .object({
+    serviceType: z.literal('water'),
+    ...CommonBookingFields,
+    quantityLitres: z.number().int().positive().max(100000),
+    intendedUse: z.enum(['residential', 'agricultural', 'other']),
+    waterCategory: z.enum(['potable', 'non_potable', 'irrigation']),
+    accessNotes: z.string().trim().max(500).optional(),
+  })
+  .superRefine((value, context) => {
+    validateCoordinatePairs(value, context, [['pickupLatitude', 'pickupLongitude']]);
+  });
 
 export const CreateBookingSchema = z.discriminatedUnion('serviceType', [
   CreateFreightBookingSchema,
@@ -117,7 +135,10 @@ export const CreateBookingSchema = z.discriminatedUnion('serviceType', [
 export type CreateBookingInput = z.infer<typeof CreateBookingSchema>;
 
 export const DevSessionSchema = z.object({
-  phoneE164: z.string().trim().regex(/^\+[1-9]\d{7,14}$/),
+  phoneE164: z
+    .string()
+    .trim()
+    .regex(/^\+[1-9]\d{7,14}$/),
   displayName: z.string().trim().min(2).max(80),
   role: z.enum(['customer', 'provider', 'admin']),
   adminKey: z.string().optional(),

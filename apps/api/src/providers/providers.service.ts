@@ -132,13 +132,19 @@ export class ProvidersService {
         throw new ForbiddenException('An approved provider profile is required.');
       }
 
-      const selected = await client.query<{ id: string; service_type: string; status: string; assigned_provider_id: string | null }>(
+      const selected = await client.query<{
+        id: string;
+        service_type: string;
+        status: string;
+        assigned_provider_id: string | null;
+      }>(
         'SELECT id, service_type, status, assigned_provider_id FROM bookings WHERE id = $1 FOR UPDATE',
         [bookingId],
       );
       const booking = selected.rows[0];
       if (!booking) throw new NotFoundException('Booking not found.');
-      if (booking.assigned_provider_id) throw new ForbiddenException('This booking has already been assigned.');
+      if (booking.assigned_provider_id)
+        throw new ForbiddenException('This booking has already been assigned.');
       if (!['submitted', 'matching', 'offer_received'].includes(booking.status)) {
         throw new ForbiddenException('This request is no longer available.');
       }
@@ -147,16 +153,25 @@ export class ProvidersService {
         'SELECT 1 FROM provider_services WHERE provider_id = $1 AND service_type = $2 AND is_approved = true',
         [provider.id, booking.service_type],
       );
-      if (!service.rowCount) throw new ForbiddenException('Your account is not approved for this service.');
+      if (!service.rowCount)
+        throw new ForbiddenException('Your account is not approved for this service.');
 
       const updated = await client.query(
         `UPDATE bookings SET assigned_provider_id = $1, status = 'accepted', accepted_at = now(), updated_at = now()
          WHERE id = $2 AND assigned_provider_id IS NULL`,
         [provider.id, bookingId],
       );
-      if (!updated.rowCount) throw new ForbiddenException('This request has already been assigned.');
+      if (!updated.rowCount)
+        throw new ForbiddenException('This request has already been assigned.');
 
-      await BookingsService.insertEvent(client, bookingId, userId, 'provider_accepted', booking.status, 'accepted');
+      await BookingsService.insertEvent(
+        client,
+        bookingId,
+        userId,
+        'provider_accepted',
+        booking.status,
+        'accepted',
+      );
       return { success: true, bookingId, status: 'accepted' };
     });
   }
@@ -193,7 +208,14 @@ export class ProvidersService {
          WHERE id = $2`,
         [next, bookingId],
       );
-      await BookingsService.insertEvent(client, bookingId, userId, 'provider_status_updated', booking.status, next);
+      await BookingsService.insertEvent(
+        client,
+        bookingId,
+        userId,
+        'provider_status_updated',
+        booking.status,
+        next,
+      );
       return { success: true, bookingId, status: next };
     });
   }

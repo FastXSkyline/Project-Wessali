@@ -48,8 +48,11 @@ export class AdminService {
       if (!selected.rows[0]) throw new NotFoundException('Provider application not found.');
 
       const status =
-        input.decision === 'approve' ? 'approved' :
-        input.decision === 'reject' ? 'rejected' : 'suspended';
+        input.decision === 'approve'
+          ? 'approved'
+          : input.decision === 'reject'
+            ? 'rejected'
+            : 'suspended';
 
       await client.query(
         `UPDATE provider_profiles
@@ -60,15 +63,20 @@ export class AdminService {
         [status, input.notes ?? null, providerId],
       );
 
-      await client.query(
-        'UPDATE provider_services SET is_approved = $1 WHERE provider_id = $2',
-        [status === 'approved', providerId],
-      );
+      await client.query('UPDATE provider_services SET is_approved = $1 WHERE provider_id = $2', [
+        status === 'approved',
+        providerId,
+      ]);
 
       await client.query(
         `INSERT INTO audit_events (actor_user_id, action, entity_type, entity_id, metadata)
          VALUES ($1, $2, 'provider_profile', $3, $4::jsonb)`,
-        [adminUserId, `provider_${input.decision}`, providerId, JSON.stringify({ notes: input.notes ?? null })],
+        [
+          adminUserId,
+          `provider_${input.decision}`,
+          providerId,
+          JSON.stringify({ notes: input.notes ?? null }),
+        ],
       );
 
       return { success: true, id: providerId, status };

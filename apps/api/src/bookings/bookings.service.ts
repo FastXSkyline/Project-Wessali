@@ -12,8 +12,10 @@ export class BookingsService {
       const reference = `WES-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
       const pickupLatitude = input.pickupLatitude ?? null;
       const pickupLongitude = input.pickupLongitude ?? null;
-      const destinationLatitude = input.serviceType === 'freight' ? input.destinationLatitude ?? null : null;
-      const destinationLongitude = input.serviceType === 'freight' ? input.destinationLongitude ?? null : null;
+      const destinationLatitude =
+        input.serviceType === 'freight' ? (input.destinationLatitude ?? null) : null;
+      const destinationLongitude =
+        input.serviceType === 'freight' ? (input.destinationLongitude ?? null) : null;
       const destinationAddress = input.serviceType === 'freight' ? input.destinationAddress : null;
 
       const inserted = await client.query<{ id: string; public_reference: string; status: string }>(
@@ -31,9 +33,15 @@ export class BookingsService {
          )
          RETURNING id, public_reference, status`,
         [
-          reference, customerId, input.serviceType,
-          pickupLatitude, pickupLongitude, destinationLatitude, destinationLongitude,
-          input.pickupAddress, destinationAddress,
+          reference,
+          customerId,
+          input.serviceType,
+          pickupLatitude,
+          pickupLongitude,
+          destinationLatitude,
+          destinationLongitude,
+          input.pickupAddress,
+          destinationAddress,
           input.requestedAt ? new Date(input.requestedAt) : null,
           input.customerNotes ?? null,
         ],
@@ -47,25 +55,51 @@ export class BookingsService {
           `INSERT INTO freight_details
            (booking_id, cargo_description, weight_kg, truck_type, loading_requirements)
            VALUES ($1, $2, $3, $4, $5)`,
-          [booking.id, input.cargoDescription, input.weightKg, input.truckType, input.loadingRequirements ?? null],
+          [
+            booking.id,
+            input.cargoDescription,
+            input.weightKg,
+            input.truckType,
+            input.loadingRequirements ?? null,
+          ],
         );
       } else if (input.serviceType === 'roadside') {
         await client.query(
           `INSERT INTO roadside_details
            (booking_id, vehicle_type, issue_category, needs_towing, towing_destination, notes)
            VALUES ($1, $2, $3, $4, $5, $6)`,
-          [booking.id, input.vehicleType, input.issueCategory, input.needsTowing, input.towingDestination ?? null, input.notes ?? null],
+          [
+            booking.id,
+            input.vehicleType,
+            input.issueCategory,
+            input.needsTowing,
+            input.towingDestination ?? null,
+            input.notes ?? null,
+          ],
         );
       } else {
         await client.query(
           `INSERT INTO water_details
            (booking_id, quantity_litres, intended_use, water_category, access_notes)
            VALUES ($1, $2, $3, $4, $5)`,
-          [booking.id, input.quantityLitres, input.intendedUse, input.waterCategory, input.accessNotes ?? null],
+          [
+            booking.id,
+            input.quantityLitres,
+            input.intendedUse,
+            input.waterCategory,
+            input.accessNotes ?? null,
+          ],
         );
       }
 
-      await BookingsService.insertEvent(client, booking.id, customerId, 'booking_submitted', null, 'submitted');
+      await BookingsService.insertEvent(
+        client,
+        booking.id,
+        customerId,
+        'booking_submitted',
+        null,
+        'submitted',
+      );
       return booking;
     });
   }
@@ -98,16 +132,26 @@ export class BookingsService {
       );
       const booking = selected.rows[0];
       if (!booking) throw new NotFoundException('Booking not found.');
-      if (booking.customer_id !== customerId) throw new ForbiddenException('This booking belongs to another account.');
+      if (booking.customer_id !== customerId)
+        throw new ForbiddenException('This booking belongs to another account.');
       if (!['submitted', 'matching', 'offer_received'].includes(booking.status)) {
-        throw new ForbiddenException('This booking can no longer be cancelled from the customer app.');
+        throw new ForbiddenException(
+          'This booking can no longer be cancelled from the customer app.',
+        );
       }
 
       await client.query(
         `UPDATE bookings SET status = 'cancelled', cancelled_at = now(), updated_at = now() WHERE id = $1`,
         [bookingId],
       );
-      await BookingsService.insertEvent(client, bookingId, customerId, 'booking_cancelled', booking.status, 'cancelled');
+      await BookingsService.insertEvent(
+        client,
+        bookingId,
+        customerId,
+        'booking_cancelled',
+        booking.status,
+        'cancelled',
+      );
       return { success: true, id: bookingId, status: 'cancelled' };
     });
   }

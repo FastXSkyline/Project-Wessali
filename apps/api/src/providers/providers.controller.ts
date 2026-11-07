@@ -1,4 +1,14 @@
-import { Body, Controller, ForbiddenException, Get, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ProviderApplicationSchema } from '@wessali/contracts';
 import { parseBody } from '../common/parse-body.js';
 import type { AuthenticatedRequest } from '../auth/auth.types.js';
@@ -47,6 +57,7 @@ export class ProvidersController {
   }
 
   private assertProvider(request: AuthenticatedRequest) {
-    if (request.actor!.role !== 'provider') throw new ForbiddenException('A provider session is required.');
+    if (request.actor!.role !== 'provider')
+      throw new ForbiddenException('A provider session is required.');
   }
 }

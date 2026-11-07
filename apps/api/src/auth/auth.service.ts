@@ -9,7 +9,9 @@ export class AuthService {
 
   async createDevelopmentSession(input: DevSessionInput) {
     if (process.env.NODE_ENV === 'production' || process.env.ALLOW_DEV_AUTH !== 'true') {
-      throw new ForbiddenException('Development sign-in is disabled. Configure a real OTP provider.');
+      throw new ForbiddenException(
+        'Development sign-in is disabled. Configure a real OTP provider.',
+      );
     }
 
     if (input.role === 'admin') {

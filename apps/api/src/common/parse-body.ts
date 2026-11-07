@@ -2,9 +2,9 @@ import { BadRequestException } from '@nestjs/common';
 
 type ValidationIssue = { path: PropertyKey[]; message: string };
 type SafeParseSchema<T> = {
-  safeParse(input: unknown):
-    | { success: true; data: T }
-    | { success: false; error: { issues: ValidationIssue[] } };
+  safeParse(
+    input: unknown,
+  ): { success: true; data: T } | { success: false; error: { issues: ValidationIssue[] } };
 };
 
 export function parseBody<T>(schema: SafeParseSchema<T>, input: unknown): T {
