@@ -134,15 +134,32 @@ export const CreateBookingSchema = z.discriminatedUnion('serviceType', [
 ]);
 export type CreateBookingInput = z.infer<typeof CreateBookingSchema>;
 
-export const DevSessionSchema = z.object({
-  phoneE164: z
-    .string()
-    .trim()
-    .regex(/^\+[1-9]\d{7,14}$/),
-  displayName: z.string().trim().min(2).max(80),
-  role: z.enum(['customer', 'provider', 'admin']),
-  adminKey: z.string().optional(),
-});
+export const DevSessionSchema = z
+  .object({
+    phoneE164: z
+      .string()
+      .trim()
+      .regex(/^\+[1-9]\d{7,14}$/),
+    displayName: z.string().trim().min(2).max(80),
+    role: z.enum(['customer', 'provider', 'admin']),
+    adminUsername: z
+      .string()
+      .trim()
+      .min(3)
+      .max(32)
+      .regex(/^[a-zA-Z0-9._-]+$/)
+      .optional(),
+    adminKey: z.string().optional(),
+  })
+  .superRefine((value, context) => {
+    if (value.role === 'admin' && !value.adminUsername) {
+      context.addIssue({
+        code: 'custom',
+        path: ['adminUsername'],
+        message: 'Admin username is required.',
+      });
+    }
+  });
 export type DevSessionInput = z.infer<typeof DevSessionSchema>;
 
 export const ProviderApplicationSchema = z.object({
