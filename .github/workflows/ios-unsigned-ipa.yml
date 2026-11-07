@@ -89,7 +89,7 @@ jobs:
           echo "Using workspace: $WORKSPACE"
           echo "Using scheme: $SCHEME"
 
-      - name: Archive iOS app without code signing
+      - name: Build iOS device app without code signing
         shell: bash
         run: |
           set -o pipefail
@@ -99,26 +99,33 @@ jobs:
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
-            -archivePath "$RUNNER_TEMP/Wessali.xcarchive" \
             -derivedDataPath "$RUNNER_TEMP/WessaliDerivedData" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            archive
+            build
 
       - name: Package unsigned IPA
         shell: bash
         run: |
           set -euo pipefail
 
-          APP_PATH="$(find "$RUNNER_TEMP/Wessali.xcarchive/Products/Applications" -maxdepth 1 -type d -name '*.app' -print -quit)"
+          PRODUCTS_DIR="$RUNNER_TEMP/WessaliDerivedData/Build/Products"
+          echo "Looking for iOS device app bundles under: $PRODUCTS_DIR"
+          find "$PRODUCTS_DIR" -maxdepth 4 -type d -name '*.app' -print || true
+
+          APP_PATH="$(find "$PRODUCTS_DIR" -type d -name '*.app' -path '*iphoneos*' -not -path '*iphonesimulator*' -print -quit)"
           if [ -z "$APP_PATH" ]; then
-            echo "The iOS archive does not contain an .app bundle."
+            echo "No iOS device .app bundle was produced by Xcode."
+            echo "Build product directories:"
+            find "$PRODUCTS_DIR" -maxdepth 4 -print | head -200 || true
             exit 1
           fi
 
+          echo "Packaging app: $APP_PATH"
           mkdir -p "$RUNNER_TEMP/ipa/Payload"
           cp -R "$APP_PATH" "$RUNNER_TEMP/ipa/Payload/"
+
           find "$RUNNER_TEMP/ipa/Payload" -type d -name _CodeSignature -prune -exec rm -rf {} +
           find "$RUNNER_TEMP/ipa/Payload" -type f -name embedded.mobileprovision -delete
 
@@ -126,9 +133,9 @@ jobs:
           /usr/bin/zip -qry "$GITHUB_WORKSPACE/Wessali-unsigned.ipa" Payload
 
           test -s "$GITHUB_WORKSPACE/Wessali-unsigned.ipa"
-          unzip -l "$GITHUB_WORKSPACE/Wessali-unsigned.ipa" | head -25
-          echo "Created: $GITHUB_WORKSPACE/Wessali-unsigned.ipa"
+          echo "Created unsigned IPA:"
           ls -lh "$GITHUB_WORKSPACE/Wessali-unsigned.ipa"
+          unzip -l "$GITHUB_WORKSPACE/Wessali-unsigned.ipa" | head -25
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
