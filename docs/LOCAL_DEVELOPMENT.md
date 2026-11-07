@@ -84,7 +84,7 @@ pnpm --filter @wessali/mobile dev
 
 1. Sign in on mobile as a customer and submit a freight, roadside, or water request.
 2. Sign in on a second device/session as a provider, submit the service application, and wait for approval.
-3. Sign in to the admin website using the local admin key and approve the provider application.
+3. Sign in to the admin website with username `fastx` and your local `ADMIN_DEMO_KEY` password, then approve the provider application.
 4. Refresh the provider request list, accept a matching request, and advance the job through en-route, arrived, in-progress, and completed.
 5. Return to customer mode to see the booking status.
 
