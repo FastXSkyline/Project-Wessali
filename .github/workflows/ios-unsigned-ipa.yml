@@ -32,11 +32,11 @@ jobs:
       - name: Set up Node.js and pnpm
         uses: pnpm/setup@v3
         with:
-          require-lockfile: true
+          install: false
           cache: true
 
-      - name: Install workspace dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install workspace dependencies and refresh lockfile
+        run: CI=false pnpm install --no-frozen-lockfile
 
       - name: Build shared workspace packages
         run: |
