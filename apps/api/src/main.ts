@@ -37,7 +37,9 @@ async function bootstrap() {
     origin: (origin, callback) => {
       const explicitlyAllowed = !origin || allowedOrigins.includes(origin);
       const localDevelopmentAllowed =
-        process.env.NODE_ENV !== 'production' && Boolean(origin) && isLocalDevelopmentOrigin(origin);
+        process.env.NODE_ENV !== 'production' &&
+        typeof origin === 'string' &&
+        isLocalDevelopmentOrigin(origin);
 
       callback(
         explicitlyAllowed || localDevelopmentAllowed
