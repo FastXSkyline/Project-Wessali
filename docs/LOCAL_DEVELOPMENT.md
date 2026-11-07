@@ -5,29 +5,18 @@
 - Node.js 24.22.2.
 - pnpm 12.18.0.
 - Git.
-- Docker Desktop with Docker Compose.
-- Android Studio and an emulator for local Android device builds.
-- macOS and Xcode for local iOS simulator/device builds.
+- PostgreSQL 17 with PostGIS 3.7 (Docker Compose is optional).
+- Redis 7.4 is optional until the worker/queue features are used.
+- Android Studio for local Android native builds.
+- macOS and Xcode for local iOS native builds.
 
-Check versions:
-
-~~~bash
-node --version
-pnpm --version
-git --version
-docker --version
-docker compose version
-~~~
-
-## 1. Clone and install
+## 1. Install
 
 ~~~bash
-git clone https://github.com/FastXSkyline/Project-Wessali.git
-cd Project-Wessali
-pnpm install
+pnpm install --frozen-lockfile
 ~~~
 
-Copy .env.example to .env.
+Copy `.env.example` to `.env`. Configure `DATABASE_URL` for a local PostgreSQL instance with PostGIS enabled.
 
 PowerShell:
 
@@ -35,31 +24,40 @@ PowerShell:
 Copy-Item .env.example .env
 ~~~
 
-macOS / Linux:
+The checked-in credentials are development-only examples. Do not use them for a public deployment.
 
-~~~bash
-cp .env.example .env
-~~~
+## 2. Database
 
-The checked-in values are local development defaults only.
-
-## 2. Start local infrastructure
+Use Docker Compose:
 
 ~~~bash
 pnpm db:up
+pnpm db:migrate
 ~~~
 
-PostgreSQL/PostGIS uses port 5432. Redis uses port 6379. Wait for both containers to become healthy.
-
-## 3. Apply database migrations
+Or run PostgreSQL/PostGIS yourself and point `DATABASE_URL` at it, then:
 
 ~~~bash
 pnpm db:migrate
 ~~~
 
-Applied SQL filenames are recorded in schema_migrations.
+PostgreSQL uses port 5432 by default. Redis uses port 6379. The core booking API requires PostgreSQL. Redis is only required by the background worker/queue.
 
-## 4. Start the workspaces
+## 3. Local demo accounts
+
+The starter release includes a **development-only sign-in** so customer, provider, and admin workflows can be exercised before an OTP supplier has been selected.
+
+Keep `ALLOW_DEV_AUTH=true` only in local development. The API refuses this sign-in when `NODE_ENV=production`.
+
+- Customer: choose customer mode, enter a name and an E.164 phone such as `+213555123456`.
+- Provider: choose provider mode and use a different phone number; submit a provider application.
+- Admin: open the admin website, enter the admin name/phone and `ADMIN_DEMO_KEY` from your local `.env` (default example: `local-admin-change-me`), then approve provider applications.
+
+This is not real phone verification and is not suitable for public production use. Before launch, replace it with OTP verification, protected admin authentication, rate limiting, and session/device controls.
+
+## 4. Start the API, admin, and mobile
+
+From the repository root:
 
 ~~~bash
 pnpm dev
@@ -71,38 +69,35 @@ pnpm dev
 | API | http://localhost:4000/v1 |
 | API health | http://localhost:4000/v1/health |
 | Mobile | Expo CLI terminal and QR code |
-| Worker | Background process; requires Redis |
 
-Start one workspace:
+For a physical phone on the same Wi-Fi, set `EXPO_PUBLIC_API_BASE_URL` to the PC's LAN IP, for example `http://192.168.1.20:4000/v1`, before creating a new mobile build. Allow inbound TCP port 4000 in Windows Firewall for private networks only. The mobile sign-in screen lets you edit the API base URL for the current app session.
+
+Start a single workspace:
 
 ~~~bash
-pnpm --filter @wessali/mobile dev
 pnpm --filter @wessali/admin dev
 pnpm --filter @wessali/api dev
-pnpm --filter @wessali/worker dev
+pnpm --filter @wessali/mobile dev
 ~~~
 
-## 5. Validate
+## 5. End-to-end demo flow
+
+1. Sign in on mobile as a customer and submit a freight, roadside, or water request.
+2. Sign in on a second device/session as a provider, submit the service application, and wait for approval.
+3. Sign in to the admin website using the local admin key and approve the provider application.
+4. Refresh the provider request list, accept a matching request, and advance the job through en-route, arrived, in-progress, and completed.
+5. Return to customer mode to see the booking status.
+
+The demo currently uses manual address entry; it does not provide live maps, automatic matching, GPS tracking, SMS, online payments, or push notifications.
+
+## 6. Validate
 
 ~~~bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
 pnpm validate
 ~~~
 
-The mobile CI build exports Android and iOS JavaScript bundles. It does not create signed Play Store or App Store binaries.
+The validation command runs lint, typecheck, tests, and workspace builds.
 
-## 6. Native mobile builds
+## 7. Production checklist
 
-Android device builds require Android tooling. Local iOS builds require macOS and Xcode. Cloud iOS builds need separately configured build credentials. Never commit signing certificates, provisioning profiles, keystores, or service credentials.
-
-## Troubleshooting
-
-- Docker unavailable: start Docker Desktop and rerun pnpm db:up.
-- Port 5432/6379 occupied: stop the conflicting service or change the host port mapping.
-- API cannot connect: check container health and DATABASE_URL.
-- Worker cannot connect: check Redis health and REDIS_URL.
-- Expo cannot resolve a workspace package: run pnpm install from the repository root.
-- Arabic layout appears LTR: confirm locale ar and apply RTL direction to the root layout.
+Before public use: implement real OTP authentication and stronger admin RBAC; configure private document storage; select and integrate maps/routing, push/SMS, and payment/settlement vendors; complete Algerian legal/compliance review; add operational rate limits and observability; and test backups/restores and device workflows.

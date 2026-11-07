@@ -78,9 +78,15 @@ See docs/LOCAL_DEVELOPMENT.md for platform-specific setup.
 
 ## Current implementation status
 
-This repository contains initial application shells, shared packages, API health/service endpoints, a background worker shell, a first PostGIS schema migration, and CI configuration. Booking workflows, authentication, provider verification, matching, tracking, payment integration, and live admin data are not implemented yet.
+The repository now contains a local-development MVP slice:
 
-The mobile app and admin dashboard currently display starter UI. The API health endpoint is not a substitute for production readiness.
+- Customer demo sessions and booking creation for freight, roadside, and water requests.
+- Provider applications, admin approval/rejection, request acceptance, and job milestone updates.
+- PostgreSQL persistence, booking events, and protected session-token API routes.
+- Mobile customer/provider screens and an API-connected admin operations dashboard.
+- Arabic, French, and English interface labels for the primary workflows.
+
+The demo sign-in is not phone verification and is disabled when `NODE_ENV=production`. The MVP still does not include production OTP, provider document uploads, automated geospatial matching, live GPS, maps/routing, SMS/push delivery, online payments/payouts, or a production admin identity system. The app is not ready for public launch until those integrations, legal checks, rate limits, monitoring, and security review are completed.
 
 ## Team
 
