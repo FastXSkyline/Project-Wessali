@@ -16,8 +16,18 @@ export default function DashboardPage() {
     providers: locale === 'ar' ? 'مقدمو الخدمات' : locale === 'fr' ? 'Prestataires' : 'Providers',
     services: locale === 'ar' ? 'الخدمات' : locale === 'fr' ? 'Services' : 'Services',
     settings: locale === 'ar' ? 'الإعدادات' : locale === 'fr' ? 'Paramètres' : 'Settings',
-    pageTitle: locale === 'ar' ? 'لوحة العمليات' : locale === 'fr' ? 'Tableau des opérations' : 'Operations dashboard',
-    starter: locale === 'ar' ? 'بيئة أولية' : locale === 'fr' ? 'Environnement initial' : 'Starter environment',
+    pageTitle:
+      locale === 'ar'
+        ? 'لوحة العمليات'
+        : locale === 'fr'
+          ? 'Tableau des opérations'
+          : 'Operations dashboard',
+    starter:
+      locale === 'ar'
+        ? 'بيئة أولية'
+        : locale === 'fr'
+          ? 'Environnement initial'
+          : 'Starter environment',
     starterText:
       locale === 'ar'
         ? 'الواجهة متصلة بهيكل المشروع فقط. ستظهر البيانات الحقيقية بعد ربط واجهة API وقاعدة البيانات.'
@@ -27,16 +37,40 @@ export default function DashboardPage() {
     stats: [
       locale === 'ar' ? 'الطلبات النشطة' : locale === 'fr' ? 'Demandes actives' : 'Active requests',
       locale === 'ar' ? 'مقدمو الخدمات' : locale === 'fr' ? 'Prestataires' : 'Providers',
-      locale === 'ar' ? 'الخدمات المكتملة' : locale === 'fr' ? 'Services terminés' : 'Completed services',
+      locale === 'ar'
+        ? 'الخدمات المكتملة'
+        : locale === 'fr'
+          ? 'Services terminés'
+          : 'Completed services',
       locale === 'ar' ? 'المناطق النشطة' : locale === 'fr' ? 'Zones actives' : 'Active zones',
     ],
-    awaiting: locale === 'ar' ? 'بانتظار ربط البيانات' : locale === 'fr' ? 'En attente des données' : 'Awaiting data connection',
+    awaiting:
+      locale === 'ar'
+        ? 'بانتظار ربط البيانات'
+        : locale === 'fr'
+          ? 'En attente des données'
+          : 'Awaiting data connection',
     sectors: locale === 'ar' ? 'قطاعات المنصة' : locale === 'fr' ? 'SECTEURS' : 'SERVICE LINES',
-    threeServices: locale === 'ar' ? 'الخدمات الثلاث' : locale === 'fr' ? 'Les trois services' : 'Three service lines',
+    threeServices:
+      locale === 'ar'
+        ? 'الخدمات الثلاث'
+        : locale === 'fr'
+          ? 'Les trois services'
+          : 'Three service lines',
     preparing: locale === 'ar' ? 'قيد الإعداد' : locale === 'fr' ? 'En préparation' : 'In setup',
     monitoring: locale === 'ar' ? 'مراقبة المنصة' : locale === 'fr' ? 'SUPERVISION' : 'MONITORING',
-    recent: locale === 'ar' ? 'الطلبات الأخيرة' : locale === 'fr' ? 'Demandes récentes' : 'Recent requests',
-    empty: locale === 'ar' ? 'لا توجد طلبات بعد' : locale === 'fr' ? 'Aucune demande pour le moment' : 'No requests yet',
+    recent:
+      locale === 'ar'
+        ? 'الطلبات الأخيرة'
+        : locale === 'fr'
+          ? 'Demandes récentes'
+          : 'Recent requests',
+    empty:
+      locale === 'ar'
+        ? 'لا توجد طلبات بعد'
+        : locale === 'fr'
+          ? 'Aucune demande pour le moment'
+          : 'No requests yet',
     emptyText:
       locale === 'ar'
         ? 'ستظهر الطلبات هنا بمجرد تشغيل نظام الحجز.'
@@ -57,15 +91,31 @@ export default function DashboardPage() {
         </div>
         <div className="side-label">{labels.menu}</div>
         <nav className="navigation">
-          <a className="nav-item active" href="#overview">{copy.home}</a>
-          <a className="nav-item" href="#requests">{copy.requests}</a>
-          <a className="nav-item" href="#providers">{labels.providers}</a>
-          <a className="nav-item" href="#services">{labels.services}</a>
-          <a className="nav-item" href="#settings">{labels.settings}</a>
+          <a className="nav-item active" href="#overview">
+            {copy.home}
+          </a>
+          <a className="nav-item" href="#requests">
+            {copy.requests}
+          </a>
+          <a className="nav-item" href="#providers">
+            {labels.providers}
+          </a>
+          <a className="nav-item" href="#services">
+            {labels.services}
+          </a>
+          <a className="nav-item" href="#settings">
+            {labels.settings}
+          </a>
         </nav>
         <div className="sidebar-note">
           <span className="status-dot" />
-          <span>{locale === 'ar' ? 'المنصة جاهزة للتطوير' : locale === 'fr' ? 'Base technique prête' : 'Foundation ready'}</span>
+          <span>
+            {locale === 'ar'
+              ? 'المنصة جاهزة للتطوير'
+              : locale === 'fr'
+                ? 'Base technique prête'
+                : 'Foundation ready'}
+          </span>
         </div>
       </aside>
 

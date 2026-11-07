@@ -3,7 +3,10 @@ import test from 'node:test';
 import { CreateWaterRequestSchema, SERVICE_CATEGORIES, SERVICE_KINDS } from '../src/index.js';
 
 test('the first release exposes all three service categories', () => {
-  assert.deepEqual(SERVICE_CATEGORIES.map((service) => service.id), SERVICE_KINDS);
+  assert.deepEqual(
+    SERVICE_CATEGORIES.map((service) => service.id),
+    SERVICE_KINDS,
+  );
 });
 
 test('each service category has Arabic, French, and English labels', () => {
