@@ -4,6 +4,7 @@ import {
   Animated,
   Easing,
   ImageBackground,
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -678,7 +679,8 @@ export default function App() {
   const [providerServices, setProviderServices] = useState<ServiceKind[]>(['freight']);
   const scrollY = useRef(new Animated.Value(0)).current;
   const screenProgress = useRef(new Animated.Value(1)).current;
-  const bottomGlow = useRef(new Animated.Value(0)).current;
+  const [previewService, setPreviewService] = useState<ServiceKind | null>(null);
+  const previewProgress = useRef(new Animated.Value(0)).current;
 
   const copy = getMessages(locale);
   const ui = words[locale];
@@ -686,12 +688,12 @@ export default function App() {
   const directionStyle = isRtl ? styles.textRtl : styles.textLtr;
   const rowStyle = isRtl ? styles.rowReverse : undefined;
   const brandTitle = locale === 'ar' ? 'وصلي' : 'Wessali';
-  const heroGlowOpacity = scrollY.interpolate({
-    inputRange: [0, 180],
-    outputRange: [0.92, 0.16],
+  const heroTextTranslate = scrollY.interpolate({
+    inputRange: [0, 260],
+    outputRange: [0, 18],
     extrapolate: 'clamp',
   });
-  const heroGlowScale = scrollY.interpolate({
+  const heroTextOpacity = scrollY.interpolate({
     inputRange: [0, 220],
     outputRange: [1, 0.78],
     extrapolate: 'clamp',
@@ -704,14 +706,9 @@ export default function App() {
     inputRange: [0, 1],
     outputRange: [16, 0],
   });
-  const bottomGlowOpacity = bottomGlow.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.12, 0.46],
-  });
-  const bottomGlowScale = bottomGlow.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.92, 1.08],
-  });
+  const previewOpacity = previewProgress.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
+  const previewScale = previewProgress.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] });
+  const previewTranslateY = previewProgress.interpolate({ inputRange: [0, 1], outputRange: [22, 0] });
 
   const statusLabel = (status: string) => {
     const labels = ui as Record<string, string>;
@@ -774,25 +771,16 @@ export default function App() {
   }, [screen, screenProgress]);
 
   useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(bottomGlow, {
-          toValue: 1,
-          duration: 2300,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(bottomGlow, {
-          toValue: 0,
-          duration: 2300,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-    pulse.start();
-    return () => pulse.stop();
-  }, [bottomGlow]);
+    if (!previewService) return;
+    previewProgress.setValue(0);
+    Animated.spring(previewProgress, {
+      toValue: 1,
+      damping: 22,
+      stiffness: 190,
+      mass: 0.82,
+      useNativeDriver: true,
+    }).start();
+  }, [previewService, previewProgress]);
 
   async function signIn() {
     if (name.trim().length < 2 || !/^\+[1-9]\d{7,14}$/.test(phone.trim())) {
@@ -836,6 +824,28 @@ export default function App() {
     setProviderRequests([]);
     setProviderJobs([]);
     setScreen('home');
+  }
+
+  function openServicePreview(kind: ServiceKind) {
+    setPreviewService(kind);
+  }
+
+  function closeServicePreview() {
+    Animated.timing(previewProgress, {
+      toValue: 0,
+      duration: 170,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) setPreviewService(null);
+    });
+  }
+
+  function startPreviewBooking() {
+    if (!previewService) return;
+    const kind = previewService;
+    closeServicePreview();
+    beginBooking(kind);
   }
 
   function beginBooking(kind: ServiceKind) {
@@ -1204,31 +1214,30 @@ export default function App() {
   const renderServiceCard = (kind: ServiceKind, index: number) => {
     const item = serviceContent[kind];
     return (
-      <MotionPressable key={kind} onPress={() => beginBooking(kind)} style={styles.serviceCard}>
+      <MotionPressable key={kind} onPress={() => openServicePreview(kind)} style={styles.serviceCard}>
         <ImageBackground
           source={{ uri: item.photo }}
           style={styles.serviceImage}
           imageStyle={styles.serviceImageRadius}
           resizeMode="cover"
         >
-          <View style={styles.imageShade} />
-          <View style={[styles.serviceImageTop, rowStyle]}>
-            <View style={styles.serviceIcon}>
-              <Text style={styles.serviceIconText}>{item.icon}</Text>
-            </View>
-            <Text style={styles.serviceNumber}>0{index + 1}</Text>
-          </View>
-          <View style={styles.serviceImageBottom}>
-            <Text style={[styles.serviceTitle, directionStyle]}>{serviceTitle(kind)}</Text>
-            <Text style={[styles.serviceDescription, directionStyle]}>
-              {serviceDescription(kind)}
-            </Text>
-            <View style={[styles.cardAction, rowStyle]}>
-              <Text style={styles.cardActionText}>{ui.start}</Text>
-              <Text style={styles.cardActionArrow}>{isRtl ? '←' : '↗'}</Text>
-            </View>
+          <LinearGradient
+            colors={['rgba(8,24,27,0.02)', 'rgba(8,24,27,0.08)', 'rgba(8,24,27,0.62)']}
+            locations={[0, 0.48, 1]}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.serviceImageTop}>
+            <Text style={styles.serviceNumber}>0{index + 1} / 03</Text>
+            <Text style={styles.serviceOpenArrow}>↗</Text>
           </View>
         </ImageBackground>
+        <View style={styles.serviceMeta}>
+          <Text style={[styles.serviceTitle, directionStyle]}>{serviceTitle(kind)}</Text>
+          <Text style={[styles.serviceDescription, directionStyle]}>{serviceDescription(kind)}</Text>
+          <Text style={[styles.serviceAction, directionStyle]}>
+            {ui.start} <Text style={styles.serviceActionArrow}>↗</Text>
+          </Text>
+        </View>
       </MotionPressable>
     );
   };
@@ -1239,8 +1248,6 @@ export default function App() {
       <ScrollView contentContainerStyle={styles.loginScroll} keyboardShouldPersistTaps="handled">
         {renderLanguagePicker()}
         <View style={styles.loginVisual}>
-          <View style={styles.glowOrbOne} />
-          <View style={styles.glowOrbTwo} />
           <ImageBackground
             source={{ uri: photo.freight }}
             style={styles.loginPhoto}
@@ -1324,69 +1331,58 @@ export default function App() {
   );
 
   const renderCustomerHome = () => (
-    <>
+    <View style={styles.homeStack}>
       <View style={styles.heroWrap}>
         <ImageBackground
           source={{ uri: photo.freight }}
           style={styles.heroImage}
           imageStyle={styles.heroImageRadius}
+          resizeMode="cover"
         >
-          <View style={styles.heroShade} />
           <LinearGradient
-            pointerEvents="none"
-            colors={['rgba(10,42,40,0.06)', 'rgba(7,27,31,0.2)', 'rgba(5,22,25,0.42)']}
-            locations={[0, 0.55, 1]}
+            colors={['rgba(8,25,27,0.12)', 'rgba(8,25,27,0.26)', 'rgba(8,25,27,0.76)']}
+            locations={[0, 0.42, 1]}
             style={StyleSheet.absoluteFill}
           />
           <Animated.View
-            pointerEvents="none"
             style={[
-              styles.heroGlowOrb,
-              { opacity: heroGlowOpacity, transform: [{ scale: heroGlowScale }] },
+              styles.heroTextBlock,
+              { opacity: heroTextOpacity, transform: [{ translateY: heroTextTranslate }] },
             ]}
-          />
-          <View style={[styles.heroHeader, rowStyle]}>
-            <View style={styles.brandInline}>
-              <View style={styles.brandSquare}>
-                <Text style={styles.brandSquareText}>W</Text>
-              </View>
-              <View>
-                <Text style={styles.brandName}>{brandTitle}</Text>
-                <Text style={styles.brandTagline}>{ui.tagline}</Text>
-              </View>
-            </View>
-            <MotionPressable onPress={() => setScreen('about')} style={styles.heroHeaderButton}>
-              <Text style={styles.heroHeaderButtonText}>ⓘ</Text>
-            </MotionPressable>
-          </View>
-          <View style={styles.heroTextBlock}>
-            <Text style={styles.heroEyebrow}>WESSALI · ALGERIA</Text>
+          >
+            <Text style={styles.heroEyebrow}>WESSALI  /  ALGERIA</Text>
             <Text style={[styles.heroTitle, isRtl && styles.arabicHero]}>{ui.welcome}</Text>
             <Text style={[styles.heroSubtitle, isRtl && styles.arabicHero]}>{ui.welcomeSub}</Text>
-            <View style={[styles.locationPill, rowStyle]}>
+            <View style={styles.heroLocationLine}>
               <Text style={styles.locationPillIcon}>⌖</Text>
-              <Text style={styles.locationPillText}>{ui.corridor}</Text>
+              <Text style={styles.heroLocationText}>{ui.corridor}</Text>
             </View>
-          </View>
+          </Animated.View>
         </ImageBackground>
       </View>
 
       <View style={styles.sectionHeaderBlock}>
-        <View>
-          <Text style={[styles.sectionEyebrow, directionStyle]}>01 / WESSALI SERVICES</Text>
+        <View style={styles.sectionHeadingCopy}>
+          <Text style={[styles.sectionEyebrow, directionStyle]}>01  /  WESSALI SERVICES</Text>
           <Text style={[styles.sectionTitle, directionStyle]}>{ui.choose}</Text>
         </View>
         <Text style={styles.sectionCount}>03</Text>
       </View>
-      <View style={styles.servicesGrid}>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.servicesRail}>
         {renderServiceCard('freight', 0)}
         {renderServiceCard('roadside', 1)}
         {renderServiceCard('water', 2)}
-      </View>
+      </ScrollView>
 
-      <View style={styles.softPanel}>
-        <Text style={[styles.sectionEyebrow, directionStyle]}>02 / SIMPLE BY DESIGN</Text>
-        <Text style={[styles.sectionTitle, directionStyle]}>{ui.how}</Text>
+      <View style={styles.howSection}>
+        <View style={styles.sectionHeaderBlock}>
+          <View style={styles.sectionHeadingCopy}>
+            <Text style={[styles.sectionEyebrow, directionStyle]}>02  /  FOUR SIMPLE STEPS</Text>
+            <Text style={[styles.sectionTitle, directionStyle]}>{ui.how}</Text>
+          </View>
+          <Text style={styles.sectionCount}>04</Text>
+        </View>
         <View style={styles.stepsGrid}>
           {[
             ['01', ui.step1, ui.step1d],
@@ -1403,44 +1399,19 @@ export default function App() {
         </View>
       </View>
 
-      <ImageBackground
-        source={{ uri: photo.water }}
-        style={styles.storyBanner}
-        imageStyle={styles.storyBannerRadius}
-      >
-        <View style={styles.storyShade} />
-        <Text style={styles.storyEyebrow}>THE WESSALI IDEA</Text>
-        <Text style={[styles.storyTitle, isRtl && styles.arabicHero]}>{ui.story}</Text>
-        <Text style={[styles.storyDescription, isRtl && styles.arabicHero]}>{ui.storySub}</Text>
-        <MotionPressable style={styles.storyButton} onPress={() => setScreen('about')}>
-          <Text style={styles.storyButtonText}>{ui.learn}</Text>
-          <Text style={styles.storyButtonArrow}>{isRtl ? '←' : '↗'}</Text>
-        </MotionPressable>
-      </ImageBackground>
-
-      <View style={styles.trustPanel}>
-        <View style={styles.trustGlow} />
-        <Text style={styles.trustMark}>✦</Text>
-        <Text style={[styles.trustTitle, directionStyle]}>{ui.trustTitle}</Text>
-        <Text style={[styles.trustText, directionStyle]}>{ui.trustSub}</Text>
-        <View style={[styles.trustStats, rowStyle]}>
-          <View style={styles.trustStat}>
-            <Text style={styles.trustStatValue}>03</Text>
-            <Text style={styles.trustStatLabel}>{ui.services}</Text>
-          </View>
-          <View style={styles.trustStatDivider} />
-          <View style={styles.trustStat}>
-            <Text style={styles.trustStatValue}>03</Text>
-            <Text style={styles.trustStatLabel}>{ui.language}</Text>
-          </View>
-          <View style={styles.trustStatDivider} />
-          <View style={styles.trustStat}>
-            <Text style={styles.trustStatValue}>DZ</Text>
-            <Text style={styles.trustStatLabel}>Algeria</Text>
-          </View>
+      <View style={styles.aboutTeaser}>
+        <View style={styles.aboutTeaserAccent} />
+        <View style={styles.aboutTeaserCopy}>
+          <Text style={styles.sectionEyebrow}>03  /  THE WESSALI IDEA</Text>
+          <Text style={[styles.aboutTeaserTitle, directionStyle]}>{ui.story}</Text>
+          <Text style={[styles.aboutTeaserText, directionStyle]}>{ui.storySub}</Text>
+          <MotionPressable style={styles.aboutTeaserLink} onPress={() => setScreen('about')}>
+            <Text style={styles.aboutTeaserLinkText}>{ui.learn}</Text>
+            <Text style={styles.aboutTeaserArrow}>{isRtl ? '←' : '↗'}</Text>
+          </MotionPressable>
         </View>
       </View>
-    </>
+    </View>
   );
 
   const renderBookingForm = () => (
@@ -1796,25 +1767,27 @@ export default function App() {
       </View>
 
       <View style={styles.sectionHeaderBlock}>
-        <View>
+        <View style={styles.sectionHeadingCopy}>
           <Text style={[styles.sectionEyebrow, directionStyle]}>02 / THE CHALLENGE</Text>
           <Text style={[styles.sectionTitle, directionStyle]}>{ui.market}</Text>
         </View>
       </View>
-      {[
-        ['01', ui.problem1, ui.problem1d, '↗'],
-        ['02', ui.problem2, ui.problem2d, '⌁'],
-        ['03', ui.problem3, ui.problem3d, '◌'],
-      ].map(([number, title, description, glyph]) => (
-        <View key={number} style={styles.informationCard}>
-          <View style={styles.infoCardTop}>
-            <Text style={styles.infoCardNumber}>{number}</Text>
-            <Text style={styles.infoCardGlyph}>{glyph}</Text>
+      <View style={styles.problemGrid}>
+        {[
+          ['01', ui.problem1, ui.problem1d, '↗'],
+          ['02', ui.problem2, ui.problem2d, '⌁'],
+          ['03', ui.problem3, ui.problem3d, '◌'],
+        ].map(([number, title, description, glyph]) => (
+          <View key={number} style={styles.informationCard}>
+            <View style={styles.infoCardTop}>
+              <Text style={styles.infoCardNumber}>{number}</Text>
+              <Text style={styles.infoCardGlyph}>{glyph}</Text>
+            </View>
+            <Text style={[styles.infoCardTitle, directionStyle]}>{title}</Text>
+            <Text style={[styles.bodyCopy, directionStyle]}>{description}</Text>
           </View>
-          <Text style={[styles.infoCardTitle, directionStyle]}>{title}</Text>
-          <Text style={[styles.bodyCopy, directionStyle]}>{description}</Text>
-        </View>
-      ))}
+        ))}
+      </View>
 
       <View style={styles.softPanel}>
         <Text style={[styles.sectionEyebrow, directionStyle]}>03 / OUR RESPONSE</Text>
@@ -1949,25 +1922,67 @@ export default function App() {
           <Text style={styles.footerText}>{ui.footer} · 0.3.0</Text>
         </Animated.ScrollView>
 
+        <Modal
+          visible={previewService !== null}
+          transparent
+          animationType="none"
+          statusBarTranslucent
+          onRequestClose={closeServicePreview}
+        >
+          <View style={styles.previewModalRoot}>
+            <Animated.View style={[StyleSheet.absoluteFill, { opacity: previewOpacity }]}>
+              <BlurView intensity={78} tint="dark" style={StyleSheet.absoluteFill} />
+              <LinearGradient
+                colors={['rgba(7,26,25,0.46)', 'rgba(9,32,31,0.66)', 'rgba(15,48,40,0.78)']}
+                style={StyleSheet.absoluteFill}
+              />
+            </Animated.View>
+            <Pressable accessibilityRole="button" accessibilityLabel="Close service preview" style={StyleSheet.absoluteFill} onPress={closeServicePreview} />
+            {previewService ? (
+              <Animated.View
+                style={[
+                  styles.previewModalStage,
+                  { opacity: previewOpacity, transform: [{ scale: previewScale }, { translateY: previewTranslateY }] },
+                ]}
+              >
+                <LinearGradient
+                  colors={['rgba(119,231,183,0.38)', 'rgba(206,164,104,0.14)', 'rgba(255,255,255,0)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.previewAura}
+                />
+                <View style={styles.previewCard}>
+                  <ImageBackground source={{ uri: serviceContent[previewService].photo }} style={styles.previewImage} imageStyle={styles.previewImageRadius} resizeMode="cover">
+                    <LinearGradient colors={['rgba(6,22,24,0.06)', 'rgba(6,22,24,0.68)']} style={StyleSheet.absoluteFill} />
+                    <Text style={styles.previewImageEyebrow}>
+                      WESSALI  /  0{SERVICE_CATEGORIES.findIndex((item) => item.id === previewService) + 1}
+                    </Text>
+                    <Text style={[styles.previewImageTitle, isRtl && styles.arabicHero]}>
+                      {serviceTitle(previewService)}
+                    </Text>
+                  </ImageBackground>
+                  <View style={styles.previewCardBody}>
+                    <Text style={[styles.previewDescription, directionStyle]}>
+                      {serviceDescription(previewService)}
+                    </Text>
+                    <View style={styles.previewDivider} />
+                    <MotionPressable style={styles.previewPrimaryButton} onPress={startPreviewBooking}>
+                      <LinearGradient colors={['#236B59', '#174B40']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+                      <Text style={styles.previewPrimaryText}>{ui.start}</Text>
+                      <Text style={styles.previewPrimaryArrow}>{isRtl ? '←' : '↗'}</Text>
+                    </MotionPressable>
+                    <MotionPressable style={styles.previewCloseButton} onPress={closeServicePreview}>
+                      <Text style={styles.previewCloseText}>{ui.back}</Text>
+                    </MotionPressable>
+                  </View>
+                </View>
+              </Animated.View>
+            ) : null}
+          </View>
+        </Modal>
+
         {session.user.role === 'customer' ? (
           <View style={styles.bottomBarShell}>
-            <BlurView intensity={82} tint="light" style={StyleSheet.absoluteFill} />
-            <LinearGradient
-              pointerEvents="none"
-              colors={['rgba(255,255,255,0.46)', 'rgba(250,255,252,0.7)', 'rgba(242,250,246,0.92)']}
-              locations={[0, 0.52, 1]}
-              style={StyleSheet.absoluteFill}
-            />
-            <Animated.View
-              pointerEvents="none"
-              style={[
-                styles.bottomGlow,
-                {
-                  opacity: bottomGlowOpacity,
-                  transform: [{ scale: bottomGlowScale }],
-                },
-              ]}
-            />
             <View style={styles.bottomBar}>
               {[
                 ['home', '⌂', ui.home],
@@ -1984,17 +1999,7 @@ export default function App() {
                   }}
                   style={styles.bottomTab}
                 >
-                  <View
-                    style={[styles.bottomGlyphWrap, screen === id && styles.bottomGlyphWrapActive]}
-                  >
-                    {screen === id ? (
-                      <LinearGradient
-                        colors={['rgba(218,246,233,0.96)', 'rgba(255,255,255,0.84)']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={StyleSheet.absoluteFill}
-                      />
-                    ) : null}
+                  <View style={styles.bottomGlyphWrap}>
                     <Text style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]}>
                       {glyph}
                     </Text>
@@ -2002,6 +2007,7 @@ export default function App() {
                   <Text style={[styles.bottomLabel, screen === id && styles.bottomLabelActive]}>
                     {label}
                   </Text>
+                  {screen === id ? <View style={styles.bottomActiveMark} /> : null}
                 </MotionPressable>
               ))}
             </View>
