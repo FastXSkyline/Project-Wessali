@@ -1,0 +1,25 @@
+{
+  "name": "wessali",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.18.0",
+  "engines": { "node": ">=24.15.0 <25" },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "prettier --check \"apps/**/*.{ts,tsx,css,json,js}\" \"packages/**/*.{ts,tsx,json}\" \"scripts/**/*.mjs\" package.json turbo.json pnpm-workspace.yaml docker-compose.yml",
+    "test": "turbo run test",
+    "validate": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "db:up": "docker compose up -d postgres redis",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @wessali/api migrate",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,css,json,js}\" \"packages/**/*.{ts,tsx,json}\" \"scripts/**/*.mjs\" package.json turbo.json pnpm-workspace.yaml docker-compose.yml"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10",
+    "tsx": "4.20.6",
+    "turbo": "2.11.10",
+    "typescript": "5.9.3"
+  }
+}
