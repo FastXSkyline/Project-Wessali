@@ -25,7 +25,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={brandColors.canvas} />
+      <StatusBar barStyle="dark-content" />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.topBar, isRtl && styles.rowReverse]}>
           <View style={styles.brandMark}>

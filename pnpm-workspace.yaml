@@ -1,3 +1,10 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# pnpm v12 blocks dependency lifecycle scripts unless explicitly approved.
+# esbuild is required for several toolchains; msgpackr-extract is an optional
+# native accelerator with a JavaScript fallback.
+allowBuilds:
+  esbuild: true
+  msgpackr-extract: true
