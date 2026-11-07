@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto';
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service.js';
 import type { AuthenticatedRequest } from './auth.types.js';
 
 @Injectable()
 export class SessionGuard implements CanActivate {
-  constructor(private readonly database: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly database: DatabaseService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
