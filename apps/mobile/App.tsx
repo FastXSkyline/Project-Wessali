@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
   ActivityIndicator,
+  Animated,
+  Easing,
   ImageBackground,
   Pressable,
   SafeAreaView,
@@ -12,6 +14,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { DEFAULT_LOCALE, getDirection, getMessages, type Locale } from '@wessali/i18n';
 
@@ -593,6 +597,50 @@ async function apiRequest<T>(
   return data as T;
 }
 
+
+type MotionPressableProps = Omit<ComponentProps<typeof Pressable>, 'style'> & {
+  style?: import('react-native').StyleProp<import('react-native').ViewStyle>;
+};
+
+function MotionPressable({
+  children,
+  style,
+  onPressIn,
+  onPressOut,
+  ...props
+}: MotionPressableProps) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const animateScale = (value: number) => {
+    Animated.spring(scale, {
+      toValue: value,
+      damping: 20,
+      stiffness: 280,
+      mass: 0.65,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return (
+    <Animated.View style={[style, { transform: [{ scale }] }]}>
+      <MotionPressable
+        {...props}
+        style={styles.motionPressableInner}
+        onPressIn={(event) => {
+          animateScale(0.975);
+          onPressIn?.(event);
+        }}
+        onPressOut={(event) => {
+          animateScale(1);
+          onPressOut?.(event);
+        }}
+      >
+        {children}
+      </MotionPressable>
+    </Animated.View>
+  );
+}
+
 export default function App() {
   const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
   const [apiBaseUrl, setApiBaseUrl] = useState(
@@ -629,6 +677,9 @@ export default function App() {
   const [providerJobs, setProviderJobs] = useState<Booking[]>([]);
   const [businessName, setBusinessName] = useState('');
   const [providerServices, setProviderServices] = useState<ServiceKind[]>(['freight']);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const screenProgress = useRef(new Animated.Value(1)).current;
+  const bottomGlow = useRef(new Animated.Value(0)).current;
 
   const copy = getMessages(locale);
   const ui = words[locale];
@@ -636,6 +687,32 @@ export default function App() {
   const directionStyle = isRtl ? styles.textRtl : styles.textLtr;
   const rowStyle = isRtl ? styles.rowReverse : undefined;
   const brandTitle = locale === 'ar' ? 'وصلي' : 'Wessali';
+  const heroGlowOpacity = scrollY.interpolate({
+    inputRange: [0, 180],
+    outputRange: [0.92, 0.16],
+    extrapolate: 'clamp',
+  });
+  const heroGlowScale = scrollY.interpolate({
+    inputRange: [0, 220],
+    outputRange: [1, 0.78],
+    extrapolate: 'clamp',
+  });
+  const screenOpacity = screenProgress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.78, 1],
+  });
+  const screenTranslateY = screenProgress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [16, 0],
+  });
+  const bottomGlowOpacity = bottomGlow.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.12, 0.46],
+  });
+  const bottomGlowScale = bottomGlow.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.92, 1.08],
+  });
 
   const statusLabel = (status: string) => {
     const labels = ui as Record<string, string>;
@@ -685,6 +762,38 @@ export default function App() {
     // Refresh when the authenticated identity changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.accessToken]);
+
+  useEffect(() => {
+    screenProgress.setValue(0);
+    Animated.spring(screenProgress, {
+      toValue: 1,
+      damping: 22,
+      stiffness: 165,
+      mass: 0.85,
+      useNativeDriver: true,
+    }).start();
+  }, [screen, screenProgress]);
+
+  useEffect(() => {
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(bottomGlow, {
+          toValue: 1,
+          duration: 2300,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(bottomGlow, {
+          toValue: 0,
+          duration: 2300,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    pulse.start();
+    return () => pulse.stop();
+  }, [bottomGlow]);
 
   async function signIn() {
     if (name.trim().length < 2 || !/^\+[1-9]\d{7,14}$/.test(phone.trim())) {
@@ -941,7 +1050,7 @@ export default function App() {
       <Text style={[styles.fieldLabel, directionStyle]}>{label}</Text>
       <View style={[styles.choiceWrap, rowStyle]}>
         {options.map((option) => (
-          <Pressable
+          <MotionPressable
             key={option.value}
             onPress={() => onChange(option.value)}
             style={[styles.choice, value === option.value && styles.choiceActive]}
@@ -949,16 +1058,16 @@ export default function App() {
             <Text style={[styles.choiceText, value === option.value && styles.choiceTextActive]}>
               {option.label}
             </Text>
-          </Pressable>
+          </MotionPressable>
         ))}
       </View>
     </View>
   );
 
   const renderPill = (label: string, active: boolean, onPress: () => void) => (
-    <Pressable onPress={onPress} style={[styles.pill, active && styles.pillActive]}>
+    <MotionPressable onPress={onPress} style={[styles.pill, active && styles.pillActive]}>
       <Text style={[styles.pillText, active && styles.pillTextActive]}>{label}</Text>
-    </Pressable>
+    </MotionPressable>
   );
 
   const renderStatus = (status: string) => {
@@ -1057,21 +1166,21 @@ export default function App() {
           ? renderProgress(booking.status)
           : null}
         {providerMode ? (
-          <Pressable
+          <MotionPressable
             style={styles.primaryButton}
             onPress={() => void acceptRequest(booking.id)}
             disabled={busy}
           >
             <Text style={styles.primaryButtonText}>{busy ? ui.loadingText : ui.accept}</Text>
-          </Pressable>
+          </MotionPressable>
         ) : canCancel ? (
-          <Pressable
+          <MotionPressable
             style={styles.cancelButton}
             onPress={() => void cancelBooking(booking.id)}
             disabled={busy}
           >
             <Text style={styles.cancelButtonText}>{ui.cancel}</Text>
-          </Pressable>
+          </MotionPressable>
         ) : null}
       </View>
     );
@@ -1080,7 +1189,7 @@ export default function App() {
   const renderLanguagePicker = () => (
     <View style={[styles.languageSwitch, rowStyle]}>
       {(['ar', 'fr', 'en'] as const).map((item) => (
-        <Pressable
+        <MotionPressable
           key={item}
           onPress={() => setLocale(item)}
           style={[styles.languageButton, locale === item && styles.languageButtonActive]}
@@ -1088,7 +1197,7 @@ export default function App() {
           <Text style={[styles.languageText, locale === item && styles.languageTextActive]}>
             {item.toUpperCase()}
           </Text>
-        </Pressable>
+        </MotionPressable>
       ))}
     </View>
   );
@@ -1096,7 +1205,7 @@ export default function App() {
   const renderServiceCard = (kind: ServiceKind, index: number) => {
     const item = serviceContent[kind];
     return (
-      <Pressable key={kind} onPress={() => beginBooking(kind)} style={styles.serviceCard}>
+      <MotionPressable key={kind} onPress={() => beginBooking(kind)} style={styles.serviceCard}>
         <ImageBackground
           source={{ uri: item.photo }}
           style={styles.serviceImage}
@@ -1121,7 +1230,7 @@ export default function App() {
             </View>
           </View>
         </ImageBackground>
-      </Pressable>
+      </MotionPressable>
     );
   };
 
@@ -1163,12 +1272,12 @@ export default function App() {
           {showServer
             ? renderField(ui.api, apiInput, setApiInput, 'http://192.168.2.2:4000/v1')
             : null}
-          <Pressable onPress={() => setShowServer((value) => !value)} style={styles.serverToggle}>
+          <MotionPressable onPress={() => setShowServer((value) => !value)} style={styles.serverToggle}>
             <Text style={styles.serverToggleText}>
               {showServer ? ui.hideServer : ui.showServer}
             </Text>
             <Text style={styles.serverToggleGlyph}>{showServer ? '−' : '+'}</Text>
-          </Pressable>
+          </MotionPressable>
 
           <View style={[styles.roleSwitch, rowStyle]}>
             {renderPill(ui.customer, role === 'customer', () => setRole('customer'))}
@@ -1176,7 +1285,7 @@ export default function App() {
           </View>
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          <Pressable
+          <MotionPressable
             style={styles.primaryButtonLarge}
             onPress={() => void signIn()}
             disabled={busy}
@@ -1189,7 +1298,7 @@ export default function App() {
                 <Text style={styles.primaryButtonArrow}>{isRtl ? '←' : '↗'}</Text>
               </>
             )}
-          </Pressable>
+          </MotionPressable>
           <Text style={styles.demoNotice}>DEMO ACCESS · NOT PHONE VERIFICATION</Text>
         </View>
 
@@ -1221,6 +1330,19 @@ export default function App() {
           imageStyle={styles.heroImageRadius}
         >
           <View style={styles.heroShade} />
+          <LinearGradient
+            pointerEvents="none"
+            colors={['rgba(10,42,40,0.06)', 'rgba(7,27,31,0.2)', 'rgba(5,22,25,0.42)']}
+            locations={[0, 0.55, 1]}
+            style={StyleSheet.absoluteFill}
+          />
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.heroGlowOrb,
+              { opacity: heroGlowOpacity, transform: [{ scale: heroGlowScale }] },
+            ]}
+          />
           <View style={[styles.heroHeader, rowStyle]}>
             <View style={styles.brandInline}>
               <View style={styles.brandSquare}>
@@ -1231,9 +1353,9 @@ export default function App() {
                 <Text style={styles.brandTagline}>{ui.tagline}</Text>
               </View>
             </View>
-            <Pressable onPress={() => setScreen('about')} style={styles.heroHeaderButton}>
+            <MotionPressable onPress={() => setScreen('about')} style={styles.heroHeaderButton}>
               <Text style={styles.heroHeaderButtonText}>ⓘ</Text>
-            </Pressable>
+            </MotionPressable>
           </View>
           <View style={styles.heroTextBlock}>
             <Text style={styles.heroEyebrow}>WESSALI · ALGERIA</Text>
@@ -1288,10 +1410,10 @@ export default function App() {
         <Text style={styles.storyEyebrow}>THE WESSALI IDEA</Text>
         <Text style={[styles.storyTitle, isRtl && styles.arabicHero]}>{ui.story}</Text>
         <Text style={[styles.storyDescription, isRtl && styles.arabicHero]}>{ui.storySub}</Text>
-        <Pressable style={styles.storyButton} onPress={() => setScreen('about')}>
+        <MotionPressable style={styles.storyButton} onPress={() => setScreen('about')}>
           <Text style={styles.storyButtonText}>{ui.learn}</Text>
           <Text style={styles.storyButtonArrow}>{isRtl ? '←' : '↗'}</Text>
-        </Pressable>
+        </MotionPressable>
       </ImageBackground>
 
       <View style={styles.trustPanel}>
@@ -1321,10 +1443,10 @@ export default function App() {
 
   const renderBookingForm = () => (
     <View style={styles.pageContent}>
-      <Pressable onPress={() => setScreen('home')} style={[styles.backButton, rowStyle]}>
+      <MotionPressable onPress={() => setScreen('home')} style={[styles.backButton, rowStyle]}>
         <Text style={styles.backGlyph}>{isRtl ? '→' : '←'}</Text>
         <Text style={styles.backText}>{ui.back}</Text>
-      </Pressable>
+      </MotionPressable>
       <ImageBackground
         source={{ uri: serviceContent[selectedService].photo }}
         style={styles.formHero}
@@ -1459,7 +1581,7 @@ export default function App() {
         ) : null}
         {renderField(ui.notes, customerNotes, setCustomerNotes, undefined, 'default', true)}
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        <Pressable
+        <MotionPressable
           style={styles.primaryButtonLarge}
           onPress={() => void submitBooking()}
           disabled={busy}
@@ -1472,10 +1594,10 @@ export default function App() {
               <Text style={styles.primaryButtonArrow}>{isRtl ? '←' : '↗'}</Text>
             </>
           )}
-        </Pressable>
-        <Pressable style={styles.secondaryButton} onPress={() => setScreen('home')}>
+        </MotionPressable>
+        <MotionPressable style={styles.secondaryButton} onPress={() => setScreen('home')}>
           <Text style={styles.secondaryButtonText}>{ui.cancel}</Text>
-        </Pressable>
+        </MotionPressable>
       </View>
     </View>
   );
@@ -1487,10 +1609,10 @@ export default function App() {
           <Text style={[styles.sectionEyebrow, directionStyle]}>YOUR ACTIVITY</Text>
           <Text style={[styles.sectionTitle, directionStyle]}>{ui.history}</Text>
         </View>
-        <Pressable onPress={() => void refreshData()} style={styles.refreshButton}>
+        <MotionPressable onPress={() => void refreshData()} style={styles.refreshButton}>
           <Text style={styles.refreshGlyph}>↻</Text>
           <Text style={styles.refreshText}>{ui.refresh}</Text>
-        </Pressable>
+        </MotionPressable>
       </View>
       {notice ? <Text style={styles.successText}>{notice}</Text> : null}
       {bookings.length ? (
@@ -1502,9 +1624,9 @@ export default function App() {
           </View>
           <Text style={[styles.emptyTitle, directionStyle]}>{ui.noBookings}</Text>
           <Text style={[styles.emptySubtitle, directionStyle]}>{ui.choose}</Text>
-          <Pressable style={styles.primaryButton} onPress={() => setScreen('home')}>
+          <MotionPressable style={styles.primaryButton} onPress={() => setScreen('home')}>
             <Text style={styles.primaryButtonText}>{ui.start}</Text>
-          </Pressable>
+          </MotionPressable>
         </View>
       )}
     </View>
@@ -1555,7 +1677,7 @@ export default function App() {
             </View>
           ))}
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          <Pressable
+          <MotionPressable
             style={styles.primaryButtonLarge}
             onPress={() => void applyProvider()}
             disabled={busy}
@@ -1565,7 +1687,7 @@ export default function App() {
             ) : (
               <Text style={styles.primaryButtonText}>{ui.apply}</Text>
             )}
-          </Pressable>
+          </MotionPressable>
         </View>
       ) : providerProfile.status !== 'approved' ? (
         <View style={styles.approvalCard}>
@@ -1610,7 +1732,7 @@ export default function App() {
                   </Text>
                 ) : null}
                 {job.status !== 'completed' ? (
-                  <Pressable
+                  <MotionPressable
                     style={styles.primaryButton}
                     onPress={() => void advanceJob(job.id)}
                     disabled={busy}
@@ -1618,7 +1740,7 @@ export default function App() {
                     <Text style={styles.primaryButtonText}>
                       {busy ? ui.loadingText : ui.advance}
                     </Text>
-                  </Pressable>
+                  </MotionPressable>
                 ) : null}
               </View>
             ))
@@ -1770,10 +1892,15 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.appShell}>
-        <ScrollView
+        <Animated.ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true },
+          )}
         >
           <View style={[styles.accountBar, rowStyle]}>
             <View style={styles.accountIdentity}>
@@ -1789,22 +1916,29 @@ export default function App() {
             </View>
             <View style={styles.accountActions}>
               {renderLanguagePicker()}
-              <Pressable onPress={() => void signOut()} style={styles.logoutButton}>
+              <MotionPressable onPress={() => void signOut()} style={styles.logoutButton}>
                 <Text style={styles.logoutGlyph}>⇥</Text>
-              </Pressable>
+              </MotionPressable>
             </View>
           </View>
 
-          {session.user.role === 'provider' ? (
-            renderProvider()
-          ) : (
-            <>
-              {screen === 'home' ? renderCustomerHome() : null}
-              {screen === 'booking' ? renderBookingForm() : null}
-              {screen === 'history' ? renderHistory() : null}
-              {screen === 'about' ? renderAbout() : null}
-            </>
-          )}
+          <Animated.View
+            style={{
+              opacity: screenOpacity,
+              transform: [{ translateY: screenTranslateY }],
+            }}
+          >
+            {session.user.role === 'provider' ? (
+              renderProvider()
+            ) : (
+              <>
+                {screen === 'home' ? renderCustomerHome() : null}
+                {screen === 'booking' ? renderBookingForm() : null}
+                {screen === 'history' ? renderHistory() : null}
+                {screen === 'about' ? renderAbout() : null}
+              </>
+            )}
+          </Animated.View>
 
           {notice && screen !== 'history' ? <Text style={styles.successText}>{notice}</Text> : null}
           {error && screen !== 'booking' && screen !== 'history' ? (
@@ -1812,16 +1946,42 @@ export default function App() {
           ) : null}
           {busy ? <ActivityIndicator color="#168C82" style={styles.globalSpinner} /> : null}
           <Text style={styles.footerText}>{ui.footer} · 0.3.0</Text>
-        </ScrollView>
+        </Animated.ScrollView>
 
         {session.user.role === 'customer' ? (
-          <View style={styles.bottomBar}>
+          <View style={styles.bottomBarShell}>
+            <BlurView
+              intensity={82}
+              tint="light"
+              style={StyleSheet.absoluteFill}
+            />
+            <LinearGradient
+              pointerEvents="none"
+              colors={[
+                'rgba(255,255,255,0.46)',
+                'rgba(250,255,252,0.7)',
+                'rgba(242,250,246,0.92)',
+              ]}
+              locations={[0, 0.52, 1]}
+              style={StyleSheet.absoluteFill}
+            />
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.bottomGlow,
+                {
+                  opacity: bottomGlowOpacity,
+                  transform: [{ scale: bottomGlowScale }],
+                },
+              ]}
+            />
+            <View style={styles.bottomBar}>
             {[
               ['home', '⌂', ui.home],
               ['history', '◷', ui.history],
               ['about', 'ⓘ', ui.about],
             ].map(([id, glyph, label]) => (
-              <Pressable
+              <MotionPressable
                 key={id}
                 onPress={() => {
                   const next = id as Screen;
@@ -1841,8 +2001,9 @@ export default function App() {
                 <Text style={[styles.bottomLabel, screen === id && styles.bottomLabelActive]}>
                   {label}
                 </Text>
-              </Pressable>
+              </MotionPressable>
             ))}
+            </View>
           </View>
         ) : null}
       </View>
@@ -2640,16 +2801,49 @@ const styles = StyleSheet.create({
   featureNoteTitle: { color: '#896C45', fontSize: 11, fontWeight: '900' },
   featureNoteText: { color: '#9A896F', fontSize: 10, lineHeight: 17 },
 
+  motionPressableInner: { flex: 1 },
+  heroGlowOrb: {
+    position: 'absolute',
+    width: 235,
+    height: 235,
+    borderRadius: 118,
+    backgroundColor: 'rgba(84,218,173,0.24)',
+    borderWidth: 1,
+    borderColor: 'rgba(210,255,237,0.18)',
+    top: 28,
+    right: -74,
+  },
+  bottomBarShell: {
+    marginHorizontal: 12,
+    marginBottom: 5,
+    borderRadius: 25,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    shadowColor: '#397C68',
+    shadowOpacity: 0.13,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
+  bottomGlow: {
+    position: 'absolute',
+    width: 210,
+    height: 90,
+    borderRadius: 48,
+    backgroundColor: 'rgba(92,202,161,0.25)',
+    top: -46,
+    left: '28%',
+  },
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingHorizontal: 17,
-    paddingTop: 9,
-    paddingBottom: 8,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(222,232,226,0.92)',
+    paddingTop: 11,
+    paddingBottom: 11,
+    backgroundColor: 'transparent',
   },
   bottomTab: { flex: 1, alignItems: 'center', gap: 3 },
   bottomGlyphWrap: {
@@ -2659,7 +2853,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bottomGlyphWrapActive: { backgroundColor: '#E2F0E9' },
+  bottomGlyphWrapActive: {
+    backgroundColor: 'rgba(255,255,255,0.38)',
+    overflow: 'hidden',
+    shadowColor: '#59A98C',
+    shadowOpacity: 0.24,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 3 },
+  },
   bottomGlyph: { color: '#A2AEA8', fontSize: 18, fontWeight: '800' },
   bottomGlyphActive: { color: '#168C82' },
   bottomLabel: { color: '#9AA69F', fontSize: 8, fontWeight: '700' },
