@@ -40,7 +40,6 @@ const copy = {
     signIn: 'دخول الإدارة التجريبي',
     username: 'اسم المستخدم',
     password: 'كلمة مرور الإدارة',
-    key: 'كلمة مرور الإدارة المحلية',
     api: 'عنوان API',
     connect: 'دخول',
     logout: 'خروج',
@@ -76,7 +75,6 @@ const copy = {
     signIn: 'Connexion admin de démonstration',
     username: 'Nom d’utilisateur',
     password: 'Mot de passe admin',
-    key: 'Mot de passe admin local',
     api: 'URL API',
     connect: 'Connexion',
     logout: 'Déconnexion',
@@ -112,7 +110,6 @@ const copy = {
     signIn: 'Demo administrator sign-in',
     username: 'Admin username',
     password: 'Admin password',
-    key: 'Local admin password',
     api: 'API URL',
     connect: 'Sign in',
     logout: 'Sign out',
@@ -146,7 +143,7 @@ const copy = {
 
 function describeRequestError(error: unknown, base: string, fallback: string): string {
   if (error instanceof TypeError && /fetch|network/i.test(error.message)) {
-    const healthUrl = `${base.trim().replace(/\\/+$/, '')}/health`;
+    const healthUrl = `${base.trim().replace(/\/+$/, '')}/health`;
     return `Cannot reach the Wessali API at ${healthUrl}. Make sure the API is running. If you opened the dashboard using your PC's IP address, set the API URL to that same PC IP instead of localhost.`;
   }
   return error instanceof Error ? error.message : fallback;
@@ -268,7 +265,7 @@ export default function DashboardPage() {
       );
       await loadDashboard(session);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : labels.error);
+      setError(describeRequestError(requestError, apiBase, labels.error));
     } finally {
       setLoading(false);
     }
@@ -314,6 +311,8 @@ export default function DashboardPage() {
             <input
               name="username"
               autoComplete="username"
+              autoCapitalize="none"
+              spellCheck={false}
               value={adminUsername}
               onChange={(event) => setAdminUsername(event.target.value)}
               required
@@ -323,7 +322,7 @@ export default function DashboardPage() {
             />
           </label>
           <label>
-            {labels.key}
+            {labels.password}
             <input
               type="password"
               name="password"
