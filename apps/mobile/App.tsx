@@ -597,7 +597,6 @@ async function apiRequest<T>(
   return data as T;
 }
 
-
 type MotionPressableProps = Omit<ComponentProps<typeof Pressable>, 'style'> & {
   style?: import('react-native').StyleProp<import('react-native').ViewStyle>;
 };
@@ -1272,7 +1271,10 @@ export default function App() {
           {showServer
             ? renderField(ui.api, apiInput, setApiInput, 'http://192.168.2.2:4000/v1')
             : null}
-          <MotionPressable onPress={() => setShowServer((value) => !value)} style={styles.serverToggle}>
+          <MotionPressable
+            onPress={() => setShowServer((value) => !value)}
+            style={styles.serverToggle}
+          >
             <Text style={styles.serverToggleText}>
               {showServer ? ui.hideServer : ui.showServer}
             </Text>
@@ -1897,10 +1899,9 @@ export default function App() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true },
-          )}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+            useNativeDriver: true,
+          })}
         >
           <View style={[styles.accountBar, rowStyle]}>
             <View style={styles.accountIdentity}>
@@ -1950,18 +1951,10 @@ export default function App() {
 
         {session.user.role === 'customer' ? (
           <View style={styles.bottomBarShell}>
-            <BlurView
-              intensity={82}
-              tint="light"
-              style={StyleSheet.absoluteFill}
-            />
+            <BlurView intensity={82} tint="light" style={StyleSheet.absoluteFill} />
             <LinearGradient
               pointerEvents="none"
-              colors={[
-                'rgba(255,255,255,0.46)',
-                'rgba(250,255,252,0.7)',
-                'rgba(242,250,246,0.92)',
-              ]}
+              colors={['rgba(255,255,255,0.46)', 'rgba(250,255,252,0.7)', 'rgba(242,250,246,0.92)']}
               locations={[0, 0.52, 1]}
               style={StyleSheet.absoluteFill}
             />
@@ -1976,41 +1969,41 @@ export default function App() {
               ]}
             />
             <View style={styles.bottomBar}>
-            {[
-              ['home', '⌂', ui.home],
-              ['history', '◷', ui.history],
-              ['about', 'ⓘ', ui.about],
-            ].map(([id, glyph, label]) => (
-              <MotionPressable
-                key={id}
-                onPress={() => {
-                  const next = id as Screen;
-                  setScreen(next);
-                  setError('');
-                  if (next === 'history') void refreshData();
-                }}
-                style={styles.bottomTab}
-              >
-                <View
-                  style={[styles.bottomGlyphWrap, screen === id && styles.bottomGlyphWrapActive]}
+              {[
+                ['home', '⌂', ui.home],
+                ['history', '◷', ui.history],
+                ['about', 'ⓘ', ui.about],
+              ].map(([id, glyph, label]) => (
+                <MotionPressable
+                  key={id}
+                  onPress={() => {
+                    const next = id as Screen;
+                    setScreen(next);
+                    setError('');
+                    if (next === 'history') void refreshData();
+                  }}
+                  style={styles.bottomTab}
                 >
-                  {screen === id ? (
-                    <LinearGradient
-                      colors={['rgba(218,246,233,0.96)', 'rgba(255,255,255,0.84)']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={StyleSheet.absoluteFill}
-                    />
-                  ) : null}
-                  <Text style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]}>
-                    {glyph}
+                  <View
+                    style={[styles.bottomGlyphWrap, screen === id && styles.bottomGlyphWrapActive]}
+                  >
+                    {screen === id ? (
+                      <LinearGradient
+                        colors={['rgba(218,246,233,0.96)', 'rgba(255,255,255,0.84)']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFill}
+                      />
+                    ) : null}
+                    <Text style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]}>
+                      {glyph}
+                    </Text>
+                  </View>
+                  <Text style={[styles.bottomLabel, screen === id && styles.bottomLabelActive]}>
+                    {label}
                   </Text>
-                </View>
-                <Text style={[styles.bottomLabel, screen === id && styles.bottomLabelActive]}>
-                  {label}
-                </Text>
-              </MotionPressable>
-            ))}
+                </MotionPressable>
+              ))}
             </View>
           </View>
         ) : null}
