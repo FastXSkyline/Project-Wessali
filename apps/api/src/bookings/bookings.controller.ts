@@ -3,6 +3,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -18,7 +19,7 @@ import { BookingsService } from './bookings.service.js';
 @Controller('bookings')
 @UseGuards(SessionGuard)
 export class BookingsController {
-  constructor(private readonly bookings: BookingsService) {}
+  constructor(@Inject(BookingsService) private readonly bookings: BookingsService) {}
 
   @Get('mine')
   listMine(@Req() request: AuthenticatedRequest) {
