@@ -1,11 +1,11 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import type { DevSessionInput } from '@wessali/contracts';
 import { DatabaseService } from '../database/database.service.js';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly database: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly database: DatabaseService) {}
 
   async createDevelopmentSession(input: DevSessionInput) {
     if (process.env.NODE_ENV === 'production' || process.env.ALLOW_DEV_AUTH !== 'true') {
