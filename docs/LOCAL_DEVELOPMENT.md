@@ -51,7 +51,7 @@ Keep `ALLOW_DEV_AUTH=true` only in local development. The API refuses this sign-
 
 - Customer: choose customer mode, enter a name and an E.164 phone such as `+213555123456`.
 - Provider: choose provider mode and use a different phone number; submit a provider application.
-- Admin: open the admin website, enter the admin name/phone and `ADMIN_DEMO_KEY` from your local `.env` (default example: `local-admin-change-me`), then approve provider applications.
+- Admin: open the admin website and sign in with username `fastx` and the `ADMIN_DEMO_KEY` from your local `.env` as the password (default example: `local-admin-change-me`), then approve provider applications. Change `ADMIN_DEMO_USERNAME` and `ADMIN_DEMO_KEY` in `.env` to customize the local credentials.
 
 This is not real phone verification and is not suitable for public production use. Before launch, replace it with OTP verification, protected admin authentication, rate limiting, and session/device controls.
 
