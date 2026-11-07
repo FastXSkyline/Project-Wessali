@@ -4,7 +4,9 @@ The Wessali CI workflow runs on pushes to main, pull requests targeting main, an
 
 The workflow uses the repository's pinned Node.js version from .nvmrc and pnpm version from the root packageManager field. The pnpm setup action requires the committed workspace lockfile and performs a frozen install before validation.
 
-The validation command runs:
+Before code validation, CI starts the same PostgreSQL/PostGIS and Redis services defined in docker-compose.yml, waits for their health checks, creates a local environment file from .env.example, applies the SQL migrations, verifies the bookings table and PostGIS extension, and pings Redis.
+
+The workspace validation command runs:
 - Prettier checks.
 - TypeScript checks for all workspaces.
 - Unit tests for the API and shared contracts.

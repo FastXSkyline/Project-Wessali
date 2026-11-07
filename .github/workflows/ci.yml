@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   validate:
-    name: Install, typecheck, test, and build
+    name: Install, infrastructure, typecheck, test, and build
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -25,5 +25,25 @@ jobs:
           require-lockfile: true
           cache: true
 
+      - name: Start PostgreSQL/PostGIS and Redis
+        run: docker compose up -d --wait --wait-timeout 90 postgres redis
+
+      - name: Create local environment file
+        run: cp .env.example .env
+
+      - name: Apply database migrations
+        run: pnpm db:migrate
+
+      - name: Verify PostGIS schema and Redis
+        shell: bash
+        run: |
+          test "$(docker compose exec -T postgres psql -U wessali -d wessali -tAc "SELECT to_regclass('public.bookings') IS NOT NULL")" = "t"
+          docker compose exec -T postgres psql -U wessali -d wessali -tAc "SELECT PostGIS_Full_Version()"
+          test "$(docker compose exec -T redis redis-cli ping)" = "PONG"
+
       - name: Validate workspaces
         run: pnpm validate
+
+      - name: Stop local infrastructure
+        if: always()
+        run: docker compose down --volumes
