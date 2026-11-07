@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { ProviderApplicationInput } from '@wessali/contracts';
 import type { PoolClient } from 'pg';
 import { DatabaseService } from '../database/database.service.js';
@@ -6,7 +6,7 @@ import { BookingsService } from '../bookings/bookings.service.js';
 
 @Injectable()
 export class ProvidersService {
-  constructor(private readonly database: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly database: DatabaseService) {}
 
   async apply(userId: string, input: ProviderApplicationInput) {
     return this.database.transaction(async (client) => {
