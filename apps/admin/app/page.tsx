@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { SERVICE_CATEGORIES } from '@wessali/contracts';
 import { getDirection, getMessages, type Locale } from '@wessali/i18n';
 
-type AdminSession = { accessToken: string; user: { displayName: string } };
+type AdminSession = { accessToken: string; expiresAt?: string; user: { displayName: string } };
+
+const ADMIN_SESSION_KEY = 'wessali.admin.session';
 type Overview = {
   active_bookings: number;
   pending_bookings: number;
@@ -182,7 +184,7 @@ export default function DashboardPage() {
     process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000/v1',
   );
   const [adminUsername, setAdminUsername] = useState('fastx');
-  const [adminKey, setAdminKey] = useState('');
+  const [adminKey, setAdminKey] = useState('fastx');
   const [session, setSession] = useState<AdminSession | null>(null);
   const [tab, setTab] = useState<'overview' | 'bookings' | 'providers'>('overview');
   const [overview, setOverview] = useState<Overview | null>(null);
@@ -217,6 +219,22 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem(ADMIN_SESSION_KEY);
+      if (saved) {
+        const restored = JSON.parse(saved) as AdminSession;
+        if (restored.accessToken && (!restored.expiresAt || Date.parse(restored.expiresAt) > Date.now())) {
+          setSession(restored);
+        } else {
+          localStorage.removeItem(ADMIN_SESSION_KEY);
+        }
+      }
+    } catch {
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
     if (session) void loadDashboard(session);
     // Reload only when the authenticated session changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -238,6 +256,7 @@ export default function DashboardPage() {
           adminKey,
         }),
       });
+      localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(result));
       setSession(result);
       setNotice('Connected to the Wessali API');
     } catch (requestError) {
@@ -418,7 +437,13 @@ export default function DashboardPage() {
             <button className="text-button" onClick={() => void loadDashboard()}>
               {labels.refresh}
             </button>
-            <button className="text-button" onClick={() => setSession(null)}>
+            <button
+              className="text-button"
+              onClick={() => {
+                localStorage.removeItem(ADMIN_SESSION_KEY);
+                setSession(null);
+              }}
+            >
               {labels.logout}
             </button>
           </div>
