@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { DevSessionSchema } from '@wessali/contracts';
 import { parseBody } from '../common/parse-body.js';
 import type { AuthenticatedRequest } from './auth.types.js';
@@ -7,7 +7,7 @@ import { SessionGuard } from './session.guard.js';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService) {}
+  constructor(@Inject(AuthService) private readonly auth: AuthService) {}
 
   @Post('dev-session')
   createDevelopmentSession(@Body() body: unknown) {
