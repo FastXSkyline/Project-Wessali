@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate:
@@ -17,38 +17,13 @@ jobs:
     timeout-minutes: 35
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Node.js and pnpm, then install the frozen workspace
+        uses: pnpm/setup@v3
         with:
-          node-version: 24.22.2
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 12.18.0
-          run_install: false
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Format workspace sources
-        run: pnpm format
-
-      - name: Commit formatted files and initial lockfile
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          git add -A
-          if ! git diff --cached --quiet; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -m "chore: add lockfile and format workspace [skip ci]"
-            git push
-          fi
-
-      - name: Verify frozen installation
-        run: pnpm install --frozen-lockfile
+          require-lockfile: true
+          cache: true
 
       - name: Validate workspaces
         run: pnpm validate
