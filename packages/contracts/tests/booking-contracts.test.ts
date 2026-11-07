@@ -69,4 +69,24 @@ test('validates development sessions and provider applications', () => {
     }).success,
     true,
   );
+
+  assert.equal(
+    DevSessionSchema.safeParse({
+      phoneE164: '+213555000001',
+      displayName: 'fastx',
+      role: 'admin',
+      adminUsername: 'fastx',
+      adminKey: 'local-admin-change-me',
+    }).success,
+    true,
+  );
+  assert.equal(
+    DevSessionSchema.safeParse({
+      phoneE164: '+213555000001',
+      displayName: 'fastx',
+      role: 'admin',
+      adminKey: 'local-admin-change-me',
+    }).success,
+    false,
+  );
 });
