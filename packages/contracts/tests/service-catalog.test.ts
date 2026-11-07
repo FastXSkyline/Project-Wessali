@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { CreateWaterRequestSchema, SERVICE_CATEGORIES, SERVICE_KINDS } from '../src/index.js';
+import {
+  CreateWaterBookingSchema,
+  SERVICE_CATEGORIES,
+  SERVICE_KINDS,
+} from '../src/index.js';
 
 test('the first release exposes all three service categories', () => {
   assert.deepEqual(
@@ -17,13 +21,14 @@ test('each service category has Arabic, French, and English labels', () => {
   }
 });
 
-test('water request rejects a zero quantity', () => {
-  const result = CreateWaterRequestSchema.safeParse({
-    deliveryLocation: { latitude: 36.75, longitude: 3.05 },
+test('water booking rejects a zero quantity', () => {
+  const result = CreateWaterBookingSchema.safeParse({
+    serviceType: 'water',
+    pickupAddress: 'Birkhadem, Algiers',
     quantityLitres: 0,
     intendedUse: 'residential',
     waterCategory: 'potable',
-    preferredAt: '2026-11-08T10:00:00Z',
+    requestedAt: '2026-11-08T10:00:00Z',
   });
   assert.equal(result.success, false);
 });
