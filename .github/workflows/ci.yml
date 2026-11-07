@@ -19,11 +19,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Set up Node.js and pnpm, then install the frozen workspace
+      - name: Set up Node.js and pnpm
         uses: pnpm/setup@v3
         with:
-          require-lockfile: true
+          install: false
           cache: true
+
+      - name: Install workspace dependencies and refresh lockfile
+        run: CI=false pnpm install --no-frozen-lockfile
 
       - name: Start PostgreSQL/PostGIS and Redis
         run: docker compose up -d --wait --wait-timeout 90 postgres redis
@@ -51,7 +54,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         run: |
-          git add apps packages package.json turbo.json pnpm-workspace.yaml docker-compose.yml
+          git add apps packages package.json pnpm-lock.yaml turbo.json pnpm-workspace.yaml docker-compose.yml
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
