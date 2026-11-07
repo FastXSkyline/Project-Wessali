@@ -1,16 +1,28 @@
-name: Wessali iOS Unsigned IPA
+name: Build iOS unsigned IPA
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ios-unsigned-ipa.yml'
+      - 'apps/mobile/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.nvmrc'
+      - 'package.json'
 
 permissions:
   contents: read
 
 jobs:
   build-ios:
-    name: Build unsigned iOS IPA
+    name: Build Wessali for iPhone (unsigned)
     runs-on: macos-latest
     timeout-minutes: 90
+    env:
+      COCOAPODS_DISABLE_STATS: "true"
 
     steps:
       - name: Check out repository
@@ -31,7 +43,7 @@ jobs:
           pnpm --filter @wessali/design-tokens build
           pnpm --filter @wessali/i18n build
 
-      - name: Generate iOS native project
+      - name: Generate native iOS project
         working-directory: apps/mobile
         run: pnpm exec expo prebuild --platform ios --no-install --clean
 
@@ -39,35 +51,86 @@ jobs:
         working-directory: apps/mobile/ios
         run: pod install
 
+      - name: Discover generated Xcode workspace and app scheme
+        id: ios-project
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          WORKSPACE="$(find apps/mobile/ios -maxdepth 1 -type d -name '*.xcworkspace' -print -quit)"
+          if [ -z "$WORKSPACE" ]; then
+            echo "No Xcode workspace was generated."
+            exit 1
+          fi
+
+          xcodebuild -list -json -workspace "$WORKSPACE" > "$RUNNER_TEMP/xcode-list.json"
+
+          SCHEME="$(python3 - "$RUNNER_TEMP/xcode-list.json" <<'PY'
+          import json
+          import sys
+
+          with open(sys.argv[1], encoding="utf-8") as f:
+              data = json.load(f)
+
+          schemes = data.get("workspace", {}).get("schemes", [])
+          if not schemes:
+              schemes = data.get("project", {}).get("schemes", [])
+
+          app_schemes = [scheme for scheme in schemes if not scheme.startswith("Pods-")]
+          if not app_schemes:
+              raise SystemExit("No application scheme found in the generated Xcode workspace.")
+
+          print(app_schemes[0])
+          PY
+          )"
+
+          echo "workspace=$WORKSPACE" >> "$GITHUB_OUTPUT"
+          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+          echo "Using workspace: $WORKSPACE"
+          echo "Using scheme: $SCHEME"
+
       - name: Archive iOS app without code signing
+        shell: bash
         run: |
           set -o pipefail
           xcodebuild \
-            -workspace apps/mobile/ios/Wessali.xcworkspace \
-            -scheme Wessali \
+            -workspace "${{ steps.ios-project.outputs.workspace }}" \
+            -scheme "${{ steps.ios-project.outputs.scheme }}" \
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Wessali.xcarchive" \
+            -derivedDataPath "$RUNNER_TEMP/WessaliDerivedData" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             archive
 
       - name: Package unsigned IPA
+        shell: bash
         run: |
           set -euo pipefail
-          APP_PATH="$RUNNER_TEMP/Wessali.xcarchive/Products/Applications/Wessali.app"
-          test -d "$APP_PATH"
+
+          APP_PATH="$(find "$RUNNER_TEMP/Wessali.xcarchive/Products/Applications" -maxdepth 1 -type d -name '*.app' -print -quit)"
+          if [ -z "$APP_PATH" ]; then
+            echo "The iOS archive does not contain an .app bundle."
+            exit 1
+          fi
+
           mkdir -p "$RUNNER_TEMP/ipa/Payload"
-          cp -R "$APP_PATH" "$RUNNER_TEMP/ipa/Payload/Wessali.app"
+          cp -R "$APP_PATH" "$RUNNER_TEMP/ipa/Payload/"
+          find "$RUNNER_TEMP/ipa/Payload" -type d -name _CodeSignature -prune -exec rm -rf {} +
+          find "$RUNNER_TEMP/ipa/Payload" -type f -name embedded.mobileprovision -delete
+
           cd "$RUNNER_TEMP/ipa"
           /usr/bin/zip -qry "$GITHUB_WORKSPACE/Wessali-unsigned.ipa" Payload
+
           test -s "$GITHUB_WORKSPACE/Wessali-unsigned.ipa"
-          echo "Created unsigned IPA:"
+          unzip -l "$GITHUB_WORKSPACE/Wessali-unsigned.ipa" | head -25
+          echo "Created: $GITHUB_WORKSPACE/Wessali-unsigned.ipa"
           ls -lh "$GITHUB_WORKSPACE/Wessali-unsigned.ipa"
 
-      - name: Upload unsigned IPA artifact
+      - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: Wessali-unsigned-IPA
