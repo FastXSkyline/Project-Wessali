@@ -15,9 +15,16 @@ export class AuthService {
     }
 
     if (input.role === 'admin') {
+      const configuredUsername = (process.env.ADMIN_DEMO_USERNAME ?? 'fastx')
+        .trim()
+        .toLowerCase();
+      if (input.adminUsername?.trim().toLowerCase() !== configuredUsername) {
+        throw new ForbiddenException('The admin username is incorrect.');
+      }
+
       const configuredKey = process.env.ADMIN_DEMO_KEY;
       if (!configuredKey || input.adminKey !== configuredKey) {
-        throw new ForbiddenException('The local admin key is incorrect.');
+        throw new ForbiddenException('The admin password is incorrect.');
       }
     }
 
