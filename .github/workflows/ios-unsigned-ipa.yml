@@ -51,7 +51,7 @@ jobs:
         working-directory: apps/mobile/ios
         run: pod install
 
-      - name: Discover generated Xcode workspace and app scheme
+      - name: Verify Wessali Xcode scheme
         id: ios-project
         shell: bash
         run: |
@@ -65,37 +65,36 @@ jobs:
 
           xcodebuild -list -json -workspace "$WORKSPACE" > "$RUNNER_TEMP/xcode-list.json"
 
-          SCHEME="$(python3 - "$RUNNER_TEMP/xcode-list.json" <<'PY'
+          python3 - "$RUNNER_TEMP/xcode-list.json" <<'PY'
           import json
           import sys
 
           with open(sys.argv[1], encoding="utf-8") as f:
               data = json.load(f)
 
-          schemes = data.get("workspace", {}).get("schemes", [])
-          if not schemes:
-              schemes = data.get("project", {}).get("schemes", [])
+          workspace = data.get("workspace", {})
+          schemes = workspace.get("schemes", [])
+          print("Available Xcode schemes:")
+          for scheme in schemes:
+              print(f" - {scheme}")
 
-          app_schemes = [scheme for scheme in schemes if not scheme.startswith("Pods-")]
-          if not app_schemes:
-              raise SystemExit("No application scheme found in the generated Xcode workspace.")
-
-          print(app_schemes[0])
+          if "Wessali" not in schemes:
+              raise SystemExit(
+                  "Required application scheme 'Wessali' was not found. "
+                  "Refusing to build a Pods dependency scheme."
+              )
           PY
-          )"
 
           echo "workspace=$WORKSPACE" >> "$GITHUB_OUTPUT"
-          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
-          echo "Using workspace: $WORKSPACE"
-          echo "Using scheme: $SCHEME"
+          echo "scheme=Wessali" >> "$GITHUB_OUTPUT"
 
-      - name: Build iOS device app without code signing
+      - name: Build Wessali iOS device app without code signing
         shell: bash
         run: |
           set -o pipefail
           xcodebuild \
             -workspace "${{ steps.ios-project.outputs.workspace }}" \
-            -scheme "${{ steps.ios-project.outputs.scheme }}" \
+            -scheme Wessali \
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
@@ -105,26 +104,35 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             build
 
+      - name: Verify Wessali.app was built
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APP_PATH="$RUNNER_TEMP/WessaliDerivedData/Build/Products/Release-iphoneos/Wessali.app"
+
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Xcode did not produce the Wessali.app application bundle."
+            echo "Available iPhoneOS app bundles:"
+            find "$RUNNER_TEMP/WessaliDerivedData/Build/Products/Release-iphoneos" \
+              -maxdepth 4 -type d -name '*.app' -print || true
+            echo "Xcode build products:"
+            find "$RUNNER_TEMP/WessaliDerivedData/Build/Products/Release-iphoneos" \
+              -maxdepth 3 -print | head -200 || true
+            exit 1
+          fi
+
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Info.plist"
+          echo "Verified application bundle: $APP_PATH"
+
       - name: Package unsigned IPA
         shell: bash
         run: |
           set -euo pipefail
 
-          PRODUCTS_DIR="$RUNNER_TEMP/WessaliDerivedData/Build/Products"
-          echo "Looking for iOS device app bundles under: $PRODUCTS_DIR"
-          find "$PRODUCTS_DIR" -maxdepth 4 -type d -name '*.app' -print || true
-
-          APP_PATH="$(find "$PRODUCTS_DIR" -type d -name '*.app' -path '*iphoneos*' -not -path '*iphonesimulator*' -print -quit)"
-          if [ -z "$APP_PATH" ]; then
-            echo "No iOS device .app bundle was produced by Xcode."
-            echo "Build product directories:"
-            find "$PRODUCTS_DIR" -maxdepth 4 -print | head -200 || true
-            exit 1
-          fi
-
-          echo "Packaging app: $APP_PATH"
+          APP_PATH="$RUNNER_TEMP/WessaliDerivedData/Build/Products/Release-iphoneos/Wessali.app"
           mkdir -p "$RUNNER_TEMP/ipa/Payload"
-          cp -R "$APP_PATH" "$RUNNER_TEMP/ipa/Payload/"
+          cp -R "$APP_PATH" "$RUNNER_TEMP/ipa/Payload/Wessali.app"
 
           find "$RUNNER_TEMP/ipa/Payload" -type d -name _CodeSignature -prune -exec rm -rf {} +
           find "$RUNNER_TEMP/ipa/Payload" -type f -name embedded.mobileprovision -delete
