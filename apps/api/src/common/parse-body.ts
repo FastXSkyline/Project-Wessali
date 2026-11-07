@@ -1,10 +1,13 @@
 import { BadRequestException } from '@nestjs/common';
-import { z } from 'zod';
 
-export function parseBody<Schema extends z.ZodType>(
-  schema: Schema,
-  input: unknown,
-): z.infer<Schema> {
+type ValidationIssue = { path: PropertyKey[]; message: string };
+type SafeParseSchema<T> = {
+  safeParse(input: unknown):
+    | { success: true; data: T }
+    | { success: false; error: { issues: ValidationIssue[] } };
+};
+
+export function parseBody<T>(schema: SafeParseSchema<T>, input: unknown): T {
   const result = schema.safeParse(input);
   if (!result.success) {
     const message = result.error.issues

@@ -50,7 +50,7 @@ docs/           Product, architecture, domain, and delivery documentation
 
 ## Quick start
 
-Requirements: Node.js 24.22.2, pnpm 12.18.0, Git, and Docker Desktop.
+Requirements: Node.js 24.22.2, pnpm 12.18.0, Git, and PostgreSQL with PostGIS. Docker Compose is optional; Redis is only needed for the background worker.
 
 ~~~bash
 pnpm install
@@ -59,9 +59,9 @@ pnpm install
 Copy .env.example to .env, then run:
 
 ~~~bash
-pnpm db:up
+pnpm db:up   # optional if PostgreSQL/PostGIS is already installed locally
 pnpm db:migrate
-pnpm dev
+pnpm dev:core
 ~~~
 
 Useful checks:

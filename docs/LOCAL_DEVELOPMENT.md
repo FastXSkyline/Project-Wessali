@@ -60,7 +60,7 @@ This is not real phone verification and is not suitable for public production us
 From the repository root:
 
 ~~~bash
-pnpm dev
+pnpm dev:core
 ~~~
 
 | App | Address |

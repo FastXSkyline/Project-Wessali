@@ -16,7 +16,8 @@
     "db:up": "docker compose up -d postgres redis",
     "db:down": "docker compose down",
     "db:migrate": "pnpm --filter @wessali/api migrate",
-    "format": "prettier --write \"apps/**/*.{ts,tsx,css,json,js}\" \"packages/**/*.{ts,tsx,json}\" package.json turbo.json pnpm-workspace.yaml docker-compose.yml"
+    "format": "prettier --write \"apps/**/*.{ts,tsx,css,json,js}\" \"packages/**/*.{ts,tsx,json}\" package.json turbo.json pnpm-workspace.yaml docker-compose.yml",
+    "dev:core": "turbo run dev --parallel --filter=@wessali/admin --filter=@wessali/api --filter=@wessali/mobile"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
