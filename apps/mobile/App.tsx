@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -47,15 +46,15 @@ const words = {
     connect: 'دخول', signOut: 'تسجيل الخروج', home: 'الخدمات', history: 'طلباتي',
     refresh: 'تحديث', choose: 'اختر الخدمة', create: 'إرسال الطلب', cancel: 'إلغاء',
     pickup: 'عنوان الاستلام / الموقع', destination: 'عنوان الوجهة', notes: 'ملاحظات إضافية',
-    cargo: 'وصف البضاعة', weight: 'الوزن التقريبي بالكيلوغرام', truck: 'نوع الشاحنة',
+    cargo: 'وصف البضاعة', weight: 'الوزن التقريبي بالكيلوغرام', truckType: 'نوع الشاحنة',
     vehicle: 'نوع المركبة', issue: 'نوع العطل', towing: 'أحتاج إلى سحب المركبة',
     towingDestination: 'وجهة السحب', quantity: 'الكمية باللتر', intendedUse: 'الاستخدام',
     waterCategory: 'نوع المياه المطلوب', waterDisclaimer: 'تصنيف المياه هو تصريح من مقدم الخدمة وليس شهادة صلاحية للشرب. تحقق من المصدر قبل الاستلام.',
     residential: 'منزلي', agricultural: 'فلاحي', other: 'أخرى', potable: 'مصرح بأنها صالحة للشرب',
     nonPotable: 'غير صالحة للشرب', irrigation: 'للري', mechanical: 'ميكانيكي', tyre: 'عجلة',
     battery: 'بطارية', fuel: 'وقود', vehicleTowing: 'سحب', car: 'سيارة', motorcycle: 'دراجة نارية',
-    van: 'شاحنة صغيرة', truck: 'شاحنة', pickup: 'بيك أب', flatbed: 'سطحة', boxTruck: 'شاحنة مغلقة',
-    semi: 'مقطورة', loading: 'متطلبات التحميل', apply: 'إرسال طلب الانضمام', business: 'اسم النشاط',
+    van: 'شاحنة صغيرة', truckVehicle: 'شاحنة', pickupTruck: 'بيك أب', flatbed: 'سطحة', boxTruck: 'شاحنة مغلقة',
+    semi: 'مقطورة', loadingRequirements: 'متطلبات التحميل', apply: 'إرسال طلب الانضمام', business: 'اسم النشاط',
     services: 'الخدمات التي تقدمها', pending: 'طلبك قيد مراجعة الإدارة', approved: 'تم اعتماد حسابك',
     notApplied: 'قدّم طلب مقدم خدمة للبدء', available: 'الطلبات المتاحة', jobs: 'مهامي الحالية',
     accept: 'قبول الطلب', advance: 'تحديث حالة المهمة', empty: 'لا توجد طلبات حالياً',
@@ -64,7 +63,7 @@ const words = {
     arrived: 'وصل مقدم الخدمة', in_progress: 'الخدمة قيد التنفيذ', completed: 'مكتمل',
     cancelled: 'ملغي', expired: 'منتهي', disputed: 'قيد النزاع', error: 'حدث خطأ',
     saved: 'تم بنجاح', safety: 'في حالة عطل على الطريق، انتقل إلى مكان آمن إن أمكن. وصلي لا يحل محل خدمات الطوارئ.',
-    loading: 'جارٍ التنفيذ...', loginRequired: 'أدخل الاسم ورقم الهاتف الصحيح للمتابعة.',
+    working: 'جارٍ التنفيذ...', loginRequired: 'أدخل الاسم ورقم الهاتف الصحيح للمتابعة.',
     details: 'تفاصيل الطلب', waterInfo: 'لا يتم تأكيد صلاحية المياه للشرب من خلال التطبيق.',
     freightShort: 'نقل بين الولايات والوجهات', roadsideShort: 'مساعدة ميكانيكية وسحب', waterShort: 'توصيل صهاريج للمنازل والفلاحة',
   },
@@ -74,15 +73,15 @@ const words = {
     connect: 'Se connecter', signOut: 'Déconnexion', home: 'Services', history: 'Mes demandes',
     refresh: 'Actualiser', choose: 'Choisir un service', create: 'Envoyer la demande', cancel: 'Annuler',
     pickup: 'Adresse de prise en charge / lieu', destination: 'Adresse de destination', notes: 'Notes supplémentaires',
-    cargo: 'Description du chargement', weight: 'Poids estimé en kg', truck: 'Type de camion',
+    cargo: 'Description du chargement', weight: 'Poids estimé en kg', truckType: 'Type de camion',
     vehicle: 'Type de véhicule', issue: 'Type de panne', towing: 'J’ai besoin d’un remorquage',
     towingDestination: 'Destination du remorquage', quantity: 'Quantité en litres', intendedUse: 'Utilisation',
     waterCategory: 'Catégorie d’eau', waterDisclaimer: 'La catégorie est déclarée par le prestataire et ne constitue pas une certification de potabilité. Vérifiez la source avant livraison.',
     residential: 'Résidentiel', agricultural: 'Agricole', other: 'Autre', potable: 'Déclarée potable',
     nonPotable: 'Non potable', irrigation: 'Irrigation', mechanical: 'Mécanique', tyre: 'Pneu',
     battery: 'Batterie', fuel: 'Carburant', vehicleTowing: 'Remorquage', car: 'Voiture', motorcycle: 'Moto',
-    van: 'Fourgon', truck: 'Camion', pickup: 'Pickup', flatbed: 'Plateau', boxTruck: 'Fourgon fermé',
-    semi: 'Semi-remorque', loading: 'Exigences de chargement', apply: 'Envoyer la candidature', business: 'Nom de l’activité',
+    van: 'Fourgon', truckVehicle: 'Camion', pickupTruck: 'Pickup', flatbed: 'Plateau', boxTruck: 'Fourgon fermé',
+    semi: 'Semi-remorque', loadingRequirements: 'Exigences de chargement', apply: 'Envoyer la candidature', business: 'Nom de l’activité',
     services: 'Services proposés', pending: 'Votre candidature est en cours de vérification', approved: 'Votre compte est approuvé',
     notApplied: 'Déposez une candidature prestataire pour commencer', available: 'Demandes disponibles', jobs: 'Mes missions',
     accept: 'Accepter la demande', advance: 'Mettre à jour le statut', empty: 'Aucune demande pour le moment',
@@ -91,7 +90,7 @@ const words = {
     arrived: 'Prestataire arrivé', in_progress: 'Service en cours', completed: 'Terminé',
     cancelled: 'Annulé', expired: 'Expiré', disputed: 'En litige', error: 'Une erreur est survenue',
     saved: 'Enregistré', safety: 'En cas de panne, rejoignez un endroit sûr si possible. Wessali ne remplace pas les services d’urgence.',
-    loading: 'En cours...', loginRequired: 'Saisissez un nom et un numéro de téléphone valides.',
+    working: 'En cours...', loginRequired: 'Saisissez un nom et un numéro de téléphone valides.',
     details: 'Détails de la demande', waterInfo: 'L’application ne certifie pas la potabilité de l’eau.',
     freightShort: 'Transport entre villes et destinations', roadsideShort: 'Assistance mécanique et remorquage', waterShort: 'Livraison par citerne pour maison et ferme',
   },
@@ -101,15 +100,15 @@ const words = {
     connect: 'Continue', signOut: 'Sign out', home: 'Services', history: 'My requests',
     refresh: 'Refresh', choose: 'Choose a service', create: 'Submit request', cancel: 'Cancel',
     pickup: 'Pickup address / location', destination: 'Destination address', notes: 'Additional notes',
-    cargo: 'Cargo description', weight: 'Estimated weight in kg', truck: 'Truck type',
+    cargo: 'Cargo description', weight: 'Estimated weight in kg', truckType: 'Truck type',
     vehicle: 'Vehicle type', issue: 'Issue category', towing: 'I need towing',
     towingDestination: 'Towing destination', quantity: 'Quantity in litres', intendedUse: 'Intended use',
     waterCategory: 'Water category', waterDisclaimer: 'This category is declared by the provider, not a drinking-water certification. Verify the source before delivery.',
     residential: 'Residential', agricultural: 'Agricultural', other: 'Other', potable: 'Provider-declared potable',
     nonPotable: 'Non-potable', irrigation: 'Irrigation', mechanical: 'Mechanical', tyre: 'Tyre',
     battery: 'Battery', fuel: 'Fuel', vehicleTowing: 'Towing', car: 'Car', motorcycle: 'Motorcycle',
-    van: 'Van', truck: 'Truck', pickup: 'Pickup', flatbed: 'Flatbed', boxTruck: 'Box truck',
-    semi: 'Semi-trailer', loading: 'Loading requirements', apply: 'Submit provider application', business: 'Business name',
+    van: 'Van', truckVehicle: 'Truck', pickupTruck: 'Pickup', flatbed: 'Flatbed', boxTruck: 'Box truck',
+    semi: 'Semi-trailer', loadingRequirements: 'Loading requirements', apply: 'Submit provider application', business: 'Business name',
     services: 'Services you provide', pending: 'Your application is awaiting admin review', approved: 'Your account is approved',
     notApplied: 'Apply as a provider to get started', available: 'Available requests', jobs: 'My active jobs',
     accept: 'Accept request', advance: 'Advance job status', empty: 'No requests right now',
@@ -118,7 +117,7 @@ const words = {
     arrived: 'Provider arrived', in_progress: 'Service in progress', completed: 'Completed',
     cancelled: 'Cancelled', expired: 'Expired', disputed: 'Disputed', error: 'Something went wrong',
     saved: 'Saved', safety: 'For roadside breakdowns, move to a safe place if possible. Wessali does not replace emergency services.',
-    loading: 'Working...', loginRequired: 'Enter a valid name and phone number to continue.',
+    working: 'Working...', loginRequired: 'Enter a valid name and phone number to continue.',
     details: 'Request details', waterInfo: 'The app does not certify water as safe to drink.',
     freightShort: 'Freight between cities and destinations', roadsideShort: 'Mechanical help and towing', waterShort: 'Water tankers for homes and farms',
   },
@@ -162,8 +161,6 @@ async function apiRequest<T>(
   return data as T;
 }
 
-const statusOrder = ['accepted', 'provider_en_route', 'arrived', 'in_progress', 'completed'];
-
 export default function App() {
   const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
   const [apiBaseUrl, setApiBaseUrl] = useState(process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:4000/v1');
@@ -181,6 +178,7 @@ export default function App() {
   const [destinationAddress, setDestinationAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
   const [cargoDescription, setCargoDescription] = useState('');
+  const [loadingRequirements, setLoadingRequirements] = useState('');
   const [weightKg, setWeightKg] = useState('1000');
   const [truckType, setTruckType] = useState('box_truck');
   const [vehicleType, setVehicleType] = useState('car');
@@ -271,7 +269,7 @@ export default function App() {
       );
       setApiBaseUrl(base);
       setSession(result);
-      setNotice(copy.saved);
+      setNotice(ui.saved);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : ui.error);
     } finally {
@@ -302,6 +300,7 @@ export default function App() {
     setCustomerNotes('');
     setCargoDescription('');
     setLoadingRequirements('');
+    setLoadingRequirements('');
     setNeedsTowing(false);
     setError('');
     setNotice('');
@@ -331,6 +330,7 @@ export default function App() {
         cargoDescription: cargoDescription.trim(),
         weightKg: Number(weightKg),
         truckType,
+        loadingRequirements: loadingRequirements.trim() || undefined,
       };
     } else if (selectedService === 'roadside') {
       payload = {
@@ -613,11 +613,12 @@ export default function App() {
                     {renderField(ui.destination, destinationAddress, setDestinationAddress, undefined, 'default', true)}
                     {renderField(ui.cargo, cargoDescription, setCargoDescription, undefined, 'default', true)}
                     {renderField(ui.weight, weightKg, setWeightKg, '1000', 'numeric')}
-                    {renderChoice(ui.truck, [
-                      { label: ui.pickup, value: 'pickup' }, { label: ui.van, value: 'van' },
+                    {renderChoice(ui.truckType, [
+                      { label: ui.pickupTruck, value: 'pickup' }, { label: ui.van, value: 'van' },
                       { label: ui.flatbed, value: 'flatbed' }, { label: ui.boxTruck, value: 'box_truck' },
                       { label: ui.semi, value: 'semi_trailer' },
                     ], truckType, setTruckType)}
+                    {renderField(ui.loadingRequirements, loadingRequirements, setLoadingRequirements, undefined, 'default', true)}
                   </>
                 ) : null}
                 {selectedService === 'roadside' ? (
