@@ -103,7 +103,7 @@ const words = {
     potable: 'مصرح بأنها صالحة للشرب', nonPotable: 'غير صالحة للشرب', irrigation: 'للري',
     residential: 'منزلي', agricultural: 'فلاحي', other: 'أخرى',
     car: 'سيارة', motorcycle: 'دراجة نارية', van: 'شاحنة صغيرة',
-    truck: 'شاحنة', pickup: 'بيك أب', flatbed: 'سطحة',
+    truck: 'شاحنة', pickupTruck: 'بيك أب', flatbed: 'سطحة',
     boxTruck: 'شاحنة مغلقة', semi: 'مقطورة',
     mechanical: 'ميكانيكي', tyre: 'عجلة', battery: 'بطارية',
     fuel: 'وقود', towingIssue: 'سحب', error: 'حدث خطأ، حاول مرة أخرى.',
@@ -186,7 +186,7 @@ const words = {
     potable: 'Déclarée potable', nonPotable: 'Non potable', irrigation: 'Irrigation',
     residential: 'Résidentiel', agricultural: 'Agricole', other: 'Autre',
     car: 'Voiture', motorcycle: 'Moto', van: 'Fourgon',
-    truck: 'Camion', pickup: 'Pickup', flatbed: 'Plateau',
+    truck: 'Camion', pickupTruck: 'Pickup', flatbed: 'Plateau',
     boxTruck: 'Camion fermé', semi: 'Semi-remorque',
     mechanical: 'Mécanique', tyre: 'Pneu', battery: 'Batterie',
     fuel: 'Carburant', towingIssue: 'Remorquage', error: 'Une erreur est survenue. Réessayez.',
@@ -269,7 +269,7 @@ const words = {
     potable: 'Provider-declared potable', nonPotable: 'Non-potable', irrigation: 'Irrigation',
     residential: 'Residential', agricultural: 'Agricultural', other: 'Other',
     car: 'Car', motorcycle: 'Motorcycle', van: 'Van',
-    truck: 'Truck', pickup: 'Pickup', flatbed: 'Flatbed',
+    truck: 'Truck', pickupTruck: 'Pickup', flatbed: 'Flatbed',
     boxTruck: 'Box truck', semi: 'Semi-trailer',
     mechanical: 'Mechanical', tyre: 'Tyre', battery: 'Battery',
     fuel: 'Fuel', towingIssue: 'Towing', error: 'Something went wrong. Please try again.',
@@ -306,7 +306,7 @@ const serviceContent: Record<ServiceKind, { photo: string; icon: string; accent:
   water: { photo: photo.water, icon: '◌', accent: '#5B9EAA' },
 };
 
-const statusSteps = ['submitted', 'accepted', 'provider_en_route', 'arrived', 'in_progress', 'completed'];
+const statusSteps = ['submitted', 'matching', 'offer_received', 'accepted', 'provider_en_route', 'arrived', 'in_progress', 'completed'];
 
 function cleanBaseUrl(value: string) {
   return value.trim().replace(/\/+$/, '');
@@ -1014,7 +1014,7 @@ export default function App() {
             {renderField(ui.cargo, cargoDescription, setCargoDescription, undefined, 'default', true)}
             {renderField(ui.weight, weightKg, setWeightKg, '1000', 'numeric')}
             {renderChoice(ui.truckType, [
-              { label: ui.pickup, value: 'pickup' },
+              { label: ui.pickupTruck, value: 'pickup' },
               { label: ui.van, value: 'van' },
               { label: ui.flatbed, value: 'flatbed' },
               { label: ui.boxTruck, value: 'box_truck' },
@@ -1387,7 +1387,7 @@ const styles = StyleSheet.create({
   glowOrbTwo: { position: 'absolute', width: 140, height: 140, borderRadius: 100, backgroundColor: 'rgba(226,162,100,0.18)', bottom: -16, left: -18 },
   loginPhoto: { flex: 1, justifyContent: 'space-between', padding: 21, overflow: 'hidden' },
   loginPhotoRadius: { borderRadius: 30 },
-  loginPhotoShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(7,26,29,0.38)', borderRadius: 30 },
+  loginPhotoShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(7,26,29,0.38)', borderRadius: 30 },
   brandChip: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 9, backgroundColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)', borderRadius: 18, paddingVertical: 7, paddingHorizontal: 10 },
   brandChipMark: { color: '#FFFFFF', fontWeight: '900', fontSize: 17 },
   brandChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
@@ -1438,7 +1438,7 @@ const styles = StyleSheet.create({
   heroWrap: { height: 380, position: 'relative' },
   heroImage: { flex: 1, padding: 20, justifyContent: 'space-between', overflow: 'hidden' },
   heroImageRadius: { borderRadius: 29 },
-  heroShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(7,28,30,0.48)', borderRadius: 29 },
+  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(7,28,30,0.48)', borderRadius: 29 },
   heroHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   brandInline: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   brandSquare: { width: 38, height: 38, borderRadius: 13, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
@@ -1462,7 +1462,7 @@ const styles = StyleSheet.create({
   serviceCard: { borderRadius: 25, overflow: 'hidden', shadowColor: '#23473E', shadowOpacity: 0.1, shadowRadius: 16, shadowOffset: { width: 0, height: 7 }, elevation: 3 },
   serviceImage: { height: 214, padding: 17, justifyContent: 'space-between' },
   serviceImageRadius: { borderRadius: 25 },
-  imageShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(7,25,27,0.32)', borderRadius: 25 },
+  imageShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(7,25,27,0.32)', borderRadius: 25 },
   serviceImageTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   serviceIcon: { width: 38, height: 38, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' },
   serviceIconText: { color: '#1D5146', fontSize: 21, fontWeight: '800' },
@@ -1482,7 +1482,7 @@ const styles = StyleSheet.create({
   stepDescription: { color: '#788A82', fontSize: 11, lineHeight: 17 },
   storyBanner: { height: 255, padding: 20, justifyContent: 'flex-end', gap: 9, overflow: 'hidden' },
   storyBannerRadius: { borderRadius: 25 },
-  storyShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(9,38,42,0.58)', borderRadius: 25 },
+  storyShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(9,38,42,0.58)', borderRadius: 25 },
   storyEyebrow: { color: '#C2E5D9', fontSize: 8, letterSpacing: 2, fontWeight: '900' },
   storyTitle: { color: '#FFFFFF', fontSize: 20, lineHeight: 27, fontWeight: '900' },
   storyDescription: { color: 'rgba(255,255,255,0.82)', fontSize: 11, lineHeight: 17 },
