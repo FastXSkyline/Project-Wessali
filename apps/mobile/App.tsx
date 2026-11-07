@@ -301,6 +301,7 @@ export default function App() {
     setDestinationAddress('');
     setCustomerNotes('');
     setCargoDescription('');
+    setLoadingRequirements('');
     setNeedsTowing(false);
     setError('');
     setNotice('');
@@ -623,7 +624,7 @@ export default function App() {
                   <>
                     {renderChoice(ui.vehicle, [
                       { label: ui.car, value: 'car' }, { label: ui.motorcycle, value: 'motorcycle' },
-                      { label: ui.van, value: 'van' }, { label: ui.truck, value: 'truck' },
+                      { label: ui.van, value: 'van' }, { label: ui.truckVehicle, value: 'truck' },
                     ], vehicleType, setVehicleType)}
                     {renderChoice(ui.issue, [
                       { label: ui.mechanical, value: 'mechanical' }, { label: ui.tyre, value: 'tyre' },
