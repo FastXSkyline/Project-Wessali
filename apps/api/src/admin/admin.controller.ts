@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { ProviderReviewSchema } from '@wessali/contracts';
 import { parseBody } from '../common/parse-body.js';
 import type { AuthenticatedRequest } from '../auth/auth.types.js';
@@ -10,8 +10,8 @@ import { AdminService } from './admin.service.js';
 @UseGuards(SessionGuard)
 export class AdminController {
   constructor(
-    private readonly admin: AdminService,
-    private readonly bookings: BookingsService,
+    @Inject(AdminService) private readonly admin: AdminService,
+    @Inject(BookingsService) private readonly bookings: BookingsService,
   ) {}
 
   @Get('overview')
