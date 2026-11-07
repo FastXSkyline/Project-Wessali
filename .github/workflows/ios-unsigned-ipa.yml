@@ -1,0 +1,76 @@
+name: Wessali iOS Unsigned IPA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-ios:
+    name: Build unsigned iOS IPA
+    runs-on: macos-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js and pnpm
+        uses: pnpm/setup@v3
+        with:
+          require-lockfile: true
+          cache: true
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared workspace packages
+        run: |
+          pnpm --filter @wessali/contracts build
+          pnpm --filter @wessali/design-tokens build
+          pnpm --filter @wessali/i18n build
+
+      - name: Generate iOS native project
+        working-directory: apps/mobile
+        run: pnpm exec expo prebuild --platform ios --no-install --clean
+
+      - name: Install CocoaPods dependencies
+        working-directory: apps/mobile/ios
+        run: pod install
+
+      - name: Archive iOS app without code signing
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace apps/mobile/ios/Wessali.xcworkspace \
+            -scheme Wessali \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Wessali.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            archive
+
+      - name: Package unsigned IPA
+        run: |
+          set -euo pipefail
+          APP_PATH="$RUNNER_TEMP/Wessali.xcarchive/Products/Applications/Wessali.app"
+          test -d "$APP_PATH"
+          mkdir -p "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$APP_PATH" "$RUNNER_TEMP/ipa/Payload/Wessali.app"
+          cd "$RUNNER_TEMP/ipa"
+          /usr/bin/zip -qry "$GITHUB_WORKSPACE/Wessali-unsigned.ipa" Payload
+          test -s "$GITHUB_WORKSPACE/Wessali-unsigned.ipa"
+          echo "Created unsigned IPA:"
+          ls -lh "$GITHUB_WORKSPACE/Wessali-unsigned.ipa"
+
+      - name: Upload unsigned IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wessali-unsigned-IPA
+          path: Wessali-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14
