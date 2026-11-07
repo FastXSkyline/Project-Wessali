@@ -91,7 +91,7 @@ CREATE TABLE bookings (
   service_type text NOT NULL CHECK (service_type IN ('freight', 'roadside', 'water')),
   status text NOT NULL DEFAULT 'submitted' CHECK (
     status IN ('draft', 'submitted', 'matching', 'offer_received', 'accepted',
-    'provider_en_route', 'arrived', 'in_progress', 'completed', 'cancelled', 'expired', 'disputed')
+      'provider_en_route', 'arrived', 'in_progress', 'completed', 'cancelled', 'expired', 'disputed')
   ),
   pickup_location geography(Point, 4326),
   destination_location geography(Point, 4326),
