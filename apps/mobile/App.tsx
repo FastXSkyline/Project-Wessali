@@ -602,6 +602,8 @@ type MotionPressableProps = Omit<ComponentProps<typeof Pressable>, 'style'> & {
   style?: import('react-native').StyleProp<import('react-native').ViewStyle>;
 };
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 function MotionPressable({
   children,
   style,
@@ -622,22 +624,20 @@ function MotionPressable({
   };
 
   return (
-    <Animated.View style={[style, { transform: [{ scale }] }]}>
-      <MotionPressable
-        {...props}
-        style={styles.motionPressableInner}
-        onPressIn={(event) => {
-          animateScale(0.975);
-          onPressIn?.(event);
-        }}
-        onPressOut={(event) => {
-          animateScale(1);
-          onPressOut?.(event);
-        }}
-      >
-        {children}
-      </MotionPressable>
-    </Animated.View>
+    <AnimatedPressable
+      {...props}
+      style={[style, { transform: [{ scale }] }]}
+      onPressIn={(event) => {
+        animateScale(0.975);
+        onPressIn?.(event);
+      }}
+      onPressOut={(event) => {
+        animateScale(1);
+        onPressOut?.(event);
+      }}
+    >
+      {children}
+    </AnimatedPressable>
   );
 }
 
@@ -1994,6 +1994,14 @@ export default function App() {
                 <View
                   style={[styles.bottomGlyphWrap, screen === id && styles.bottomGlyphWrapActive]}
                 >
+                  {screen === id ? (
+                    <LinearGradient
+                      colors={['rgba(218,246,233,0.96)', 'rgba(255,255,255,0.84)']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={StyleSheet.absoluteFill}
+                    />
+                  ) : null}
                   <Text style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]}>
                     {glyph}
                   </Text>
@@ -2801,7 +2809,6 @@ const styles = StyleSheet.create({
   featureNoteTitle: { color: '#896C45', fontSize: 11, fontWeight: '900' },
   featureNoteText: { color: '#9A896F', fontSize: 10, lineHeight: 17 },
 
-  motionPressableInner: { flex: 1 },
   heroGlowOrb: {
     position: 'absolute',
     width: 235,
