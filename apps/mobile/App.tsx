@@ -2022,7 +2022,7 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#F4F6F5' },
   appShell: { flex: 1, backgroundColor: '#F4F6F5' },
-  content: { paddingHorizontal: 18, paddingTop: 12, paddingBottom: 32, gap: 24 },
+  content: { paddingHorizontal: 18, paddingTop: 12, paddingBottom: 132, gap: 24 },
   loginScroll: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -2821,8 +2821,10 @@ const styles = StyleSheet.create({
     right: -74,
   },
   bottomBarShell: {
-    marginHorizontal: 12,
-    marginBottom: 5,
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: 5,
     borderRadius: 25,
     overflow: 'hidden',
     borderWidth: 1,
