@@ -14,6 +14,10 @@ on:
       - '.nvmrc'
       - 'package.json'
 
+concurrency:
+  group: wessali-ios-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -50,7 +54,8 @@ jobs:
 
       - name: Install CocoaPods dependencies
         working-directory: apps/mobile/ios
-        run: pod install
+        timeout-minutes: 20
+        run: pod install --verbose
 
       - name: Verify Wessali Xcode scheme
         id: ios-project
