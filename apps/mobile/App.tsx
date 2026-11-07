@@ -708,7 +708,10 @@ export default function App() {
   });
   const previewOpacity = previewProgress.interpolate({ inputRange: [0, 1], outputRange: [0, 1] });
   const previewScale = previewProgress.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] });
-  const previewTranslateY = previewProgress.interpolate({ inputRange: [0, 1], outputRange: [22, 0] });
+  const previewTranslateY = previewProgress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [22, 0],
+  });
 
   const statusLabel = (status: string) => {
     const labels = ui as Record<string, string>;
@@ -1214,7 +1217,11 @@ export default function App() {
   const renderServiceCard = (kind: ServiceKind, index: number) => {
     const item = serviceContent[kind];
     return (
-      <MotionPressable key={kind} onPress={() => openServicePreview(kind)} style={styles.serviceCard}>
+      <MotionPressable
+        key={kind}
+        onPress={() => openServicePreview(kind)}
+        style={styles.serviceCard}
+      >
         <ImageBackground
           source={{ uri: item.photo }}
           style={styles.serviceImage}
@@ -1233,7 +1240,9 @@ export default function App() {
         </ImageBackground>
         <View style={styles.serviceMeta}>
           <Text style={[styles.serviceTitle, directionStyle]}>{serviceTitle(kind)}</Text>
-          <Text style={[styles.serviceDescription, directionStyle]}>{serviceDescription(kind)}</Text>
+          <Text style={[styles.serviceDescription, directionStyle]}>
+            {serviceDescription(kind)}
+          </Text>
           <Text style={[styles.serviceAction, directionStyle]}>
             {ui.start} <Text style={styles.serviceActionArrow}>↗</Text>
           </Text>
@@ -1350,7 +1359,7 @@ export default function App() {
               { opacity: heroTextOpacity, transform: [{ translateY: heroTextTranslate }] },
             ]}
           >
-            <Text style={styles.heroEyebrow}>WESSALI  /  ALGERIA</Text>
+            <Text style={styles.heroEyebrow}>WESSALI / ALGERIA</Text>
             <Text style={[styles.heroTitle, isRtl && styles.arabicHero]}>{ui.welcome}</Text>
             <Text style={[styles.heroSubtitle, isRtl && styles.arabicHero]}>{ui.welcomeSub}</Text>
             <View style={styles.heroLocationLine}>
@@ -1363,13 +1372,17 @@ export default function App() {
 
       <View style={styles.sectionHeaderBlock}>
         <View style={styles.sectionHeadingCopy}>
-          <Text style={[styles.sectionEyebrow, directionStyle]}>01  /  WESSALI SERVICES</Text>
+          <Text style={[styles.sectionEyebrow, directionStyle]}>01 / WESSALI SERVICES</Text>
           <Text style={[styles.sectionTitle, directionStyle]}>{ui.choose}</Text>
         </View>
         <Text style={styles.sectionCount}>03</Text>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.servicesRail}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.servicesRail}
+      >
         {renderServiceCard('freight', 0)}
         {renderServiceCard('roadside', 1)}
         {renderServiceCard('water', 2)}
@@ -1378,7 +1391,7 @@ export default function App() {
       <View style={styles.howSection}>
         <View style={styles.sectionHeaderBlock}>
           <View style={styles.sectionHeadingCopy}>
-            <Text style={[styles.sectionEyebrow, directionStyle]}>02  /  FOUR SIMPLE STEPS</Text>
+            <Text style={[styles.sectionEyebrow, directionStyle]}>02 / FOUR SIMPLE STEPS</Text>
             <Text style={[styles.sectionTitle, directionStyle]}>{ui.how}</Text>
           </View>
           <Text style={styles.sectionCount}>04</Text>
@@ -1402,7 +1415,7 @@ export default function App() {
       <View style={styles.aboutTeaser}>
         <View style={styles.aboutTeaserAccent} />
         <View style={styles.aboutTeaserCopy}>
-          <Text style={styles.sectionEyebrow}>03  /  THE WESSALI IDEA</Text>
+          <Text style={styles.sectionEyebrow}>03 / THE WESSALI IDEA</Text>
           <Text style={[styles.aboutTeaserTitle, directionStyle]}>{ui.story}</Text>
           <Text style={[styles.aboutTeaserText, directionStyle]}>{ui.storySub}</Text>
           <MotionPressable style={styles.aboutTeaserLink} onPress={() => setScreen('about')}>
@@ -1937,25 +1950,46 @@ export default function App() {
                 style={StyleSheet.absoluteFill}
               />
             </Animated.View>
-            <Pressable accessibilityRole="button" accessibilityLabel="Close service preview" style={StyleSheet.absoluteFill} onPress={closeServicePreview} />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Close service preview"
+              style={StyleSheet.absoluteFill}
+              onPress={closeServicePreview}
+            />
             {previewService ? (
               <Animated.View
                 style={[
                   styles.previewModalStage,
-                  { opacity: previewOpacity, transform: [{ scale: previewScale }, { translateY: previewTranslateY }] },
+                  {
+                    opacity: previewOpacity,
+                    transform: [{ scale: previewScale }, { translateY: previewTranslateY }],
+                  },
                 ]}
               >
                 <LinearGradient
-                  colors={['rgba(119,231,183,0.38)', 'rgba(206,164,104,0.14)', 'rgba(255,255,255,0)']}
+                  colors={[
+                    'rgba(119,231,183,0.38)',
+                    'rgba(206,164,104,0.14)',
+                    'rgba(255,255,255,0)',
+                  ]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.previewAura}
                 />
                 <View style={styles.previewCard}>
-                  <ImageBackground source={{ uri: serviceContent[previewService].photo }} style={styles.previewImage} imageStyle={styles.previewImageRadius} resizeMode="cover">
-                    <LinearGradient colors={['rgba(6,22,24,0.06)', 'rgba(6,22,24,0.68)']} style={StyleSheet.absoluteFill} />
+                  <ImageBackground
+                    source={{ uri: serviceContent[previewService].photo }}
+                    style={styles.previewImage}
+                    imageStyle={styles.previewImageRadius}
+                    resizeMode="cover"
+                  >
+                    <LinearGradient
+                      colors={['rgba(6,22,24,0.06)', 'rgba(6,22,24,0.68)']}
+                      style={StyleSheet.absoluteFill}
+                    />
                     <Text style={styles.previewImageEyebrow}>
-                      WESSALI  /  0{SERVICE_CATEGORIES.findIndex((item) => item.id === previewService) + 1}
+                      WESSALI / 0
+                      {SERVICE_CATEGORIES.findIndex((item) => item.id === previewService) + 1}
                     </Text>
                     <Text style={[styles.previewImageTitle, isRtl && styles.arabicHero]}>
                       {serviceTitle(previewService)}
@@ -1966,12 +2000,23 @@ export default function App() {
                       {serviceDescription(previewService)}
                     </Text>
                     <View style={styles.previewDivider} />
-                    <MotionPressable style={styles.previewPrimaryButton} onPress={startPreviewBooking}>
-                      <LinearGradient colors={['#236B59', '#174B40']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+                    <MotionPressable
+                      style={styles.previewPrimaryButton}
+                      onPress={startPreviewBooking}
+                    >
+                      <LinearGradient
+                        colors={['#236B59', '#174B40']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={StyleSheet.absoluteFill}
+                      />
                       <Text style={styles.previewPrimaryText}>{ui.start}</Text>
                       <Text style={styles.previewPrimaryArrow}>{isRtl ? '←' : '↗'}</Text>
                     </MotionPressable>
-                    <MotionPressable style={styles.previewCloseButton} onPress={closeServicePreview}>
+                    <MotionPressable
+                      style={styles.previewCloseButton}
+                      onPress={closeServicePreview}
+                    >
                       <Text style={styles.previewCloseText}>{ui.back}</Text>
                     </MotionPressable>
                   </View>
@@ -2029,27 +2074,98 @@ const styles = StyleSheet.create({
   serviceAction: { color: '#267A64', fontSize: 10, fontWeight: '900', marginTop: 2 },
   serviceActionArrow: { color: '#267A64', fontSize: 12 },
   howSection: { gap: 13 },
-  aboutTeaser: { flexDirection: 'row', gap: 13, paddingTop: 17, borderTopWidth: 1, borderTopColor: '#E0E9E4' },
+  aboutTeaser: {
+    flexDirection: 'row',
+    gap: 13,
+    paddingTop: 17,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E9E4',
+  },
   aboutTeaserAccent: { width: 3, minHeight: 100, borderRadius: 2, backgroundColor: '#3A9A79' },
   aboutTeaserCopy: { flex: 1, gap: 7 },
   aboutTeaserTitle: { color: '#203F34', fontSize: 15, lineHeight: 21, fontWeight: '900' },
   aboutTeaserText: { color: '#73827B', fontSize: 10, lineHeight: 16 },
-  aboutTeaserLink: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 5 },
+  aboutTeaserLink: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 5,
+  },
   aboutTeaserLinkText: { color: '#287A63', fontSize: 10, fontWeight: '900' },
   aboutTeaserArrow: { color: '#287A63', fontSize: 13, fontWeight: '900' },
-  bottomActiveMark: { width: 13, height: 2, borderRadius: 1, backgroundColor: '#27836B', marginTop: 1 },
-  previewModalRoot: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 35 },
-  previewModalStage: { width: '100%', maxWidth: 420, alignItems: 'center', justifyContent: 'center' },
-  previewAura: { position: 'absolute', width: '100%', height: '100%', borderRadius: 34, transform: [{ scale: 1.08 }] },
-  previewCard: { width: '100%', borderRadius: 25, overflow: 'hidden', backgroundColor: '#FAFCFB', borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)', shadowColor: '#061E18', shadowOpacity: 0.3, shadowRadius: 32, shadowOffset: { width: 0, height: 18 }, elevation: 14 },
-  previewImage: { height: 188, padding: 17, justifyContent: 'flex-end', gap: 7, overflow: 'hidden' },
+  bottomActiveMark: {
+    width: 13,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: '#27836B',
+    marginTop: 1,
+  },
+  previewModalRoot: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 35,
+  },
+  previewModalStage: {
+    width: '100%',
+    maxWidth: 420,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  previewAura: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    borderRadius: 34,
+    transform: [{ scale: 1.08 }],
+  },
+  previewCard: {
+    width: '100%',
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: '#FAFCFB',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.9)',
+    shadowColor: '#061E18',
+    shadowOpacity: 0.3,
+    shadowRadius: 32,
+    shadowOffset: { width: 0, height: 18 },
+    elevation: 14,
+  },
+  previewImage: {
+    height: 188,
+    padding: 17,
+    justifyContent: 'flex-end',
+    gap: 7,
+    overflow: 'hidden',
+  },
   previewImageRadius: { borderTopLeftRadius: 24, borderTopRightRadius: 24 },
-  previewImageEyebrow: { color: 'rgba(255,255,255,0.76)', fontSize: 8, letterSpacing: 1.7, fontWeight: '900' },
+  previewImageEyebrow: {
+    color: 'rgba(255,255,255,0.76)',
+    fontSize: 8,
+    letterSpacing: 1.7,
+    fontWeight: '900',
+  },
   previewImageTitle: { color: '#FFFFFF', fontSize: 23, lineHeight: 29, fontWeight: '900' },
   previewCardBody: { padding: 18, gap: 13 },
   previewDescription: { color: '#586D63', fontSize: 12, lineHeight: 19 },
   previewDivider: { height: 1, backgroundColor: '#E2EAE5' },
-  previewPrimaryButton: { minHeight: 52, borderRadius: 15, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, shadowColor: '#26775F', shadowOpacity: 0.24, shadowRadius: 13, shadowOffset: { width: 0, height: 5 }, elevation: 4 },
+  previewPrimaryButton: {
+    minHeight: 52,
+    borderRadius: 15,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    shadowColor: '#26775F',
+    shadowOpacity: 0.24,
+    shadowRadius: 13,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4,
+  },
   previewPrimaryText: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
   previewPrimaryArrow: { color: '#BDE9D6', fontSize: 16, fontWeight: '900' },
   previewCloseButton: { minHeight: 36, alignItems: 'center', justifyContent: 'center' },
@@ -2117,7 +2233,13 @@ const styles = StyleSheet.create({
   loginHeading: { gap: 6 },
   loginTitle: { color: '#132B27', fontSize: 27, fontWeight: '800', letterSpacing: -0.6 },
   loginSubtitle: { color: '#788580', fontSize: 13, lineHeight: 20 },
-  glassPanel: { backgroundColor: 'transparent', borderWidth: 0, borderRadius: 0, padding: 0, gap: 15 },
+  glassPanel: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    borderRadius: 0,
+    padding: 0,
+    gap: 15,
+  },
   field: { gap: 7 },
   fieldLabel: { color: '#30423D', fontSize: 11, fontWeight: '800', letterSpacing: 0.1 },
   input: {
@@ -2224,7 +2346,14 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
   },
   accountIdentity: { flexDirection: 'row', alignItems: 'center', gap: 9, flex: 1 },
-  accountAvatar: { width: 39, height: 39, borderRadius: 12, backgroundColor: '#D7E8E1', alignItems: 'center', justifyContent: 'center' },
+  accountAvatar: {
+    width: 39,
+    height: 39,
+    borderRadius: 12,
+    backgroundColor: '#D7E8E1',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   accountAvatarText: { color: '#1C574B', fontSize: 15, fontWeight: '900' },
   accountEyebrow: { color: '#95A19B', fontSize: 9, fontWeight: '700' },
   accountName: { color: '#19342D', fontSize: 12, fontWeight: '800' },
@@ -2277,7 +2406,13 @@ const styles = StyleSheet.create({
   heroHeaderButtonText: { color: '#FFFFFF', fontSize: 17 },
   heroTextBlock: { gap: 8, maxWidth: 340 },
   heroEyebrow: { color: '#C5E5D9', fontSize: 9, letterSpacing: 2.1, fontWeight: '900' },
-  heroTitle: { color: '#FFFFFF', fontSize: 25, lineHeight: 31, fontWeight: '900', letterSpacing: -0.35 },
+  heroTitle: {
+    color: '#FFFFFF',
+    fontSize: 25,
+    lineHeight: 31,
+    fontWeight: '900',
+    letterSpacing: -0.35,
+  },
   heroSubtitle: { color: 'rgba(255,255,255,0.9)', fontSize: 11, lineHeight: 17 },
   locationPill: {
     alignSelf: 'flex-start',
@@ -2294,7 +2429,12 @@ const styles = StyleSheet.create({
   },
   locationPillIcon: { color: '#CBE9DE', fontSize: 15 },
   locationPillText: { color: '#FFFFFF', fontSize: 9, fontWeight: '800' },
-  sectionHeaderBlock: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 },
+  sectionHeaderBlock: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    gap: 12,
+  },
   sectionEyebrow: {
     color: '#8BA49A',
     fontSize: 8,
@@ -2323,12 +2463,35 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   serviceImageTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  serviceNumber: { color: 'rgba(255,255,255,0.9)', fontSize: 8, fontWeight: '900', letterSpacing: 1.6 },
+  serviceNumber: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1.6,
+  },
   serviceTitle: { color: '#183A31', fontSize: 14, lineHeight: 19, fontWeight: '900' },
   serviceDescription: { color: '#718179', fontSize: 10, lineHeight: 15 },
-  softPanel: { backgroundColor: 'transparent', borderWidth: 0, borderRadius: 0, padding: 0, gap: 15 },
-  stepsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 14 },
-  stepCard: { width: '48%', minHeight: 122, paddingVertical: 4, gap: 6, borderBottomWidth: 1, borderBottomColor: '#DDE8E2' },
+  softPanel: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    borderRadius: 0,
+    padding: 0,
+    gap: 15,
+  },
+  stepsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 14,
+  },
+  stepCard: {
+    width: '48%',
+    minHeight: 122,
+    paddingVertical: 4,
+    gap: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#DDE8E2',
+  },
   stepNumber: { color: '#27836B', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
   stepTitle: { color: '#203F34', fontSize: 12, lineHeight: 17, fontWeight: '900' },
   stepDescription: { color: '#73827B', fontSize: 10, lineHeight: 15 },
@@ -2569,23 +2732,58 @@ const styles = StyleSheet.create({
   },
   reviewTrackFill: { height: 5, width: '64%', backgroundColor: '#5AAB91', borderRadius: 5 },
 
-  aboutHero: { height: 188, borderRadius: 22, padding: 18, justifyContent: 'flex-end', gap: 7, overflow: 'hidden' },
+  aboutHero: {
+    height: 188,
+    borderRadius: 22,
+    padding: 18,
+    justifyContent: 'flex-end',
+    gap: 7,
+    overflow: 'hidden',
+  },
   aboutHeroRadius: { borderRadius: 26 },
   aboutHeroTitle: { color: '#FFFFFF', fontSize: 29, fontWeight: '900' },
   aboutHeroSubtitle: { color: 'rgba(255,255,255,0.82)', fontSize: 12 },
-  corridorCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'transparent', borderTopWidth: 1, borderTopColor: '#E6EEE9', borderRadius: 0, paddingVertical: 13, marginTop: 7 },
+  corridorCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: 'transparent',
+    borderTopWidth: 1,
+    borderTopColor: '#E6EEE9',
+    borderRadius: 0,
+    paddingVertical: 13,
+    marginTop: 7,
+  },
   corridorGlyph: { color: '#248A75', fontSize: 24, fontWeight: '900' },
   corridorCopy: { flex: 1, gap: 3 },
   corridorTitle: { color: '#315C4C', fontSize: 12, fontWeight: '900' },
   corridorSub: { color: '#8CA39A', fontSize: 7, letterSpacing: 1.3, fontWeight: '900' },
-  problemGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 14 },
-  informationCard: { width: '48%', paddingVertical: 10, gap: 7, borderBottomWidth: 1, borderBottomColor: '#E1EAE5' },
+  problemGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 14,
+  },
+  informationCard: {
+    width: '48%',
+    paddingVertical: 10,
+    gap: 7,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E1EAE5',
+  },
   infoCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   infoCardNumber: { color: '#A2B4AA', fontSize: 9, fontWeight: '900', letterSpacing: 1.3 },
   infoCardGlyph: { color: '#28917A', fontSize: 20, fontWeight: '900' },
   infoCardTitle: { color: '#25473A', fontSize: 14, fontWeight: '900' },
   solutionRow: { flexDirection: 'row', alignItems: 'center', gap: 11, paddingVertical: 7 },
-  solutionIcon: { width: 28, height: 28, borderRadius: 0, backgroundColor: 'transparent', alignItems: 'center', justifyContent: 'center' },
+  solutionIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 0,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   solutionIconText: { color: '#258875', fontSize: 18, fontWeight: '900' },
   solutionText: { flex: 1, color: '#5F756A', fontSize: 11, lineHeight: 18, fontWeight: '600' },
   workflowRow: {
@@ -2596,28 +2794,86 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#EFF3F1',
   },
-  workflowNumber: { width: 27, height: 27, borderRadius: 8, backgroundColor: 'transparent', borderWidth: 1, borderColor: '#D8E6DE', alignItems: 'center', justifyContent: 'center' },
+  workflowNumber: {
+    width: 27,
+    height: 27,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#D8E6DE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   workflowNumberText: { color: '#33836D', fontSize: 9, fontWeight: '900' },
   workflowText: { flex: 1, gap: 4 },
   workflowTitle: { color: '#2F4A3E', fontSize: 12, fontWeight: '900' },
-  teamCard: { backgroundColor: 'transparent', borderTopWidth: 1, borderTopColor: '#DDE8E2', paddingTop: 17, gap: 13 },
+  teamCard: {
+    backgroundColor: 'transparent',
+    borderTopWidth: 1,
+    borderTopColor: '#DDE8E2',
+    paddingTop: 17,
+    gap: 13,
+  },
   teamTitle: { color: '#1B3D32', fontSize: 20, fontWeight: '900' },
   teamMember: { flexDirection: 'row', alignItems: 'center', gap: 11 },
-  avatar: { width: 38, height: 38, borderRadius: 12, backgroundColor: '#E8F1EC', alignItems: 'center', justifyContent: 'center' },
+  avatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: '#E8F1EC',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   avatarText: { color: '#317B64', fontSize: 10, fontWeight: '900' },
   teamMemberText: { flex: 1, gap: 3 },
   teamMemberName: { color: '#214337', fontSize: 12, fontWeight: '900' },
   teamMemberRole: { color: '#85948C', fontSize: 9 },
   teamDivider: { height: 1, backgroundColor: '#E1EAE5' },
   supervisorText: { color: '#42745F', fontSize: 11, fontWeight: '800' },
-  featureNoteCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingTop: 15, borderTopWidth: 1, borderTopColor: '#E9E4D6' },
-  featureNoteMark: { width: 18, height: 18, color: '#9A713E', fontSize: 13, fontWeight: '900', textAlign: 'center' },
+  featureNoteCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#E9E4D6',
+  },
+  featureNoteMark: {
+    width: 18,
+    height: 18,
+    color: '#9A713E',
+    fontSize: 13,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
   featureNoteCopy: { flex: 1, gap: 5 },
   featureNoteTitle: { color: '#896C45', fontSize: 11, fontWeight: '900' },
   featureNoteText: { color: '#9A896F', fontSize: 10, lineHeight: 17 },
 
-  bottomBarShell: { position: 'absolute', left: 14, right: 14, bottom: 7, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: '#E3ECE6', backgroundColor: 'rgba(255,255,255,0.98)', shadowColor: '#244C3F', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
-  bottomBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 17, paddingTop: 10, paddingBottom: 10 },
+  bottomBarShell: {
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    bottom: 7,
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E3ECE6',
+    backgroundColor: 'rgba(255,255,255,0.98)',
+    shadowColor: '#244C3F',
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingHorizontal: 17,
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
   bottomTab: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 2 },
   bottomGlyphWrap: { width: 30, height: 25, alignItems: 'center', justifyContent: 'center' },
   bottomGlyph: { color: '#A2AEA8', fontSize: 18, fontWeight: '800' },
