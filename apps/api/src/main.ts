@@ -33,7 +33,10 @@ async function bootstrap() {
 
   app.setGlobalPrefix('v1');
   app.enableCors({
-    origin: (origin, callback) => {
+    origin: (
+      origin: string | undefined,
+      callback: (error: Error | null, allow?: boolean) => void,
+    ) => {
       const explicitlyAllowed = !origin || allowedOrigins.includes(origin);
       const localDevelopmentAllowed =
         process.env.NODE_ENV !== 'production' &&
