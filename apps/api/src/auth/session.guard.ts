@@ -1,5 +1,11 @@
 import { createHash } from 'node:crypto';
-import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { DatabaseService } from '../database/database.service.js';
 import type { AuthenticatedRequest } from './auth.types.js';
 

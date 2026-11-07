@@ -15,9 +15,7 @@ export class AuthService {
     }
 
     if (input.role === 'admin') {
-      const configuredUsername = (process.env.ADMIN_DEMO_USERNAME ?? 'fastx')
-        .trim()
-        .toLowerCase();
+      const configuredUsername = (process.env.ADMIN_DEMO_USERNAME ?? 'fastx').trim().toLowerCase();
       if (input.adminUsername?.trim().toLowerCase() !== configuredUsername) {
         throw new ForbiddenException('The admin username is incorrect.');
       }
