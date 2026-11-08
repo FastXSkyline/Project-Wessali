@@ -1428,7 +1428,7 @@ export default function App() {
             ['03', ui.step3, ui.step3d, threeDIcons.roadside],
             ['04', ui.step4, ui.step4d, threeDIcons.clock],
           ].map(([number, title, description, glyph]) => (
-            <LinearGradient key={number} colors={['#1B3827', '#12161D']} style={styles.stepCard}>
+            <LinearGradient key={number} colors={['#1B3827', '#13271D']} style={styles.stepCard}>
               <View style={styles.stepCardTop}>
                 <Text style={styles.stepNumber}>{number}</Text>
                 <Floating3DIcon glyph={glyph} size={30} glow="#48C982" />
