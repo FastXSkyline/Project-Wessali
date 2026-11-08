@@ -550,9 +550,9 @@ const words = {
 } as const;
 
 const serviceContent: Record<ServiceKind, { photo: string; icon: string; accent: string }> = {
-  freight: { photo: photo.freight, icon: '↗', accent: '#D6A15C' },
-  roadside: { photo: photo.roadside, icon: '⌁', accent: '#E27C69' },
-  water: { photo: photo.water, icon: '◌', accent: '#5B9EAA' },
+  freight: { photo: photo.freight, icon: '📦', accent: '#FF6A24' },
+  roadside: { photo: photo.roadside, icon: '🛠️', accent: '#FF7A36' },
+  water: { photo: photo.water, icon: '💧', accent: '#42A9E8' },
 };
 
 const statusSteps = [
@@ -638,6 +638,39 @@ function MotionPressable({
     >
       {children}
     </AnimatedPressable>
+  );
+}
+
+
+function Floating3DIcon({ glyph, size = 62, glow = '#FF6A24' }: { glyph: string; size?: number; glow?: string }) {
+  return (
+    <View pointerEvents="none" style={{ width: size * 1.48, height: size * 1.3, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ position: 'absolute', bottom: size * 0.07, width: size * 0.94, height: size * 0.2, borderRadius: 99, backgroundColor: glow, opacity: 0.2, transform: [{ scaleX: 1.28 }] }} />
+      <Text style={{ fontSize: size * 0.88, lineHeight: size * 1.08, textShadowColor: glow, textShadowOffset: { width: 0, height: size * 0.08 }, textShadowRadius: size * 0.34, elevation: 10 }}>{glyph}</Text>
+      <LinearGradient colors={['rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']} style={{ position: 'absolute', top: size * 0.08, width: size * 0.56, height: size * 0.1, borderRadius: 99, opacity: 0.45, transform: [{ rotate: '-18deg' }] }} />
+    </View>
+  );
+}
+
+function Service3DIcon({ kind, size = 62 }: { kind: ServiceKind; size?: number }) {
+  const config = {
+    freight: { glyph: '📦', glow: '#FF6A24' },
+    roadside: { glyph: '🛠️', glow: '#FF7A36' },
+    water: { glyph: '💧', glow: '#42A9E8' },
+  }[kind];
+  return <Floating3DIcon glyph={config.glyph} size={size} glow={config.glow} />;
+}
+
+function AmbientBackground() {
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <LinearGradient colors={['#08090D', '#11151D', '#090B10', '#07080C']} locations={[0, 0.38, 0.72, 1]} style={StyleSheet.absoluteFill} />
+      <View style={[styles.ambientGlow, styles.ambientGlowTop]} />
+      <View style={[styles.ambientGlow, styles.ambientGlowBottom]} />
+      <BlurView intensity={26} tint="dark" style={[styles.ambientBlur, styles.ambientBlurTop]} />
+      <BlurView intensity={22} tint="dark" style={[styles.ambientBlur, styles.ambientBlurBottom]} />
+      <LinearGradient colors={['rgba(255,105,39,0.08)', 'rgba(255,105,39,0)', 'rgba(255,105,39,0.035)']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+    </View>
   );
 }
 
@@ -1138,6 +1171,7 @@ export default function App() {
 
     return (
       <View key={booking.id} style={styles.bookingCard}>
+        <LinearGradient colors={['#1B2028', '#13171E', '#11151B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
         <View style={[styles.bookingTop, rowStyle]}>
           <View style={styles.referenceBlock}>
             <Text style={styles.overline}>WESSALI · {booking.public_reference}</Text>
@@ -1215,37 +1249,24 @@ export default function App() {
   );
 
   const renderServiceCard = (kind: ServiceKind, index: number) => {
-    const item = serviceContent[kind];
     return (
-      <MotionPressable
-        key={kind}
-        onPress={() => openServicePreview(kind)}
-        style={styles.serviceCard}
-      >
-        <ImageBackground
-          source={{ uri: item.photo }}
-          style={styles.serviceImage}
-          imageStyle={styles.serviceImageRadius}
-          resizeMode="cover"
-        >
-          <LinearGradient
-            colors={['rgba(8,24,27,0.02)', 'rgba(8,24,27,0.08)', 'rgba(8,24,27,0.62)']}
-            locations={[0, 0.48, 1]}
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={styles.serviceImageTop}>
-            <Text style={styles.serviceNumber}>0{index + 1} / 03</Text>
-            <Text style={styles.serviceOpenArrow}>↗</Text>
-          </View>
-        </ImageBackground>
+      <MotionPressable key={kind} onPress={() => openServicePreview(kind)} style={styles.serviceCard}>
+        <LinearGradient colors={['#20232B', '#151920', '#101319']} locations={[0, 0.52, 1]} style={StyleSheet.absoluteFill} />
+        <View style={styles.serviceCardTop}>
+          <Text style={styles.serviceNumber}>0{index + 1} / 03</Text>
+          <Text style={styles.serviceOpenArrow}>↗</Text>
+        </View>
+        <View style={styles.serviceArt}>
+          <View style={[styles.serviceIconGlow, { backgroundColor: kind === 'water' ? 'rgba(66,169,232,0.18)' : 'rgba(255,106,36,0.2)' }]} />
+          <Service3DIcon kind={kind} size={66} />
+        </View>
         <View style={styles.serviceMeta}>
           <Text style={[styles.serviceTitle, directionStyle]}>{serviceTitle(kind)}</Text>
-          <Text style={[styles.serviceDescription, directionStyle]}>
-            {serviceDescription(kind)}
-          </Text>
-          <Text style={[styles.serviceAction, directionStyle]}>
-            {ui.start} <Text style={styles.serviceActionArrow}>↗</Text>
-          </Text>
+          <Text style={[styles.serviceDescription, directionStyle]}>{serviceDescription(kind)}</Text>
+          <View style={[styles.serviceMetaBottom, rowStyle]}>
+            <Text style={[styles.serviceAction, directionStyle]}>{ui.start}</Text>
+            <Text style={styles.serviceActionArrow}>{isRtl ? '←' : '↗'}</Text>
+          </View>
         </View>
       </MotionPressable>
     );
@@ -1253,7 +1274,8 @@ export default function App() {
 
   const renderLogin = () => (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
+      <AmbientBackground />
+      <StatusBar barStyle="light-content" />
       <ScrollView contentContainerStyle={styles.loginScroll} keyboardShouldPersistTaps="handled">
         {renderLanguagePicker()}
         <View style={styles.loginVisual}>
@@ -1263,7 +1285,8 @@ export default function App() {
             imageStyle={styles.loginPhotoRadius}
             resizeMode="cover"
           >
-            <View style={styles.loginPhotoShade} />
+            <LinearGradient colors={['rgba(5,7,10,0.08)', 'rgba(5,7,10,0.4)', 'rgba(5,7,10,0.9)']} style={StyleSheet.absoluteFill} />
+            <View style={styles.loginPhotoGlow} />
             <View style={styles.brandChip}>
               <Text style={styles.brandChipMark}>W</Text>
               <Text style={styles.brandChipText}>{brandTitle}</Text>
@@ -1349,10 +1372,13 @@ export default function App() {
           resizeMode="cover"
         >
           <LinearGradient
-            colors={['rgba(8,25,27,0.12)', 'rgba(8,25,27,0.26)', 'rgba(8,25,27,0.76)']}
+            colors={['rgba(7,8,12,0.12)', 'rgba(7,8,12,0.38)', 'rgba(7,8,12,0.92)']}
             locations={[0, 0.42, 1]}
             style={StyleSheet.absoluteFill}
           />
+          <View style={styles.heroObject}>
+            <Service3DIcon kind="freight" size={68} />
+          </View>
           <Animated.View
             style={[
               styles.heroTextBlock,
@@ -1398,21 +1424,29 @@ export default function App() {
         </View>
         <View style={styles.stepsGrid}>
           {[
-            ['01', ui.step1, ui.step1d],
-            ['02', ui.step2, ui.step2d],
-            ['03', ui.step3, ui.step3d],
-            ['04', ui.step4, ui.step4d],
-          ].map(([number, title, description]) => (
-            <View key={number} style={styles.stepCard}>
-              <Text style={styles.stepNumber}>{number}</Text>
+            ['01', ui.step1, ui.step1d, '📦'],
+            ['02', ui.step2, ui.step2d, '📍'],
+            ['03', ui.step3, ui.step3d, '🚚'],
+            ['04', ui.step4, ui.step4d, '✨'],
+          ].map(([number, title, description, glyph]) => (
+            <LinearGradient key={number} colors={['#1C2028', '#12161D']} style={styles.stepCard}>
+              <View style={styles.stepCardTop}>
+                <Text style={styles.stepNumber}>{number}</Text>
+                <Floating3DIcon glyph={glyph} size={30} glow="#FF6A24" />
+              </View>
               <Text style={[styles.stepTitle, directionStyle]}>{title}</Text>
               <Text style={[styles.stepDescription, directionStyle]}>{description}</Text>
-            </View>
+            </LinearGradient>
           ))}
         </View>
       </View>
 
-      <View style={styles.aboutTeaser}>
+      <LinearGradient
+        colors={['rgba(39,31,28,0.96)', 'rgba(20,23,29,0.98)', '#141820']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.aboutTeaser}
+      >
         <View style={styles.aboutTeaserAccent} />
         <View style={styles.aboutTeaserCopy}>
           <Text style={styles.sectionEyebrow}>03 / THE WESSALI IDEA</Text>
@@ -1423,7 +1457,7 @@ export default function App() {
             <Text style={styles.aboutTeaserArrow}>{isRtl ? '←' : '↗'}</Text>
           </MotionPressable>
         </View>
-      </View>
+      </LinearGradient>
     </View>
   );
 
@@ -1440,7 +1474,7 @@ export default function App() {
       >
         <View style={styles.heroShade} />
         <View style={styles.formHeroIcon}>
-          <Text style={styles.formHeroIconText}>{serviceContent[selectedService].icon}</Text>
+          <Service3DIcon kind={selectedService} size={54} />
         </View>
         <Text style={[styles.formHeroTitle, isRtl && styles.arabicHero]}>
           {selectedServiceCopy?.labels[locale] ?? serviceTitle(selectedService)}
@@ -1637,15 +1671,8 @@ export default function App() {
           <Text style={[styles.fieldLabel, directionStyle]}>{ui.serviceTypes}</Text>
           {SERVICE_CATEGORIES.map((service) => (
             <View key={service.id} style={[styles.providerServiceRow, rowStyle]}>
-              <View
-                style={[
-                  styles.providerServiceIcon,
-                  { backgroundColor: serviceContent[service.id].accent + '24' },
-                ]}
-              >
-                <Text style={styles.providerServiceIconText}>
-                  {serviceContent[service.id].icon}
-                </Text>
+              <View style={styles.providerServiceIcon}>
+                <Service3DIcon kind={service.id} size={34} />
               </View>
               <View style={styles.providerServiceCopy}>
                 <Text style={[styles.providerServiceTitle, directionStyle]}>
@@ -1878,7 +1905,8 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
+      <AmbientBackground />
+      <StatusBar barStyle="light-content" />
       <View style={styles.appShell}>
         <Animated.ScrollView
           contentContainerStyle={styles.content}
@@ -1946,7 +1974,7 @@ export default function App() {
             <Animated.View style={[StyleSheet.absoluteFill, { opacity: previewOpacity }]}>
               <BlurView intensity={78} tint="dark" style={StyleSheet.absoluteFill} />
               <LinearGradient
-                colors={['rgba(7,26,25,0.46)', 'rgba(9,32,31,0.66)', 'rgba(15,48,40,0.78)']}
+                colors={['rgba(5,7,11,0.62)', 'rgba(10,13,19,0.82)', 'rgba(24,15,13,0.84)']}
                 style={StyleSheet.absoluteFill}
               />
             </Animated.View>
@@ -1968,8 +1996,8 @@ export default function App() {
               >
                 <LinearGradient
                   colors={[
-                    'rgba(119,231,183,0.38)',
-                    'rgba(206,164,104,0.14)',
+                    'rgba(255,112,45,0.34)',
+                    'rgba(255,160,94,0.12)',
                     'rgba(255,255,255,0)',
                   ]}
                   start={{ x: 0, y: 0 }}
@@ -2005,7 +2033,7 @@ export default function App() {
                       onPress={startPreviewBooking}
                     >
                       <LinearGradient
-                        colors={['#236B59', '#174B40']}
+                        colors={['#FF873B', '#F04A16', '#B92D0D']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={StyleSheet.absoluteFill}
@@ -2028,6 +2056,8 @@ export default function App() {
 
         {session.user.role === 'customer' ? (
           <View style={styles.bottomBarShell}>
+            <BlurView intensity={48} tint="dark" style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={['rgba(35,29,27,0.9)', 'rgba(15,18,24,0.94)']} style={StyleSheet.absoluteFill} />
             <View style={styles.bottomBar}>
               {[
                 ['home', '⌂', ui.home],
