@@ -14,7 +14,8 @@
       "infoPlist": {
         "UIUserInterfaceStyle": "Light",
         "UIViewControllerBasedStatusBarAppearance": false
-      }
+      },
+      "deploymentTarget": "18.0"
     },
     "android": {
       "package": "dz.wessali.app",
@@ -45,6 +46,19 @@
         {
           "backgroundColor": "#F3F3EF",
           "resizeMode": "contain"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Wessali uses your location to place accurate pickup and delivery pins."
+        }
+      ],
+      [
+        "expo-maps",
+        {
+          "requestLocationPermission": true,
+          "locationPermission": "Wessali uses your location to place accurate pickup and delivery pins."
         }
       ]
     ]
