@@ -193,7 +193,7 @@ function ServiceConstellation({ isRtl, ui }: { isRtl: boolean; ui: Copy }) {
   return (
     <View style={styles.constellation}>
       <LinearGradient
-        colors={['rgba(17, 54, 40, 0.82)', 'rgba(4, 16, 11, 0.92)']}
+        colors={['rgba(232, 239, 230, 0.96)', 'rgba(247, 248, 244, 0.92)']}
         start={{ x: 0.15, y: 0 }}
         end={{ x: 0.85, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -203,14 +203,14 @@ function ServiceConstellation({ isRtl, ui }: { isRtl: boolean; ui: Copy }) {
       <View
         style={[
           styles.orbit,
-          { borderColor: 'rgba(155, 244, 209, 0.10)' },
+          { borderColor: 'rgba(82, 105, 87, 0.12)' },
           isRtl ? { right: -40 } : { left: -40 },
         ]}
       />
       <View
         style={[
           styles.orbitLarge,
-          { borderColor: 'rgba(155, 244, 209, 0.055)' },
+          { borderColor: 'rgba(82, 105, 87, 0.07)' },
           isRtl ? { right: -85 } : { left: -85 },
         ]}
       />
@@ -277,8 +277,8 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(55, 225, 165, 0.18)',
-    backgroundColor: 'rgba(55, 225, 165, 0.07)',
+    borderColor: 'rgba(88, 116, 94, 0.18)',
+    backgroundColor: 'rgba(88, 116, 94, 0.07)',
   },
   kickerDot: {
     width: 5,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(174, 245, 217, 0.13)',
+    borderColor: 'rgba(82, 105, 87, 0.14)',
     backgroundColor: palette.glassDeep,
   },
   node: { position: 'absolute', flexDirection: 'row', alignItems: 'center' },
@@ -309,8 +309,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(174, 245, 217, 0.14)',
-    backgroundColor: 'rgba(5, 20, 14, 0.55)',
+    borderColor: 'rgba(82, 105, 87, 0.13)',
+    backgroundColor: 'rgba(255, 255, 255, 0.78)',
   },
   serviceDot: {
     width: 5,

@@ -26,37 +26,37 @@ type Recipe = {
  */
 const recipes: Record<TileTone, Recipe> = {
   freight: {
-    gradient: ['#7CFFD4', '#2BD79E', '#067552'],
+    gradient: ['#D2E0D1', '#91AA92', '#58745E'],
     accent: palette.jade,
     icon: 'truck-fast',
   },
   roadside: {
-    gradient: ['#FFE0B0', '#F6A54F', '#8A4711'],
+    gradient: ['#F0E0CC', '#C8A37B', '#8D6944'],
     accent: palette.amber,
     icon: 'car-wrench',
   },
   water: {
-    gradient: ['#B6F3FF', '#3EC4E4', '#0A5A70'],
+    gradient: ['#DCE7E9', '#A3BCC3', '#668795'],
     accent: palette.aqua,
     icon: 'water',
   },
   jade: {
-    gradient: ['#8BFFD8', '#2ED3A0', '#066B4E'],
+    gradient: ['#D2E0D1', '#91AA92', '#58745E'],
     accent: palette.jade,
     icon: 'cube',
   },
   aqua: {
-    gradient: ['#BFF6FF', '#4AC7E6', '#0B566A'],
+    gradient: ['#DCE7E9', '#A3BCC3', '#668795'],
     accent: palette.aqua,
     icon: 'waves',
   },
   amber: {
-    gradient: ['#FFE4B6', '#F5A855', '#7C420F'],
+    gradient: ['#F0E0CC', '#C8A37B', '#8D6944'],
     accent: palette.amber,
     icon: 'lightning-bolt',
   },
   sand: {
-    gradient: ['#FFF4DA', '#E2BE84', '#6E4E1D'],
+    gradient: ['#EEE5D7', '#CDB895', '#947A51'],
     accent: palette.sand,
     icon: 'shield-check',
   },
@@ -66,7 +66,7 @@ const recipes: Record<TileTone, Recipe> = {
     icon: 'alert',
   },
   neutral: {
-    gradient: ['rgba(196, 231, 217, 0.55)', 'rgba(62, 103, 86, 0.8)', 'rgba(8, 26, 19, 0.96)'],
+    gradient: ['#E8EBE4', '#B8C2B5', '#788579'],
     accent: palette.inkSoft,
     icon: 'dots-horizontal',
   },
@@ -110,12 +110,12 @@ export function IconTile({ tone = 'jade', icon, size = 'md', glow = true }: Prop
           bottom: -dimension * 0.045,
           height: dimension * 0.82,
           borderRadius: radius,
-          backgroundColor: 'rgba(0, 9, 6, 0.5)',
+          backgroundColor: 'rgba(34, 44, 36, 0.18)',
           shadowColor: '#000000',
-          shadowOpacity: 0.5,
+          shadowOpacity: 0.22,
           shadowRadius: dimension * 0.18,
           shadowOffset: { width: 0, height: dimension * 0.09 },
-          elevation: 6,
+          elevation: 4,
         }}
       />
 

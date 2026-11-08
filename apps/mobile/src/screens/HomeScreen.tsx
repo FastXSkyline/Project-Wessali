@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Image as ExpoImage } from 'expo-image';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { palette, serviceTheme } from '../theme';
 import type { WessaliApp } from '../useWessali';
@@ -22,6 +23,15 @@ import { IconTile } from '../ui/IconTile';
 import { ActivityArea, ServiceMix } from '../ui/charts';
 import { RouteProgress, TripRoute } from '../ui/trip';
 import { firstName, formatShortDate, lastSevenDays, weeklyRequestCounts } from '../utils';
+
+const servicePhotos: Record<ServiceKind, string> = {
+  freight:
+    'https://images.pexels.com/photos/5410923/pexels-photo-5410923.jpeg?auto=compress&cs=tinysrgb&w=1400',
+  roadside:
+    'https://images.pexels.com/photos/6140995/pexels-photo-6140995.jpeg?auto=compress&cs=tinysrgb&w=1400',
+  water:
+    'https://images.pexels.com/photos/37899833/pexels-photo-37899833/free-photo-of-yellow-water-tanker-truck-by-seaside-in-foca.jpeg?auto=compress&cs=tinysrgb&w=1400',
+};
 
 type Props = {
   app: WessaliApp;
@@ -156,43 +166,74 @@ export function HomeScreen({
       </View>
 
       <SectionHeading title={ui.servicesTitle} caption={ui.servicesBody} />
-      <View style={{ gap: 11 }}>
-        {SERVICE_CATEGORIES.map((service) => {
+      <View style={{ gap: 12 }}>
+        {SERVICE_CATEGORIES.map((service, index) => {
           const tone = serviceTheme[service.id];
+          const description =
+            service.id === 'freight'
+              ? ui.serviceFreightShort
+              : service.id === 'roadside'
+                ? ui.serviceRoadsideShort
+                : ui.serviceWaterShort;
+
           return (
             <Pressable
               key={service.id}
               accessibilityRole="button"
               accessibilityLabel={service.labels[locale]}
               onPress={() => onOpenService(service.id)}
-              style={({ pressed }) => [pressed && { opacity: 0.78 }]}
+              style={({ pressed }) => [pressed && { opacity: 0.82 }]}
             >
-              <GlassCard padding={14} radius={24}>
+              <GlassCard padding={9} radius={23} intensity={22}>
                 <View style={[styles.serviceRow, rtlStyle && styles.rowReverse]}>
-                  <IconTile tone={service.id} size="md" />
-                  <View style={{ flex: 1, gap: 3 }}>
-                    <AppText variant="h3" numberOfLines={1} style={{ fontSize: 16.5 }}>
+                  <View style={styles.servicePhoto}>
+                    <ExpoImage
+                      source={{ uri: servicePhotos[service.id] }}
+                      style={StyleSheet.absoluteFill}
+                      contentFit="cover"
+                      transition={240}
+                      cachePolicy="memory-disk"
+                    />
+                    <LinearGradient
+                      colors={['rgba(18, 27, 21, 0.02)', 'rgba(18, 27, 21, 0.38)']}
+                      locations={[0.2, 1]}
+                      start={{ x: 0.5, y: 0 }}
+                      end={{ x: 0.5, y: 1 }}
+                      style={StyleSheet.absoluteFill}
+                    />
+                    <View style={styles.serviceImageCounter}>
+                      <AppText variant="caption" tone="white" style={{ fontSize: 8.5, lineHeight: 11 }}>
+                        {String(index + 1).padStart(2, '0')} / 03
+                      </AppText>
+                    </View>
+                    <View style={styles.serviceImageIcon}>
+                      <IconTile tone={service.id} size="sm" glow={false} />
+                    </View>
+                  </View>
+                  <View style={styles.serviceInfo}>
+                    <AppText variant="h3" numberOfLines={2} style={{ fontSize: 15.5, lineHeight: 21 }}>
                       {service.labels[locale]}
                     </AppText>
-                    <AppText variant="caption" tone="muted">
-                      {service.id === 'freight'
-                        ? ui.serviceFreightShort
-                        : service.id === 'roadside'
-                          ? ui.serviceRoadsideShort
-                          : ui.serviceWaterShort}
+                    <AppText variant="caption" tone="muted" numberOfLines={2} style={{ lineHeight: 17 }}>
+                      {description}
                     </AppText>
-                  </View>
-                  <View
-                    style={[
-                      styles.serviceArrow,
-                      { backgroundColor: `${tone.accent}1A`, borderColor: `${tone.accent}33` },
-                    ]}
-                  >
-                    <Ionicons
-                      name={isRtl ? 'arrow-back' : 'arrow-forward'}
-                      size={15}
-                      color={tone.accent}
-                    />
+                    <View style={[styles.serviceFooter, rtlStyle && styles.rowReverse]}>
+                      <AppText variant="label" style={{ color: tone.accent, fontSize: 10.5 }}>
+                        {ui.homeCta}
+                      </AppText>
+                      <View
+                        style={[
+                          styles.serviceArrow,
+                          { backgroundColor: `${tone.accent}14`, borderColor: `${tone.accent}38` },
+                        ]}
+                      >
+                        <Ionicons
+                          name={isRtl ? 'arrow-back' : 'arrow-forward'}
+                          size={14}
+                          color={tone.accent}
+                        />
+                      </View>
+                    </View>
                   </View>
                 </View>
               </GlassCard>
@@ -450,10 +491,34 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 9 },
   statTop: { flexDirection: 'row', alignItems: 'center' },
   serviceRow: { flexDirection: 'row', alignItems: 'center', gap: 13 },
+  servicePhoto: {
+    width: 116,
+    height: 108,
+    borderRadius: 17,
+    overflow: 'hidden',
+    backgroundColor: palette.canvasDeep,
+  },
+  serviceImageCounter: {
+    position: 'absolute',
+    top: 7,
+    left: 7,
+    paddingHorizontal: 7,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: 'rgba(18, 27, 21, 0.46)',
+  },
+  serviceImageIcon: { position: 'absolute', right: 6, bottom: 6 },
+  serviceInfo: { flex: 1, minWidth: 0, justifyContent: 'center', gap: 5 },
+  serviceFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 2,
+  },
   serviceArrow: {
-    width: 34,
-    height: 34,
-    borderRadius: 13,
+    width: 32,
+    height: 32,
+    borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',

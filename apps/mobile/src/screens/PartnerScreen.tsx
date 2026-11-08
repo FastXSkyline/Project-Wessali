@@ -309,8 +309,8 @@ function StatusTimeline({ app, rejected }: { app: WessaliApp; rejected: boolean 
           style={[
             styles.statusBadge,
             {
-              borderColor: rejected ? 'rgba(255,180,94,0.35)' : 'rgba(55,225,165,0.35)',
-              backgroundColor: rejected ? 'rgba(255,180,94,0.10)' : 'rgba(55,225,165,0.10)',
+              borderColor: rejected ? 'rgba(255,180,94,0.35)' : 'rgba(88,116,94,0.30)',
+              backgroundColor: rejected ? 'rgba(255,180,94,0.10)' : 'rgba(88,116,94,0.09)',
             },
           ]}
         >
@@ -528,8 +528,8 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(55, 225, 165, 0.18)',
-    backgroundColor: 'rgba(55, 225, 165, 0.07)',
+    borderColor: 'rgba(88, 116, 94, 0.17)',
+    backgroundColor: 'rgba(88, 116, 94, 0.07)',
   },
   kickerDot: { width: 5, height: 5, borderRadius: 999, backgroundColor: palette.jade },
   benefitRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -548,9 +548,9 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(240, 216, 169, 0.10)',
+    backgroundColor: 'rgba(169, 130, 85, 0.09)',
     borderWidth: 1,
-    borderColor: 'rgba(240, 216, 169, 0.22)',
+    borderColor: 'rgba(169, 130, 85, 0.18)',
   },
   serviceOption: {
     flexDirection: 'row',
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
     borderColor: palette.lineSoft,
     borderRadius: 18,
     padding: 10,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: 'rgba(47, 62, 52, 0.035)',
   },
   check: {
     width: 22,
@@ -598,14 +598,14 @@ const styles = StyleSheet.create({
     width: 1,
     flex: 1,
     minHeight: 18,
-    backgroundColor: 'rgba(155, 244, 209, 0.16)',
+    backgroundColor: 'rgba(88, 116, 94, 0.12)',
     marginVertical: 3,
   },
   stepTag: {
     borderRadius: 999,
     paddingHorizontal: 7,
     paddingVertical: 3,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: 'rgba(47, 62, 52, 0.045)',
   },
   serviceStatusRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   approvalPill: { flexDirection: 'row', alignItems: 'center', gap: 4 },
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
     borderWidth: 1,
-    borderColor: 'rgba(55, 225, 165, 0.28)',
+    borderColor: 'rgba(88, 116, 94, 0.22)',
     backgroundColor: 'rgba(55, 225, 165, 0.10)',
     borderRadius: 999,
     paddingHorizontal: 9,
