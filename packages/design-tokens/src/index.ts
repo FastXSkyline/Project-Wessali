@@ -1,14 +1,15 @@
 export const brandColors = {
-  primary: '#B6312B',
-  primaryHover: '#972722',
-  ink: '#1D2028',
-  muted: '#68707D',
-  surface: '#FFFFFF',
-  canvas: '#F4F5F7',
-  border: '#E5E7EB',
-  success: '#16845B',
-  warning: '#A96612',
-  danger: '#C43A35',
+  primary: '#37E1A5',
+  primaryHover: '#22C78D',
+  primaryDeep: '#0A6B4B',
+  ink: '#ECFBF4',
+  muted: '#87A99A',
+  surface: '#0C2118',
+  canvas: '#05100C',
+  border: 'rgba(153, 240, 207, 0.14)',
+  success: '#37E1A5',
+  warning: '#F2B45C',
+  danger: '#FF7A7A',
 } as const;
 
 export const spacing = {
@@ -18,11 +19,14 @@ export const spacing = {
   lg: 16,
   xl: 24,
   xxl: 32,
+  xxxl: 44,
 } as const;
 
 export const radii = {
-  sm: 8,
-  md: 14,
-  lg: 20,
+  sm: 10,
+  md: 16,
+  lg: 22,
+  xl: 28,
+  xxl: 36,
   pill: 999,
 } as const;

@@ -6,16 +6,47 @@
     "scheme": "wessali",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "backgroundColor": "#04120D",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "dz.wessali.app"
+      "bundleIdentifier": "dz.wessali.app",
+      "infoPlist": {
+        "UIUserInterfaceStyle": "Dark",
+        "UIViewControllerBasedStatusBarAppearance": false
+      }
     },
     "android": {
       "package": "dz.wessali.app",
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
-        "backgroundColor": "#080A0E"
+        "backgroundColor": "#04120D"
       }
-    }
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#04120D",
+      "barStyle": "light-content",
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "backgroundColor": "#04120D",
+      "barStyle": "light-content"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8018b4b1-4662-4bc6-8140-a1a43cc5f55f"
+      }
+    },
+    "plugins": [
+      "expo-status-bar",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#04120D",
+          "resizeMode": "contain"
+        }
+      ]
+    ]
   }
 }
