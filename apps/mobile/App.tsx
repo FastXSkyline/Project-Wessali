@@ -58,14 +58,22 @@ const photo = {
     'https://images.pexels.com/photos/37899833/pexels-photo-37899833/free-photo-of-yellow-water-tanker-truck-by-seaside-in-foca.jpeg?auto=compress&cs=tinysrgb&w=1400',
 };
 
-const RADIAL_GLOW_SOURCE = { uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAFs0lEQVR42u2d3XITRxCFHWP+wq8VogAxdoyNQgJODAZiSOCO9+LheLBIVdtVp051z87OzuzMWn1xblaqcul83afH0u7Mztfv33Ya1w8j1fTnu4qGzwrINhjeNJBtNr4JENtuenUYbnxlEHMwf3ekmobQovG7hdUUiFbM362k6hDmYPy1kWoaRC3zSxo+BsjkEKY2P9X4vUSVBtEEgDHG5zY8FcgYENUAjKn6IaZfH6khMCbvhhaqPtbwGwMVC6RqN5QCkMN4zdSbkYoBkgKiCQBjzQ8Z32f2rUj1QYkFURxCafNDVR9jPBt7O1IhIDEg+rohG4SpzO8z3jKdjf0xUiEgGowYEEUg1DJfq3jNdDT1zkBZQBiE1hGTQcgBINV8y3jN8Lugez3C92pA+kDkhJAFwFjzOXJijdcMvx8pDcgQEFokFYEwlfmhqkfj2XQx9AHoYY/wvQwEYSCI2G7IDiEXgKHmY9VjxaPxbPg+aGEI38NAGAR2BHZDKoTsAFKqP9Z8rno2nk0Xg38CPSLhawwEYWgguBtiIYzughLm7ynmc+Rw1WvGLxSzfyYtO/F1hrIIgNC6ASMJIezlhlA6erTKD1U9Go+mi9G/gB6T8DUEgzAQRKgbbgcGc9YoKhk9feaHjMcKR7OfgJ6S8DWEsqTOCIFIhZDcBTmqv4T5aDya/WunA0PyOkJhEFNAKAIgJno492PNDxkvhj/rdNgjed8BwLBADIWgzYOhURQEkKv6taGrmc9Vbxm/Mfao02+djklyXd53GADB3aBBCA3lbF0wdfVb5mPVa8aL4c87nRiS148BBoPAbrAgTNYFparfih4tdsR8qXrL+I3Bp2u9AK064bVTgKGBkG5gCBhHMVGUpQuGVv9uoPqtwYvRE2s+Gn9KZv/e6SVJriOUUwIRCyEURTyQU1dESQBSq1+iR1Y7mPlovlQ9VvwKDP+j05+G5PWXAAM7QrqBIchMkNVRbBSN6YJsAKzs16JHcn9Jmc/mS9Wj8RuDX631utMZSa6/AhgCAruBIeBg5nmAUTRkFgwGkDJ8U6ofo+eJEjua+Wj8xui/Ov1NkutnBMKCcEgQOIpSumDwMC4ZP1r1c/QcBMyXqkfjN0afr/XG0DnAEBDSDRaEAyOKuAuKxFCO+OHhO7T6j7oheULmS9Wz8W/XujD0VgEh3YAQTrq/eZTQBSnDuDgALX5w5cPZb1U/xg6aj8a/W+u9oXcEAiFgHPV1Ac4CWRH1xVAygBL5b8WPVf2y2gmZL8Z/6PQPSa4LiBAEWR2FuiA1hgbNgRL5b8VPqPo5es4C5m/MvlzrI+kSQGgQzpQo6usCLYayzoHcy0/O/30DAGe/Vv3nZD4b/4nEIBDCudEFPAs0APs9c2DUcnSq/Lfi5znEj1b9F1D5l2D8v4Y+AQTphAujC1YwC/piqNgcKAEgJv+t+NGqX2IHzf/PEEKQONK6wIqhsXOgOQALBQDmPy49MX6s6kfzP5MQgtUFGEO4JMU5wAAWcwcg638ewLj2l/zX4kerfjH9SyeEwF2gxZDMAfyfgAcx/z8wawDLAIBVIoAvpBQAqwCApQNwAB5BVwGAD2Ffhm7XMtT/EfOvIrbjqwj/Mq7Cl3H+dXSBr6P9B5nKP8j4T5Iz/knSf5Sv8KO835ZS4LYUvzGr8o1ZfmviTG5N9JtzK9yc67enT3R7uj+gUfkBDX9EqYFHlPwhvcoP6fljqg0/puoPak/0oLZvVVB5qwLfrKOBzTp8u5rK29X4hk0NbNjkW5Y1sGWZb9pXedM+37aygW0rfePWBjZu9a2LK29d7Jt3N7B5t29f38D29X6Aw0xO0PAjTPwQn6t9iI8fY9XAMVZ+kJsfZehHGfphnn6crR9n6wc6+5HmfqR5aQi1tHNVAMwNxGSeTA2gZRhVfKgJoBUQVT9/CwCmBtLU520RQG4gTX++/wGHb7JNpAannwAAAABJRU5ErkJggg==' };
+const RADIAL_GLOW_SOURCE = {
+  uri: 'data:image/png;base64,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',
+};
 const threeDIcons = {
-  freight: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/f71a3e-bag/dynamic/200/color.webp',
-  roadside: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/ff5be0-tools/dynamic/200/color.webp',
-  water: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/deb9ff-can/dynamic/200/color.webp',
-  mapPin: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/1858b9-map-pin/dynamic/200/color.webp',
-  clock: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/8ef1fa-clock/dynamic/200/color.webp',
-  notebook: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/628100-notebook/dynamic/200/color.webp',
+  freight:
+    'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/f71a3e-bag/dynamic/200/color.webp',
+  roadside:
+    'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/ff5be0-tools/dynamic/200/color.webp',
+  water:
+    'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/deb9ff-can/dynamic/200/color.webp',
+  mapPin:
+    'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/1858b9-map-pin/dynamic/200/color.webp',
+  clock:
+    'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/8ef1fa-clock/dynamic/200/color.webp',
+  notebook:
+    'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/628100-notebook/dynamic/200/color.webp',
 } as const;
 
 const words = {
@@ -655,7 +663,12 @@ function MotionPressable({
 
 function Floating3DIcon({ glyph, size = 62 }: { glyph: string; size?: number; glow?: string }) {
   return (
-    <ExpoImage source={{ uri: glyph }} contentFit="contain" style={{ width: size, height: size }} transition={160} />
+    <ExpoImage
+      source={{ uri: glyph }}
+      contentFit="contain"
+      style={{ width: size, height: size }}
+      transition={160}
+    />
   );
 }
 
@@ -666,10 +679,19 @@ function Service3DIcon({ kind, size = 62 }: { kind: ServiceKind; size?: number }
 function AmbientBackground() {
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <LinearGradient colors={['#07170F', '#0B2117', '#091910', '#06120C']} locations={[0, 0.38, 0.74, 1]} style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={['#07170F', '#0B2117', '#091910', '#06120C']}
+        locations={[0, 0.38, 0.74, 1]}
+        style={StyleSheet.absoluteFill}
+      />
       <Image source={RADIAL_GLOW_SOURCE} resizeMode="stretch" style={styles.ambientGlowTop} />
       <Image source={RADIAL_GLOW_SOURCE} resizeMode="stretch" style={styles.ambientGlowBottom} />
-      <LinearGradient colors={['rgba(60,190,122,0.055)', 'rgba(60,190,122,0)', 'rgba(6,24,15,0.16)']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={['rgba(60,190,122,0.055)', 'rgba(60,190,122,0)', 'rgba(6,24,15,0.16)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
     </View>
   );
 }
@@ -1254,13 +1276,40 @@ export default function App() {
   );
 
   const renderServiceCard = (kind: ServiceKind, index: number) => (
-    <MotionPressable key={kind} onPress={() => openServicePreview(kind)} style={[styles.serviceCard, kind === 'water' ? styles.serviceCardWide : styles.serviceCardSmall]}>
-      <LinearGradient colors={['#173D2B', '#10281D', '#0D2118']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-      <ImageBackground source={{ uri: serviceContent[kind].photo }} style={[styles.servicePhoto, kind === 'water' && styles.servicePhotoWide]} imageStyle={styles.servicePhotoRadius} resizeMode="cover">
-        <LinearGradient colors={['rgba(5,23,14,0.08)', 'rgba(5,23,14,0.78)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
+    <MotionPressable
+      key={kind}
+      onPress={() => openServicePreview(kind)}
+      style={[
+        styles.serviceCard,
+        kind === 'water' ? styles.serviceCardWide : styles.serviceCardSmall,
+      ]}
+    >
+      <LinearGradient
+        colors={['#173D2B', '#10281D', '#0D2118']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      <ImageBackground
+        source={{ uri: serviceContent[kind].photo }}
+        style={[styles.servicePhoto, kind === 'water' && styles.servicePhotoWide]}
+        imageStyle={styles.servicePhotoRadius}
+        resizeMode="cover"
+      >
+        <LinearGradient
+          colors={['rgba(5,23,14,0.08)', 'rgba(5,23,14,0.78)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
         <View style={styles.serviceImageTop}>
           <Text style={styles.serviceNumber}>0{index + 1} / 03</Text>
-          <ExpoImage source={{ uri: serviceContent[kind].icon }} style={[styles.service3DImage, kind === 'water' && styles.service3DImageWide]} contentFit="contain" transition={180} />
+          <ExpoImage
+            source={{ uri: serviceContent[kind].icon }}
+            style={[styles.service3DImage, kind === 'water' && styles.service3DImageWide]}
+            contentFit="contain"
+            transition={180}
+          />
         </View>
       </ImageBackground>
       <View style={[styles.serviceMeta, kind === 'water' && styles.serviceMetaWide]}>
@@ -1349,15 +1398,30 @@ export default function App() {
 
         <View style={styles.loginMiniFeatures}>
           <View style={styles.miniFeature}>
-            <ExpoImage source={{ uri: threeDIcons.freight }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
+            <ExpoImage
+              source={{ uri: threeDIcons.freight }}
+              style={styles.miniFeatureIcon}
+              contentFit="contain"
+              transition={160}
+            />
             <Text style={styles.miniFeatureText}>{ui.freight}</Text>
           </View>
           <View style={styles.miniFeature}>
-            <ExpoImage source={{ uri: threeDIcons.roadside }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
+            <ExpoImage
+              source={{ uri: threeDIcons.roadside }}
+              style={styles.miniFeatureIcon}
+              contentFit="contain"
+              transition={160}
+            />
             <Text style={styles.miniFeatureText}>{ui.roadside}</Text>
           </View>
           <View style={styles.miniFeature}>
-            <ExpoImage source={{ uri: threeDIcons.water }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
+            <ExpoImage
+              source={{ uri: threeDIcons.water }}
+              style={styles.miniFeatureIcon}
+              contentFit="contain"
+              transition={160}
+            />
             <Text style={styles.miniFeatureText}>{ui.water}</Text>
           </View>
         </View>
@@ -1393,7 +1457,12 @@ export default function App() {
             <Text style={[styles.heroTitle, isRtl && styles.arabicHero]}>{ui.welcome}</Text>
             <Text style={[styles.heroSubtitle, isRtl && styles.arabicHero]}>{ui.welcomeSub}</Text>
             <View style={styles.heroLocationLine}>
-              <ExpoImage source={{ uri: threeDIcons.mapPin }} style={styles.locationPill3DIcon} contentFit="contain" transition={160} />
+              <ExpoImage
+                source={{ uri: threeDIcons.mapPin }}
+                style={styles.locationPill3DIcon}
+                contentFit="contain"
+                transition={160}
+              />
               <Text style={styles.heroLocationText}>{ui.corridor}</Text>
             </View>
           </Animated.View>
@@ -1821,7 +1890,12 @@ export default function App() {
           <View key={number} style={styles.informationCard}>
             <View style={styles.infoCardTop}>
               <Text style={styles.infoCardNumber}>{number}</Text>
-              <ExpoImage source={{ uri: glyph }} style={styles.infoCardGlyph} contentFit="contain" transition={160} />
+              <ExpoImage
+                source={{ uri: glyph }}
+                style={styles.infoCardGlyph}
+                contentFit="contain"
+                transition={160}
+              />
             </View>
             <Text style={[styles.infoCardTitle, directionStyle]}>{title}</Text>
             <Text style={[styles.bodyCopy, directionStyle]}>{description}</Text>
@@ -1839,7 +1913,12 @@ export default function App() {
         ].map(([glyph, value], index) => (
           <View key={String(index)} style={[styles.solutionRow, rowStyle]}>
             <View style={styles.solutionIcon}>
-              <ExpoImage source={{ uri: glyph }} style={styles.solutionIconImage} contentFit="contain" transition={160} />
+              <ExpoImage
+                source={{ uri: glyph }}
+                style={styles.solutionIconImage}
+                contentFit="contain"
+                transition={160}
+              />
             </View>
             <Text style={[styles.solutionText, directionStyle]}>{value}</Text>
           </View>
@@ -1995,7 +2074,11 @@ export default function App() {
                 ]}
               >
                 <LinearGradient
-                  colors={['rgba(63,196,128,0.34)', 'rgba(113,221,158,0.12)', 'rgba(255,255,255,0)']}
+                  colors={[
+                    'rgba(63,196,128,0.34)',
+                    'rgba(113,221,158,0.12)',
+                    'rgba(255,255,255,0)',
+                  ]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.previewAura}
@@ -2074,7 +2157,12 @@ export default function App() {
                   style={styles.bottomTab}
                 >
                   <View style={styles.bottomGlyphWrap}>
-                    <ExpoImage source={{ uri: glyph }} style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]} contentFit="contain" transition={160} />
+                    <ExpoImage
+                      source={{ uri: glyph }}
+                      style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]}
+                      contentFit="contain"
+                      transition={160}
+                    />
                   </View>
                   <Text style={[styles.bottomLabel, screen === id && styles.bottomLabelActive]}>
                     {label}
@@ -2092,8 +2180,22 @@ export default function App() {
 
 const styles = StyleSheet.create({
   ambientGlow: { position: 'absolute', width: 0, height: 0, opacity: 0 },
-  ambientGlowTop: { position: 'absolute', top: -176, right: -166, width: 410, height: 410, opacity: 0.76 },
-  ambientGlowBottom: { position: 'absolute', bottom: 86, left: -178, width: 370, height: 370, opacity: 0.58 },
+  ambientGlowTop: {
+    position: 'absolute',
+    top: -176,
+    right: -166,
+    width: 410,
+    height: 410,
+    opacity: 0.76,
+  },
+  ambientGlowBottom: {
+    position: 'absolute',
+    bottom: 86,
+    left: -178,
+    width: 370,
+    height: 370,
+    opacity: 0.58,
+  },
   ambientBlur: { position: 'absolute', width: 0, height: 0, opacity: 0 },
   ambientBlurTop: { top: -100, right: -100 },
   ambientBlurBottom: { bottom: 100, left: -100 },
@@ -2517,7 +2619,17 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
   sectionCount: { color: '#78818D', fontSize: 21, fontWeight: '300' },
-  serviceCard: { borderRadius: 22, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(137,220,166,0.16)', shadowColor: '#07130E', shadowOpacity: 0.32, shadowRadius: 20, shadowOffset: { width: 0, height: 10 }, elevation: 5 },
+  serviceCard: {
+    borderRadius: 22,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(137,220,166,0.16)',
+    shadowColor: '#07130E',
+    shadowOpacity: 0.32,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
+  },
   serviceImage: { height: 132, padding: 12, justifyContent: 'space-between', overflow: 'hidden' },
   serviceImageRadius: { borderRadius: 17 },
   imageShade: {
@@ -2529,7 +2641,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(4,18,11,0.6)',
     borderRadius: 25,
   },
-  serviceImageTop: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  serviceImageTop: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
   serviceNumber: {
     color: 'rgba(255,255,255,0.78)',
     fontSize: 8,
@@ -2551,7 +2668,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: 14,
   },
-  stepCard: { width: '48.4%', minHeight: 150, borderRadius: 19, paddingHorizontal: 13, paddingVertical: 13, gap: 8, borderWidth: 1, borderColor: 'rgba(137,220,166,0.13)', overflow: 'hidden' },
+  stepCard: {
+    width: '48.4%',
+    minHeight: 150,
+    borderRadius: 19,
+    paddingHorizontal: 13,
+    paddingVertical: 13,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(137,220,166,0.13)',
+    overflow: 'hidden',
+  },
   stepNumber: { color: '#48C982', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
   stepTitle: { color: '#F1F8F3', fontSize: 12, lineHeight: 17, fontWeight: '900' },
   stepDescription: { color: '#A1AAB5', fontSize: 10, lineHeight: 15 },
@@ -2929,8 +3056,31 @@ const styles = StyleSheet.create({
   featureNoteTitle: { color: '#77B98E', fontSize: 11, fontWeight: '900' },
   featureNoteText: { color: '#8EAA96', fontSize: 10, lineHeight: 17 },
 
-  bottomBarShell: { position: 'absolute', left: -30, right: -30, bottom: -108, height: 222, borderRadius: 180, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(116,216,153,0.2)', backgroundColor: 'rgba(8,29,18,0.28)', shadowColor: '#45C881', shadowOpacity: 0.12, shadowRadius: 34, shadowOffset: { width: 0, height: -8 }, elevation: 16 },
-  bottomBar: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-around', paddingHorizontal: 48, paddingTop: 20, paddingBottom: 112 },
+  bottomBarShell: {
+    position: 'absolute',
+    left: -30,
+    right: -30,
+    bottom: -108,
+    height: 222,
+    borderRadius: 180,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(116,216,153,0.2)',
+    backgroundColor: 'rgba(8,29,18,0.28)',
+    shadowColor: '#45C881',
+    shadowOpacity: 0.12,
+    shadowRadius: 34,
+    shadowOffset: { width: 0, height: -8 },
+    elevation: 16,
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-around',
+    paddingHorizontal: 48,
+    paddingTop: 20,
+    paddingBottom: 112,
+  },
   bottomTab: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 2, minHeight: 72 },
   bottomGlyphWrap: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
   bottomGlyph: { width: 31, height: 31, opacity: 0.68 },
@@ -2939,16 +3089,31 @@ const styles = StyleSheet.create({
   bottomLabelActive: { color: '#8EE4AE', fontWeight: '900' },
   globalSpinner: { marginVertical: 8 },
 
-  servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 14 },
+  servicesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 14,
+  },
   serviceCardSmall: { width: '48.4%', minHeight: 252 },
   serviceCardWide: { width: '100%', minHeight: 164, flexDirection: 'row' },
-  servicePhoto: { height: 122, width: '100%', padding: 11, justifyContent: 'flex-start', overflow: 'hidden' },
+  servicePhoto: {
+    height: 122,
+    width: '100%',
+    padding: 11,
+    justifyContent: 'flex-start',
+    overflow: 'hidden',
+  },
   servicePhotoWide: { width: 132, height: 164, flexShrink: 0 },
   servicePhotoRadius: { borderRadius: 0 },
   service3DImage: { width: 76, height: 76, alignSelf: 'flex-end', marginTop: 10 },
   service3DImageWide: { width: 82, height: 82, alignSelf: 'center', marginTop: 18 },
-  serviceMetaWide: { flex: 1, justifyContent: 'center', paddingHorizontal: 15, paddingVertical: 12 },
+  serviceMetaWide: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+  },
   locationPill3DIcon: { width: 17, height: 17 },
   solutionIconImage: { width: 35, height: 35 },
-
 });
