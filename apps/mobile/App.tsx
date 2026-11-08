@@ -1076,7 +1076,7 @@ export default function App() {
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder ?? label}
-        placeholderTextColor="#9AA6B2"
+        placeholderTextColor="#8D96A2"
         keyboardType={keyboardType}
         multiline={multiline}
         textAlign={isRtl ? 'right' : 'left'}
@@ -1345,15 +1345,15 @@ export default function App() {
 
         <View style={styles.loginMiniFeatures}>
           <View style={styles.miniFeature}>
-            <Text style={styles.miniFeatureIcon}>↗</Text>
+            <Text style={styles.miniFeatureIcon}>📦</Text>
             <Text style={styles.miniFeatureText}>{ui.freight}</Text>
           </View>
           <View style={styles.miniFeature}>
-            <Text style={styles.miniFeatureIcon}>⌁</Text>
+            <Text style={styles.miniFeatureIcon}>🛠️</Text>
             <Text style={styles.miniFeatureText}>{ui.roadside}</Text>
           </View>
           <View style={styles.miniFeature}>
-            <Text style={styles.miniFeatureIcon}>◌</Text>
+            <Text style={styles.miniFeatureIcon}>💧</Text>
             <Text style={styles.miniFeatureText}>{ui.water}</Text>
           </View>
         </View>
@@ -1959,7 +1959,7 @@ export default function App() {
           {error && screen !== 'booking' && screen !== 'history' ? (
             <Text style={styles.errorText}>{error}</Text>
           ) : null}
-          {busy ? <ActivityIndicator color="#168C82" style={styles.globalSpinner} /> : null}
+          {busy ? <ActivityIndicator color="#FF6A24" style={styles.globalSpinner} /> : null}
           <Text style={styles.footerText}>{ui.footer} · 0.3.0</Text>
         </Animated.ScrollView>
 
@@ -2094,27 +2094,34 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  homeStack: { gap: 22 },
+  ambientGlow: { position: 'absolute', width: 250, height: 250, borderRadius: 140, shadowColor: '#FF5B1F', shadowOpacity: 0.72, shadowRadius: 82, elevation: 0 }
+  ambientGlowTop: { top: -132, right: -114, backgroundColor: 'rgba(255,91,31,0.14)' }
+  ambientGlowBottom: { bottom: 105, left: -166, backgroundColor: 'rgba(219,65,24,0.1)' }
+  ambientBlur: { position: 'absolute', width: 250, height: 250, borderRadius: 130 }
+  ambientBlurTop: { top: -130, right: -115 }
+  ambientBlurBottom: { bottom: 110, left: -165 }
+  loginPhotoGlow: { position: 'absolute', right: -40, bottom: -44, width: 190, height: 190, borderRadius: 100, backgroundColor: 'rgba(255,89,27,0.2)', shadowColor: '#FF5B1F', shadowOpacity: 0.8, shadowRadius: 56 }
+  heroObject: { position: 'absolute', top: 14, right: 8, zIndex: 2, opacity: 0.98 }
+  serviceCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
+  serviceArt: { height: 100, alignItems: 'center', justifyContent: 'center' }
+  serviceIconGlow: { position: 'absolute', width: 92, height: 68, borderRadius: 50, opacity: 0.68, shadowColor: '#FF6A24', shadowOpacity: 0.55, shadowRadius: 28 }
+  serviceMetaBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 }
+  stepCardTop: { minHeight: 49, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
+  homeStack: { gap: 23 }
   sectionHeadingCopy: { flex: 1, gap: 1 },
   heroLocationLine: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   heroLocationText: { color: 'rgba(255,255,255,0.82)', fontSize: 9, fontWeight: '700' },
-  servicesRail: { gap: 15, paddingRight: 18 },
+  servicesRail: { gap: 13, paddingRight: 18 }
   serviceOpenArrow: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  serviceMeta: { gap: 4, paddingHorizontal: 2 },
-  serviceAction: { color: '#267A64', fontSize: 10, fontWeight: '900', marginTop: 2 },
-  serviceActionArrow: { color: '#267A64', fontSize: 12 },
+  serviceMeta: { gap: 5, paddingHorizontal: 2 }
+  serviceAction: { color: '#FF8A4D', fontSize: 10, fontWeight: '900', marginTop: 2 }
+  serviceActionArrow: { color: '#FF8A4D', fontSize: 12 }
   howSection: { gap: 13 },
-  aboutTeaser: {
-    flexDirection: 'row',
-    gap: 13,
-    paddingTop: 17,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E9E4',
-  },
-  aboutTeaserAccent: { width: 3, minHeight: 100, borderRadius: 2, backgroundColor: '#3A9A79' },
+  aboutTeaser: { flexDirection: 'row', gap: 13, padding: 17, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', overflow: 'hidden' }
+  aboutTeaserAccent: { width: 3, minHeight: 100, borderRadius: 2, backgroundColor: '#FF6A24', shadowColor: '#FF6A24', shadowOpacity: 0.8, shadowRadius: 12 }
   aboutTeaserCopy: { flex: 1, gap: 7 },
-  aboutTeaserTitle: { color: '#203F34', fontSize: 15, lineHeight: 21, fontWeight: '900' },
-  aboutTeaserText: { color: '#73827B', fontSize: 10, lineHeight: 16 },
+  aboutTeaserTitle: { color: '#F2F3F5', fontSize: 15, lineHeight: 21, fontWeight: '900' }
+  aboutTeaserText: { color: '#A1AAB5', fontSize: 10, lineHeight: 16 }
   aboutTeaserLink: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
@@ -2122,13 +2129,13 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 5,
   },
-  aboutTeaserLinkText: { color: '#287A63', fontSize: 10, fontWeight: '900' },
-  aboutTeaserArrow: { color: '#287A63', fontSize: 13, fontWeight: '900' },
+  aboutTeaserLinkText: { color: '#FF8A4D', fontSize: 10, fontWeight: '900' }
+  aboutTeaserArrow: { color: '#FF8A4D', fontSize: 13, fontWeight: '900' }
   bottomActiveMark: {
     width: 13,
     height: 2,
     borderRadius: 1,
-    backgroundColor: '#27836B',
+    backgroundColor: '#FF6A24',
     marginTop: 1,
   },
   previewModalRoot: {
@@ -2151,19 +2158,7 @@ const styles = StyleSheet.create({
     borderRadius: 34,
     transform: [{ scale: 1.08 }],
   },
-  previewCard: {
-    width: '100%',
-    borderRadius: 25,
-    overflow: 'hidden',
-    backgroundColor: '#FAFCFB',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.9)',
-    shadowColor: '#061E18',
-    shadowOpacity: 0.3,
-    shadowRadius: 32,
-    shadowOffset: { width: 0, height: 18 },
-    elevation: 14,
-  },
+  previewCard: { width: '100%', borderRadius: 25, overflow: 'hidden', backgroundColor: '#171B22', borderWidth: 1, borderColor: 'rgba(255,255,255,0.14)', shadowColor: '#000000', shadowOpacity: 0.48, shadowRadius: 32, shadowOffset: { width: 0, height: 18 }, elevation: 14 }
   previewImage: {
     height: 188,
     padding: 17,
@@ -2179,9 +2174,9 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   previewImageTitle: { color: '#FFFFFF', fontSize: 23, lineHeight: 29, fontWeight: '900' },
-  previewCardBody: { padding: 18, gap: 13 },
-  previewDescription: { color: '#586D63', fontSize: 12, lineHeight: 19 },
-  previewDivider: { height: 1, backgroundColor: '#E2EAE5' },
+  previewCardBody: { padding: 18, gap: 13, backgroundColor: '#171B22' }
+  previewDescription: { color: '#B0B7C1', fontSize: 12, lineHeight: 19 }
+  previewDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.1)' }
   previewPrimaryButton: {
     minHeight: 52,
     borderRadius: 15,
@@ -2199,10 +2194,10 @@ const styles = StyleSheet.create({
   previewPrimaryText: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
   previewPrimaryArrow: { color: '#BDE9D6', fontSize: 16, fontWeight: '900' },
   previewCloseButton: { minHeight: 36, alignItems: 'center', justifyContent: 'center' },
-  previewCloseText: { color: '#77877F', fontSize: 11, fontWeight: '800' },
-  safeArea: { flex: 1, backgroundColor: '#F4F6F5' },
-  appShell: { flex: 1, backgroundColor: '#F4F6F5' },
-  content: { paddingHorizontal: 18, paddingTop: 10, paddingBottom: 116, gap: 18 },
+  previewCloseText: { color: '#A4ACB7', fontSize: 11, fontWeight: '800' }
+  safeArea: { flex: 1, backgroundColor: '#080A0E' }
+  appShell: { flex: 1, backgroundColor: 'transparent' }
+  content: { paddingHorizontal: 18, paddingTop: 13, paddingBottom: 132, gap: 21 }
   loginScroll: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -2221,13 +2216,13 @@ const styles = StyleSheet.create({
     gap: 3,
     padding: 4,
     borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.78)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.9)',
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   languageButton: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: 18 },
-  languageButtonActive: { backgroundColor: '#173F3A' },
-  languageText: { color: '#7B8783', fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
+  languageButtonActive: { backgroundColor: '#FF681F' },
+  languageText: { color: '#A1AAB5', fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
   languageTextActive: { color: '#FFFFFF' },
 
   loginVisual: { height: 224, position: 'relative', justifyContent: 'center' },
@@ -2257,32 +2252,16 @@ const styles = StyleSheet.create({
   brandChipMark: { color: '#FFFFFF', fontWeight: '900', fontSize: 17 },
   brandChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
   loginPhotoCopy: { gap: 9, maxWidth: 310 },
-  loginPhotoEyebrow: { color: '#C8E4DA', fontSize: 9, letterSpacing: 2.2, fontWeight: '800' },
+  loginPhotoEyebrow: { color: '#FFC19B', fontSize: 9, letterSpacing: 2.2, fontWeight: '800' },
   loginPhotoTitle: { color: '#FFFFFF', fontSize: 30, lineHeight: 37, fontWeight: '800' },
   loginPhotoSub: { color: 'rgba(255,255,255,0.84)', fontSize: 12, lineHeight: 19 },
   loginHeading: { gap: 6 },
-  loginTitle: { color: '#132B27', fontSize: 27, fontWeight: '800', letterSpacing: -0.6 },
-  loginSubtitle: { color: '#788580', fontSize: 13, lineHeight: 20 },
-  glassPanel: {
-    backgroundColor: 'transparent',
-    borderWidth: 0,
-    borderRadius: 0,
-    padding: 0,
-    gap: 15,
-  },
+  loginTitle: { color: '#F4F5F7', fontSize: 27, fontWeight: '800', letterSpacing: -0.6 },
+  loginSubtitle: { color: '#A1AAB5', fontSize: 13, lineHeight: 20 },
+  glassPanel: { backgroundColor: 'rgba(20,23,30,0.88)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', borderRadius: 22, padding: 17, gap: 15, overflow: 'hidden' }
   field: { gap: 7 },
-  fieldLabel: { color: '#30423D', fontSize: 11, fontWeight: '800', letterSpacing: 0.1 },
-  input: {
-    minHeight: 50,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#E5ECE8',
-    backgroundColor: 'rgba(248,250,249,0.94)',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 13,
-    color: '#19342D',
-  },
+  fieldLabel: { color: '#E5E8ED', fontSize: 11, fontWeight: '800', letterSpacing: 0.1 }
+  input: { minHeight: 50, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)', backgroundColor: 'rgba(255,255,255,0.055)', paddingHorizontal: 14, paddingVertical: 12, fontSize: 13, color: '#F2F3F5' }
   inputRtl: { textAlign: 'right' },
   multilineInput: { minHeight: 82, textAlignVertical: 'top' },
   serverToggle: {
@@ -2291,9 +2270,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 3,
   },
-  serverToggleText: { color: '#648078', fontSize: 11, fontWeight: '700' },
-  serverToggleGlyph: { color: '#168C82', fontSize: 18, fontWeight: '700' },
-  roleSwitch: { backgroundColor: '#EDF2EF', padding: 4, borderRadius: 17, gap: 5 },
+  serverToggleText: { color: '#A6AEB9', fontSize: 11, fontWeight: '700' },
+  serverToggleGlyph: { color: '#FF6A24', fontSize: 18, fontWeight: '700' },
+  roleSwitch: { backgroundColor: 'rgba(255,255,255,0.07)', padding: 4, borderRadius: 17, gap: 5 }
   pill: {
     flex: 1,
     alignItems: 'center',
@@ -2303,53 +2282,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   pillActive: {
-    backgroundColor: '#173F3A',
-    shadowColor: '#173F3A',
+    backgroundColor: '#FF681F',
+    shadowColor: '#FF5B1F',
     shadowOpacity: 0.18,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
   },
-  pillText: { color: '#81908A', fontWeight: '800', fontSize: 11 },
+  pillText: { color: '#9AA3AE', fontWeight: '800', fontSize: 11 },
   pillTextActive: { color: '#FFFFFF' },
-  primaryButtonLarge: {
-    minHeight: 54,
-    backgroundColor: '#173F3A',
-    borderRadius: 17,
-    paddingHorizontal: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    shadowColor: '#173F3A',
-    shadowOpacity: 0.2,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 7 },
-    elevation: 3,
-  },
-  primaryButton: {
-    minHeight: 47,
-    borderRadius: 15,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#173F3A',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 9,
-  },
+  primaryButtonLarge: { minHeight: 54, backgroundColor: '#FF681F', borderRadius: 17, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, shadowColor: '#FF5B1F', shadowOpacity: 0.38, shadowRadius: 18, shadowOffset: { width: 0, height: 7 }, elevation: 5 }
+  primaryButton: { minHeight: 47, borderRadius: 15, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FF681F', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, shadowColor: '#FF5B1F', shadowOpacity: 0.24, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 3 }
   primaryButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
   primaryButtonArrow: { color: '#B9E4D8', fontSize: 18, fontWeight: '800' },
   secondaryButton: {
     minHeight: 44,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: '#E3EAE6',
+    borderColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  secondaryButtonText: { color: '#73817B', fontSize: 12, fontWeight: '800' },
+  secondaryButtonText: { color: '#A1AAB5', fontSize: 12, fontWeight: '800' },
   demoNotice: {
-    color: '#9AA6A0',
+    color: '#8D96A2',
     fontSize: 8,
     textAlign: 'center',
     letterSpacing: 1.4,
@@ -2357,10 +2312,10 @@ const styles = StyleSheet.create({
   },
   loginMiniFeatures: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
   miniFeature: { flex: 1, alignItems: 'center', gap: 5 },
-  miniFeatureIcon: { color: '#168C82', fontSize: 22, fontWeight: '700' },
-  miniFeatureText: { color: '#64746E', fontSize: 9, fontWeight: '700', textAlign: 'center' },
+  miniFeatureIcon: { color: '#FF8A4D', fontSize: 23, fontWeight: '700', textShadowColor: '#FF6A24', textShadowRadius: 13 }
+  miniFeatureText: { color: '#A6AEB9', fontSize: 9, fontWeight: '700', textAlign: 'center' },
   footerText: {
-    color: '#A0AAA5',
+    color: '#818B97',
     fontSize: 9,
     textAlign: 'center',
     letterSpacing: 1.1,
@@ -2380,13 +2335,13 @@ const styles = StyleSheet.create({
     width: 39,
     height: 39,
     borderRadius: 12,
-    backgroundColor: '#D7E8E1',
+    backgroundColor: 'rgba(255,106,36,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  accountAvatarText: { color: '#1C574B', fontSize: 15, fontWeight: '900' },
-  accountEyebrow: { color: '#95A19B', fontSize: 9, fontWeight: '700' },
-  accountName: { color: '#19342D', fontSize: 12, fontWeight: '800' },
+  accountAvatarText: { color: '#FF8A4D', fontSize: 15, fontWeight: '900' },
+  accountEyebrow: { color: '#929BA7', fontSize: 9, fontWeight: '700' },
+  accountName: { color: '#F2F3F5', fontSize: 12, fontWeight: '800' },
   accountActions: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   logoutButton: {
     width: 34,
@@ -2394,11 +2349,11 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E9EFEC',
+    backgroundColor: 'rgba(255,255,255,0.07)',
   },
-  logoutGlyph: { color: '#46665C', fontSize: 17, fontWeight: '800' },
+  logoutGlyph: { color: '#AAB2BD', fontSize: 17, fontWeight: '800' },
 
-  heroWrap: { height: 238 },
+  heroWrap: { height: 252 }
   heroImage: { flex: 1, padding: 19, justifyContent: 'flex-end', overflow: 'hidden' },
   heroImageRadius: { borderRadius: 29 },
   heroShade: {
@@ -2407,7 +2362,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: 'rgba(7,28,30,0.48)',
+    backgroundColor: 'rgba(5,7,11,0.82)',
     borderRadius: 29,
   },
   heroHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -2416,26 +2371,26 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 13,
-    backgroundColor: 'rgba(255,255,255,0.94)',
+    backgroundColor: 'rgba(255,255,255,0.09)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  brandSquareText: { color: '#173F3A', fontSize: 21, fontWeight: '900' },
+  brandSquareText: { color: '#FF8A4D', fontSize: 21, fontWeight: '900' },
   brandName: { color: '#FFFFFF', fontWeight: '900', fontSize: 15 },
   brandTagline: { color: 'rgba(255,255,255,0.7)', fontSize: 8, marginTop: 2 },
   heroHeaderButton: {
     width: 36,
     height: 36,
     borderRadius: 13,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.07)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: 'rgba(255,255,255,0.16)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   heroHeaderButtonText: { color: '#FFFFFF', fontSize: 17 },
-  heroTextBlock: { gap: 8, maxWidth: 340 },
-  heroEyebrow: { color: '#C5E5D9', fontSize: 9, letterSpacing: 2.1, fontWeight: '900' },
+  heroTextBlock: { gap: 8, maxWidth: 320, zIndex: 3 }
+  heroEyebrow: { color: '#FFAD80', fontSize: 9, letterSpacing: 2.1, fontWeight: '900' }
   heroTitle: {
     color: '#FFFFFF',
     fontSize: 25,
@@ -2443,13 +2398,13 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: -0.35,
   },
-  heroSubtitle: { color: 'rgba(255,255,255,0.9)', fontSize: 11, lineHeight: 17 },
+  heroSubtitle: { color: 'rgba(255,255,255,0.12)', fontSize: 11, lineHeight: 17 },
   locationPill: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: 'rgba(255,106,36,0.14)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.24)',
     borderRadius: 20,
@@ -2457,7 +2412,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginTop: 3,
   },
-  locationPillIcon: { color: '#CBE9DE', fontSize: 15 },
+  locationPillIcon: { color: '#FFC19B', fontSize: 15 },
   locationPillText: { color: '#FFFFFF', fontSize: 9, fontWeight: '800' },
   sectionHeaderBlock: {
     flexDirection: 'row',
@@ -2465,22 +2420,24 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 12,
   },
-  sectionEyebrow: {
-    color: '#8BA49A',
-    fontSize: 8,
-    letterSpacing: 1.8,
-    fontWeight: '900',
-    marginBottom: 7,
-  },
-  sectionTitle: {
-    color: '#19342D',
-    fontSize: 21,
-    lineHeight: 27,
-    fontWeight: '900',
-    letterSpacing: -0.4,
-  },
-  sectionCount: { color: '#B1C1BA', fontSize: 21, fontWeight: '300' },
-  serviceCard: { width: 248, gap: 9 },
+  sectionEyebrow: { color: '#FF9868', fontSize: 8, letterSpacing: 1.8, fontWeight: '900', marginBottom: 7 }
+  sectionTitle: { color: '#FFFFFF', fontSize: 21, lineHeight: 27, fontWeight: '900', letterSpacing: -0.4 }
+  sectionCount: { color: '#78818D', fontSize: 21, fontWeight: '300' }
+  serviceCard: {
+    width: 244,
+    minHeight: 238,
+    borderRadius: 22,
+    overflow: 'hidden',
+    padding: 15,
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.09)',
+    shadowColor: '#FF5B1F',
+    shadowOpacity: 0.13,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  }
   serviceImage: { height: 132, padding: 12, justifyContent: 'space-between', overflow: 'hidden' },
   serviceImageRadius: { borderRadius: 17 },
   imageShade: {
@@ -2489,18 +2446,18 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: 'rgba(7,25,27,0.32)',
+    backgroundColor: 'rgba(5,7,11,0.6)',
     borderRadius: 25,
   },
   serviceImageTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   serviceNumber: {
-    color: 'rgba(255,255,255,0.9)',
+    color: 'rgba(255,255,255,0.12)',
     fontSize: 8,
     fontWeight: '900',
     letterSpacing: 1.6,
   },
-  serviceTitle: { color: '#183A31', fontSize: 14, lineHeight: 19, fontWeight: '900' },
-  serviceDescription: { color: '#718179', fontSize: 10, lineHeight: 15 },
+  serviceTitle: { color: '#F2F3F5', fontSize: 15, lineHeight: 20, fontWeight: '900' }
+  serviceDescription: { color: '#9AA3AE', fontSize: 10, lineHeight: 15 }
   softPanel: {
     backgroundColor: 'transparent',
     borderWidth: 0,
@@ -2514,17 +2471,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: 14,
   },
-  stepCard: {
-    width: '48%',
-    minHeight: 122,
-    paddingVertical: 4,
-    gap: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: '#DDE8E2',
-  },
-  stepNumber: { color: '#27836B', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
-  stepTitle: { color: '#203F34', fontSize: 12, lineHeight: 17, fontWeight: '900' },
-  stepDescription: { color: '#73827B', fontSize: 10, lineHeight: 15 },
+  stepCard: { width: '48%', minHeight: 150, borderRadius: 18, paddingHorizontal: 12, paddingVertical: 12, gap: 7, borderWidth: 1, borderColor: 'rgba(255,255,255,0.075)' }
+  stepNumber: { color: '#FF6A24', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
+  stepTitle: { color: '#F2F3F5', fontSize: 12, lineHeight: 17, fontWeight: '900' },
+  stepDescription: { color: '#A1AAB5', fontSize: 10, lineHeight: 15 },
   pageContent: { gap: 17 },
   backButton: {
     alignSelf: 'flex-start',
@@ -2533,8 +2483,8 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 4,
   },
-  backGlyph: { color: '#168C82', fontSize: 19, fontWeight: '900' },
-  backText: { color: '#64776F', fontSize: 11, fontWeight: '800' },
+  backGlyph: { color: '#FF6A24', fontSize: 19, fontWeight: '900' },
+  backText: { color: '#A6AEB9', fontSize: 11, fontWeight: '800' },
   formHero: {
     height: 190,
     borderRadius: 24,
@@ -2544,29 +2494,21 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   formHeroRadius: { borderRadius: 24 },
-  formHeroIcon: {
-    width: 37,
-    height: 37,
-    borderRadius: 13,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 2,
-  },
-  formHeroIconText: { color: '#1C5147', fontSize: 20, fontWeight: '900' },
+  formHeroIcon: { width: 78, height: 62, alignItems: 'flex-start', justifyContent: 'center', marginBottom: 2 }
+  formHeroIconText: { color: '#FF8A4D', fontSize: 20, fontWeight: '900' },
   formHeroTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '900' },
   formHeroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 11 },
   formSectionHeading: { gap: 1 },
   choiceWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
   choice: {
     borderWidth: 1,
-    borderColor: '#E2EAE5',
-    backgroundColor: '#F9FBFA',
+    borderColor: 'rgba(255,255,255,0.09)',
+    backgroundColor: 'rgba(255,255,255,0.055)',
     borderRadius: 19,
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  choiceActive: { backgroundColor: '#DCEFE7', borderColor: '#9CCBBB' },
+  choiceActive: { backgroundColor: 'rgba(255,106,36,0.2)', borderColor: '#9CCBBB' },
   choiceText: { color: '#77877F', fontSize: 10, fontWeight: '800' },
   choiceTextActive: { color: '#205849' },
   switchCard: {
@@ -2574,38 +2516,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
-    backgroundColor: '#F5F8F6',
+    backgroundColor: 'rgba(255,255,255,0.055)',
     borderRadius: 16,
     paddingHorizontal: 13,
     paddingVertical: 10,
   },
   switchCopy: { flex: 1, gap: 3 },
-  switchTitle: { color: '#30423D', fontSize: 11, fontWeight: '800' },
-  switchSub: { color: '#9BA7A1', fontSize: 9 },
+  switchTitle: { color: '#E5E8ED', fontSize: 11, fontWeight: '800' },
+  switchSub: { color: '#8D96A2', fontSize: 9 },
   infoNote: {
-    backgroundColor: '#EEF4F1',
+    backgroundColor: 'rgba(255,106,36,0.12)',
     borderRadius: 14,
-    color: '#71847B',
+    color: '#A1AAB5',
     fontSize: 10,
     lineHeight: 17,
     padding: 12,
   },
   errorText: { color: '#B34C45', fontSize: 11, lineHeight: 17, fontWeight: '700' },
-  successText: { color: '#27816E', fontSize: 11, lineHeight: 17, fontWeight: '700' },
+  successText: { color: '#FF6A24', fontSize: 11, lineHeight: 17, fontWeight: '700' },
 
-  bookingCard: {
-    backgroundColor: 'rgba(255,255,255,0.88)',
-    borderRadius: 22,
-    padding: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.96)',
-    shadowColor: '#25473E',
-    shadowOpacity: 0.05,
-    shadowRadius: 15,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 2,
-  },
+  bookingCard: { position: 'relative', overflow: 'hidden', backgroundColor: 'rgba(19,22,29,0.92)', borderRadius: 22, padding: 16, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', shadowColor: '#000000', shadowOpacity: 0.3, shadowRadius: 18, shadowOffset: { width: 0, height: 7 }, elevation: 3 }
   bookingTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -2613,8 +2543,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   referenceBlock: { flex: 1, gap: 4 },
-  overline: { color: '#9BAAA3', fontSize: 8, letterSpacing: 1.3, fontWeight: '900' },
-  bookingService: { color: '#1E3931', fontSize: 14, fontWeight: '900' },
+  overline: { color: '#8D96A2', fontSize: 8, letterSpacing: 1.3, fontWeight: '900' },
+  bookingService: { color: '#F2F3F5', fontSize: 14, fontWeight: '900' },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2623,30 +2553,24 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 14,
   },
-  statusBadgeActive: { backgroundColor: '#E7F3EC' },
-  statusBadgeMuted: { backgroundColor: '#F1F3F2' },
+  statusBadgeActive: { backgroundColor: 'rgba(255,106,36,0.16)' },
+  statusBadgeMuted: { backgroundColor: 'rgba(255,255,255,0.055)' },
   statusDot: { width: 5, height: 5, borderRadius: 5 },
-  statusDotActive: { backgroundColor: '#278B70' },
-  statusDotMuted: { backgroundColor: '#A7B0AB' },
+  statusDotActive: { backgroundColor: '#FF6A24' },
+  statusDotMuted: { backgroundColor: '#929BA7' },
   statusText: { fontSize: 8, fontWeight: '900' },
-  statusTextActive: { color: '#367A65' },
-  statusTextMuted: { color: '#8F9A94' },
-  routeBlock: {
-    flexDirection: 'row',
-    gap: 11,
-    backgroundColor: '#F8FAF9',
-    borderRadius: 15,
-    padding: 12,
-  },
+  statusTextActive: { color: '#FF8A4D' },
+  statusTextMuted: { color: '#929BA7' },
+  routeBlock: { flexDirection: 'row', gap: 11, backgroundColor: 'rgba(255,255,255,0.055)', borderRadius: 15, padding: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }
   routePinColumn: { alignItems: 'center', width: 8, paddingTop: 2 },
-  routePinStart: { width: 7, height: 7, borderRadius: 5, backgroundColor: '#27917A' },
-  routePinLine: { width: 1, height: 18, backgroundColor: '#B7CBC2' },
+  routePinStart: { width: 7, height: 7, borderRadius: 5, backgroundColor: '#FF6A24' },
+  routePinLine: { width: 1, height: 18, backgroundColor: 'rgba(255,255,255,0.07)' },
   routePinEnd: { width: 7, height: 7, borderRadius: 2, backgroundColor: '#D19B5D' },
   routeLabels: { flex: 1, gap: 3 },
-  routeCaption: { color: '#A1AEA7', fontSize: 8, fontWeight: '800' },
+  routeCaption: { color: '#929BA7', fontSize: 8, fontWeight: '800' },
   routeAddress: { color: '#435B51', fontSize: 11, lineHeight: 16, fontWeight: '700' },
   bookingDetail: { color: '#7A8B82', fontSize: 10, lineHeight: 16 },
-  providerName: { color: '#537B6B', fontSize: 10, fontWeight: '800' },
+  providerName: { color: '#FF8A4D', fontSize: 10, fontWeight: '800' },
   progressWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2660,20 +2584,20 @@ const styles = StyleSheet.create({
     height: 15,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#D9E2DD',
+    borderColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  progressNodeActive: { backgroundColor: '#218B76', borderColor: '#218B76' },
+  progressNodeActive: { backgroundColor: '#FF6A24', borderColor: '#FF6A24' },
   progressCheck: { color: '#FFFFFF', fontSize: 9, fontWeight: '900' },
-  progressInner: { width: 4, height: 4, borderRadius: 3, backgroundColor: '#D9E2DD' },
-  progressLine: { flex: 1, height: 2, backgroundColor: '#E4EBE7', marginHorizontal: 2 },
-  progressLineActive: { backgroundColor: '#89C6B2' },
+  progressInner: { width: 4, height: 4, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.07)' },
+  progressLine: { flex: 1, height: 2, backgroundColor: 'rgba(255,255,255,0.1)', marginHorizontal: 2 },
+  progressLineActive: { backgroundColor: '#FF8A4D' },
   cancelButton: {
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: '#E9DAD6',
-    backgroundColor: '#FFF9F7',
+    borderColor: 'rgba(255,106,36,0.2)',
+    backgroundColor: 'rgba(255,106,36,0.08)',
     minHeight: 38,
     alignItems: 'center',
     justifyContent: 'center',
@@ -2685,15 +2609,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 11,
     paddingVertical: 8,
-    backgroundColor: '#E6F0EB',
+    backgroundColor: 'rgba(255,106,36,0.13)',
     borderRadius: 16,
   },
-  refreshGlyph: { color: '#248673', fontSize: 15, fontWeight: '900' },
-  refreshText: { color: '#4E7A6C', fontSize: 9, fontWeight: '900' },
+  refreshGlyph: { color: '#FF6A24', fontSize: 15, fontWeight: '900' },
+  refreshText: { color: '#FF8A4D', fontSize: 9, fontWeight: '900' },
   emptyState: {
     alignItems: 'center',
     padding: 30,
-    backgroundColor: 'rgba(255,255,255,0.75)',
+    backgroundColor: 'rgba(19,22,29,0.88)',
     borderWidth: 1,
     borderColor: '#FFFFFF',
     borderRadius: 24,
@@ -2703,44 +2627,32 @@ const styles = StyleSheet.create({
     width: 53,
     height: 53,
     borderRadius: 18,
-    backgroundColor: '#E6F1EB',
+    backgroundColor: 'rgba(255,106,36,0.13)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyIconText: { color: '#4B927E', fontSize: 25 },
-  emptyTitle: { color: '#29473D', fontSize: 15, fontWeight: '900' },
-  emptySubtitle: { color: '#8B9992', fontSize: 11, lineHeight: 17 },
+  emptyIconText: { color: '#FF8A4D', fontSize: 25 },
+  emptyTitle: { color: '#E8EBF0', fontSize: 15, fontWeight: '900' },
+  emptySubtitle: { color: '#929BA7', fontSize: 11, lineHeight: 17 },
 
-  providerHero: { backgroundColor: '#173F3A', borderRadius: 25, padding: 20, gap: 7 },
+  providerHero: { backgroundColor: '#171B22', borderRadius: 25, padding: 20, gap: 7, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)' }
   providerHeroTitle: { color: '#FFFFFF', fontSize: 25, fontWeight: '900' },
   providerHeroSub: { color: 'rgba(255,255,255,0.72)', fontSize: 11, lineHeight: 18 },
-  bodyCopy: { color: '#61746A', fontSize: 12, lineHeight: 20 },
+  bodyCopy: { color: '#A6AEB9', fontSize: 12, lineHeight: 20 }
   providerServiceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEF2F0',
+    borderBottomColor: 'rgba(255,255,255,0.07)',
   },
-  providerServiceIcon: {
-    width: 37,
-    height: 37,
-    borderRadius: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  providerServiceIconText: { color: '#23594A', fontSize: 19, fontWeight: '900' },
+  providerServiceIcon: { width: 58, height: 48, alignItems: 'center', justifyContent: 'center' }
+  providerServiceIconText: { color: '#FF8A4D', fontSize: 19, fontWeight: '900' },
   providerServiceCopy: { flex: 1, gap: 3 },
-  providerServiceTitle: { color: '#2C453B', fontSize: 11, fontWeight: '900' },
-  providerServiceSub: { color: '#8B9992', fontSize: 9, lineHeight: 14 },
-  approvalCard: {
-    backgroundColor: '#E8F2EC',
-    borderRadius: 24,
-    padding: 22,
-    alignItems: 'center',
-    gap: 9,
-  },
+  providerServiceTitle: { color: '#E8EBF0', fontSize: 11, fontWeight: '900' },
+  providerServiceSub: { color: '#929BA7', fontSize: 9, lineHeight: 14 },
+  approvalCard: { backgroundColor: 'rgba(255,106,36,0.1)', borderColor: 'rgba(255,106,36,0.22)', borderWidth: 1, borderRadius: 24, padding: 22, alignItems: 'center', gap: 9 }
   approvalIcon: {
     width: 48,
     height: 48,
@@ -2749,27 +2661,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  approvalIconText: { color: '#25856F', fontSize: 25, fontWeight: '800' },
-  approvalTitle: { color: '#285D4E', fontSize: 16, fontWeight: '900', textAlign: 'center' },
+  approvalIconText: { color: '#FF6A24', fontSize: 25, fontWeight: '800' },
+  approvalTitle: { color: '#FF8A4D', fontSize: 16, fontWeight: '900', textAlign: 'center' },
   approvalText: { color: '#7D9287', fontSize: 11 },
   reviewTrack: {
     height: 5,
     width: '100%',
     borderRadius: 5,
-    backgroundColor: '#D5E5DB',
+    backgroundColor: 'rgba(255,106,36,0.2)',
     overflow: 'hidden',
     marginTop: 6,
   },
-  reviewTrackFill: { height: 5, width: '64%', backgroundColor: '#5AAB91', borderRadius: 5 },
+  reviewTrackFill: { height: 5, width: '64%', backgroundColor: '#FF8A4D', borderRadius: 5 },
 
-  aboutHero: {
-    height: 188,
-    borderRadius: 22,
-    padding: 18,
-    justifyContent: 'flex-end',
-    gap: 7,
-    overflow: 'hidden',
-  },
+  aboutHero: { height: 188, borderRadius: 22, padding: 18, justifyContent: 'flex-end', gap: 7, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }
   aboutHeroRadius: { borderRadius: 26 },
   aboutHeroTitle: { color: '#FFFFFF', fontSize: 29, fontWeight: '900' },
   aboutHeroSubtitle: { color: 'rgba(255,255,255,0.82)', fontSize: 12 },
@@ -2779,14 +2684,14 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: 'transparent',
     borderTopWidth: 1,
-    borderTopColor: '#E6EEE9',
+    borderTopColor: 'rgba(255,255,255,0.09)',
     borderRadius: 0,
     paddingVertical: 13,
     marginTop: 7,
   },
-  corridorGlyph: { color: '#248A75', fontSize: 24, fontWeight: '900' },
+  corridorGlyph: { color: '#FF6A24', fontSize: 24, fontWeight: '900' },
   corridorCopy: { flex: 1, gap: 3 },
-  corridorTitle: { color: '#315C4C', fontSize: 12, fontWeight: '900' },
+  corridorTitle: { color: '#FF8A4D', fontSize: 12, fontWeight: '900' },
   corridorSub: { color: '#8CA39A', fontSize: 7, letterSpacing: 1.3, fontWeight: '900' },
   problemGrid: {
     flexDirection: 'row',
@@ -2799,12 +2704,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     gap: 7,
     borderBottomWidth: 1,
-    borderBottomColor: '#E1EAE5',
+    borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   infoCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  infoCardNumber: { color: '#A2B4AA', fontSize: 9, fontWeight: '900', letterSpacing: 1.3 },
-  infoCardGlyph: { color: '#28917A', fontSize: 20, fontWeight: '900' },
-  infoCardTitle: { color: '#25473A', fontSize: 14, fontWeight: '900' },
+  infoCardNumber: { color: '#FF8A4D', fontSize: 9, fontWeight: '900', letterSpacing: 1.3 },
+  infoCardGlyph: { color: '#FF6A24', fontSize: 20, fontWeight: '900' },
+  infoCardTitle: { color: '#F2F3F5', fontSize: 14, fontWeight: '900' },
   solutionRow: { flexDirection: 'row', alignItems: 'center', gap: 11, paddingVertical: 7 },
   solutionIcon: {
     width: 28,
@@ -2814,15 +2719,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  solutionIconText: { color: '#258875', fontSize: 18, fontWeight: '900' },
-  solutionText: { flex: 1, color: '#5F756A', fontSize: 11, lineHeight: 18, fontWeight: '600' },
+  solutionIconText: { color: '#FF6A24', fontSize: 18, fontWeight: '900' },
+  solutionText: { flex: 1, color: '#A6AEB9', fontSize: 11, lineHeight: 18, fontWeight: '600' },
   workflowRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
     paddingVertical: 9,
     borderBottomWidth: 1,
-    borderBottomColor: '#EFF3F1',
+    borderBottomColor: 'rgba(255,255,255,0.08)',
   },
   workflowNumber: {
     width: 27,
@@ -2830,21 +2735,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#D8E6DE',
+    borderColor: 'rgba(255,255,255,0.13)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  workflowNumberText: { color: '#33836D', fontSize: 9, fontWeight: '900' },
+  workflowNumberText: { color: '#FF8A4D', fontSize: 9, fontWeight: '900' },
   workflowText: { flex: 1, gap: 4 },
-  workflowTitle: { color: '#2F4A3E', fontSize: 12, fontWeight: '900' },
-  teamCard: {
-    backgroundColor: 'transparent',
-    borderTopWidth: 1,
-    borderTopColor: '#DDE8E2',
-    paddingTop: 17,
-    gap: 13,
-  },
-  teamTitle: { color: '#1B3D32', fontSize: 20, fontWeight: '900' },
+  workflowTitle: { color: '#E8EBF0', fontSize: 12, fontWeight: '900' },
+  teamCard: { backgroundColor: 'rgba(20,23,30,0.78)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: 17, gap: 13 }
+  teamTitle: { color: '#F2F3F5', fontSize: 20, fontWeight: '900' },
   teamMember: { flexDirection: 'row', alignItems: 'center', gap: 11 },
   avatar: {
     width: 38,
@@ -2854,12 +2753,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: '#317B64', fontSize: 10, fontWeight: '900' },
+  avatarText: { color: '#FF8A4D', fontSize: 10, fontWeight: '900' },
   teamMemberText: { flex: 1, gap: 3 },
-  teamMemberName: { color: '#214337', fontSize: 12, fontWeight: '900' },
-  teamMemberRole: { color: '#85948C', fontSize: 9 },
-  teamDivider: { height: 1, backgroundColor: '#E1EAE5' },
-  supervisorText: { color: '#42745F', fontSize: 11, fontWeight: '800' },
+  teamMemberName: { color: '#F2F3F5', fontSize: 12, fontWeight: '900' },
+  teamMemberRole: { color: '#929BA7', fontSize: 9 },
+  teamDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.1)' },
+  supervisorText: { color: '#FF8A4D', fontSize: 11, fontWeight: '800' },
   featureNoteCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -2880,22 +2779,7 @@ const styles = StyleSheet.create({
   featureNoteTitle: { color: '#896C45', fontSize: 11, fontWeight: '900' },
   featureNoteText: { color: '#9A896F', fontSize: 10, lineHeight: 17 },
 
-  bottomBarShell: {
-    position: 'absolute',
-    left: 14,
-    right: 14,
-    bottom: 7,
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E3ECE6',
-    backgroundColor: 'rgba(255,255,255,0.98)',
-    shadowColor: '#244C3F',
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
-  },
+  bottomBarShell: { position: 'absolute', left: 14, right: 14, bottom: 7, borderRadius: 23, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)', backgroundColor: 'rgba(15,18,24,0.78)', shadowColor: '#000000', shadowOpacity: 0.36, shadowRadius: 22, shadowOffset: { width: 0, height: 7 }, elevation: 8 }
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2906,9 +2790,9 @@ const styles = StyleSheet.create({
   },
   bottomTab: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 2 },
   bottomGlyphWrap: { width: 30, height: 25, alignItems: 'center', justifyContent: 'center' },
-  bottomGlyph: { color: '#A2AEA8', fontSize: 18, fontWeight: '800' },
-  bottomGlyphActive: { color: '#168C82' },
-  bottomLabel: { color: '#9AA69F', fontSize: 8, fontWeight: '700' },
-  bottomLabelActive: { color: '#347D69', fontWeight: '900' },
+  bottomGlyph: { color: '#929BA7', fontSize: 18, fontWeight: '800' },
+  bottomGlyphActive: { color: '#FF8A4D', textShadowColor: '#FF6A24', textShadowRadius: 12 }
+  bottomLabel: { color: '#8D96A2', fontSize: 8, fontWeight: '700' },
+  bottomLabelActive: { color: '#FF8A4D', fontWeight: '900' }
   globalSpinner: { marginVertical: 8 },
 });
