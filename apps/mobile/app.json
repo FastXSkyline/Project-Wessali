@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "scheme": "wessali",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -14,7 +14,7 @@
     "android": {
       "package": "dz.wessali.app",
       "adaptiveIcon": {
-        "backgroundColor": "#F4F5F7"
+        "backgroundColor": "#080A0E"
       }
     }
   }
