@@ -1647,7 +1647,7 @@ export default function App() {
               <Switch
                 value={needsTowing}
                 onValueChange={setNeedsTowing}
-                trackColor={{ true: '#1A8C80' }}
+                trackColor={{ true: '#FF6A24', false: 'rgba(255,255,255,0.16)' }}
               />
             </View>
             {needsTowing
@@ -1768,7 +1768,7 @@ export default function App() {
               <Switch
                 value={providerServices.includes(service.id)}
                 onValueChange={() => toggleProviderService(service.id)}
-                trackColor={{ true: '#1A8C80' }}
+                trackColor={{ true: '#FF6A24', false: 'rgba(255,255,255,0.16)' }}
               />
             </View>
           ))}
@@ -2489,7 +2489,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   primaryButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
-  primaryButtonArrow: { color: '#B9E4D8', fontSize: 18, fontWeight: '800' },
+  primaryButtonArrow: { color: '#FFC19B', fontSize: 18, fontWeight: '800' },
   secondaryButton: {
     minHeight: 44,
     borderRadius: 15,
@@ -2737,8 +2737,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  choiceActive: { backgroundColor: 'rgba(255,106,36,0.2)', borderColor: '#9CCBBB' },
-  choiceText: { color: '#77877F', fontSize: 10, fontWeight: '800' },
+  choiceActive: { backgroundColor: 'rgba(255,106,36,0.2)', borderColor: '#FF8A4D' },
+  choiceText: { color: '#A1AAB5', fontSize: 10, fontWeight: '800' },
   choiceTextActive: { color: '#FFB18A' },
   switchCard: {
     flexDirection: 'row',
@@ -2819,8 +2819,8 @@ const styles = StyleSheet.create({
   routePinEnd: { width: 7, height: 7, borderRadius: 2, backgroundColor: '#D19B5D' },
   routeLabels: { flex: 1, gap: 3 },
   routeCaption: { color: '#929BA7', fontSize: 8, fontWeight: '800' },
-  routeAddress: { color: '#435B51', fontSize: 11, lineHeight: 16, fontWeight: '700' },
-  bookingDetail: { color: '#7A8B82', fontSize: 10, lineHeight: 16 },
+  routeAddress: { color: '#E5E8ED', fontSize: 11, lineHeight: 16, fontWeight: '700' },
+  bookingDetail: { color: '#A1AAB5', fontSize: 10, lineHeight: 16 },
   providerName: { color: '#FF8A4D', fontSize: 10, fontWeight: '800' },
   progressWrap: {
     flexDirection: 'row',
