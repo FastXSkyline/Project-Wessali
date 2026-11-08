@@ -187,7 +187,7 @@ export function IconButton({
     >
       <BlurView
         intensity={30}
-        tint="dark"
+        tint="light"
         blurMethod="dimezisBlurViewSdk31Plus"
         style={[StyleSheet.absoluteFill, { borderRadius: size / 2 }]}
       />
@@ -483,9 +483,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     paddingVertical: 16,
     shadowColor: palette.jade,
-    shadowOpacity: 0.34,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 7 },
     elevation: 9,
   },
   primaryButtonCompact: { minHeight: 46, paddingVertical: 12, paddingHorizontal: 18 },
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderWidth: 1,
     borderColor: palette.line,
-    backgroundColor: 'rgba(255,255,255,0.045)',
+    backgroundColor: 'rgba(255,255,255,0.76)',
   },
   iconButton: {
     alignItems: 'center',
@@ -519,22 +519,22 @@ const styles = StyleSheet.create({
     borderColor: palette.line,
   },
   iconButtonFill: {
-    backgroundColor: 'rgba(12, 34, 25, 0.42)',
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
   },
   fieldShell: {
     minHeight: 54,
     borderRadius: 17,
     borderWidth: 1,
     borderColor: palette.line,
-    backgroundColor: 'rgba(7, 24, 17, 0.58)',
+    backgroundColor: 'rgba(255, 255, 255, 0.82)',
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
   fieldShellFocused: {
-    borderColor: 'rgba(55, 225, 165, 0.6)',
-    backgroundColor: 'rgba(11, 40, 29, 0.72)',
+    borderColor: 'rgba(88, 116, 94, 0.42)',
+    backgroundColor: 'rgba(255, 255, 255, 0.96)',
   },
   fieldShellMultiline: { alignItems: 'flex-start', paddingTop: 14, minHeight: 92 },
   input: {
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: palette.lineSoft,
-    backgroundColor: 'rgba(255,255,255,0.035)',
+    backgroundColor: 'rgba(255,255,255,0.72)',
     paddingHorizontal: 13,
     paddingVertical: 9,
     flexDirection: 'row',
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: palette.lineSoft,
-    backgroundColor: 'rgba(255,255,255,0.035)',
+    backgroundColor: 'rgba(255,255,255,0.72)',
     gap: 3,
   },
   segment: {
@@ -588,16 +588,16 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 999,
     padding: 3,
-    backgroundColor: 'rgba(255,255,255,0.10)',
+    backgroundColor: 'rgba(67, 82, 70, 0.12)',
     borderWidth: 1,
     borderColor: palette.lineSoft,
   },
-  trackOn: { backgroundColor: palette.jade, borderColor: 'rgba(55,225,165,0.5)' },
+  trackOn: { backgroundColor: palette.jade, borderColor: 'rgba(88,116,94,0.32)' },
   knob: {
     width: 22,
     height: 22,
     borderRadius: 999,
-    backgroundColor: '#F4FFF9',
+    backgroundColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOpacity: 0.25,
     shadowRadius: 4,

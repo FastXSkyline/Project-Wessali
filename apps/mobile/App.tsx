@@ -138,7 +138,7 @@ function AppRoot() {
   return (
     <LocaleProvider locale={app.locale}>
       <View style={styles.root}>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         {content}
         {app.session && !bookingOpen ? (
           <BottomDock

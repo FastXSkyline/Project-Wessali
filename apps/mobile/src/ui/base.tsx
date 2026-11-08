@@ -194,40 +194,40 @@ export function AmbientField({ variant = 'app' }: { variant?: 'app' | 'auth' }) 
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <View style={[StyleSheet.absoluteFill, { backgroundColor: palette.canvas }]} />
       <LinearGradient
-        colors={['rgba(9, 38, 28, 0.52)', 'rgba(5, 16, 12, 0)']}
+        colors={['rgba(226, 234, 224, 0.86)', 'rgba(243, 243, 239, 0)']}
         start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.75, y: 0.75 }}
+        end={{ x: 0.8, y: 0.8 }}
         style={StyleSheet.absoluteFill}
       />
       <RadialGlow
         size={Math.max(380, width * 1.1)}
         color={palette.jade}
-        opacity={variant === 'auth' ? 0.36 : 0.3}
+        opacity={variant === 'auth' ? 0.14 : 0.09}
         style={{ position: 'absolute', top: -width * 0.46, right: -width * 0.3 }}
       />
       <RadialGlow
         size={Math.max(320, width * 0.9)}
         color={palette.aqua}
-        opacity={0.23}
+        opacity={0.07}
         style={{ position: 'absolute', top: height * 0.25, left: -width * 0.42 }}
       />
       {variant === 'auth' ? (
         <RadialGlow
           size={280}
           color={palette.sand}
-          opacity={0.14}
+          opacity={0.08}
           style={{ position: 'absolute', top: height * 0.05, left: -40 }}
         />
       ) : null}
       <RadialGlow
         size={430}
         color={palette.amber}
-        opacity={0.09}
+        opacity={0.045}
         style={{ position: 'absolute', bottom: -230, right: -150 }}
       />
       <LinearGradient
-        colors={['rgba(2, 8, 6, 0.5)', 'rgba(2, 8, 6, 0)', 'rgba(2, 8, 6, 0.7)']}
-        locations={[0, 0.28, 1]}
+        colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)', 'rgba(75, 89, 77, 0.035)']}
+        locations={[0, 0.34, 1]}
         style={StyleSheet.absoluteFill}
       />
     </View>
@@ -266,16 +266,16 @@ export function GlassCard({
       >
         <BlurView
           intensity={intensity}
-          tint="dark"
+          tint="light"
           blurMethod="dimezisBlurViewSdk31Plus"
           style={StyleSheet.absoluteFill}
         />
         <LinearGradient
           colors={
             tone === 'deep'
-              ? (['rgba(15, 48, 35, 0.74)', 'rgba(3, 14, 10, 0.82)'] as const)
+              ? (['rgba(242, 246, 240, 0.96)', 'rgba(231, 237, 229, 0.90)'] as const)
               : tone === 'light'
-                ? (['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.04)'] as const)
+                ? (['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.72)'] as const)
                 : ([glassTokens.fillTop, glassTokens.fillBottom] as const)
           }
           start={{ x: 0.06, y: 0 }}
@@ -371,7 +371,7 @@ export function Avatar({
         style={{ position: 'absolute', top: -size * 0.45, left: -size * 0.45 }}
       />
       <LinearGradient
-        colors={provider ? ['#FFE9BD', '#D8AE66'] : ['#8BFFD5', '#1BA97B']}
+        colors={provider ? ['#E7D9C5', '#B38B5B'] : ['#D7E3D7', '#77947C']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
@@ -389,7 +389,7 @@ export function Avatar({
           weight="bold"
           align="center"
           style={{
-            color: provider ? '#3A2A0C' : palette.onAccent,
+            color: provider ? '#5B4225' : '#334F39',
             fontSize: size * 0.32,
             lineHeight: size * 0.4,
           }}
@@ -499,19 +499,19 @@ export function RouteDoodle({
       <Svg width="100%" height="100%" viewBox="0 0 360 160" preserveAspectRatio="xMidYMid slice">
         <Path
           d="M-20 112 C 42 70, 86 138, 152 104 S 258 48, 390 84"
-          stroke="rgba(174, 245, 217, 0.12)"
+          stroke="rgba(84, 107, 89, 0.12)"
           strokeWidth={1}
           fill="none"
         />
         <Path
           d="M-20 132 C 46 92, 96 154, 158 124 S 272 68, 390 108"
-          stroke="rgba(174, 245, 217, 0.08)"
+          stroke="rgba(84, 107, 89, 0.085)"
           strokeWidth={1}
           fill="none"
         />
         <Path
           d="M-20 92 C 48 52, 104 116, 168 84 S 272 30, 390 62"
-          stroke="rgba(174, 245, 217, 0.07)"
+          stroke="rgba(84, 107, 89, 0.07)"
           strokeWidth={1}
           fill="none"
         />
@@ -580,10 +580,10 @@ export const styles = StyleSheet.create({
   rowReverse: { flexDirection: 'row-reverse' },
   divider: { height: 1, backgroundColor: palette.lineSoft },
   cardShadow: {
-    shadowOpacity: 0.38,
-    shadowRadius: 26,
-    shadowOffset: { width: 0, height: 16 },
-    elevation: 10,
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
   topSpecular: {
     position: 'absolute',
@@ -605,7 +605,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(3, 32, 22, 0.18)',
+    borderColor: 'rgba(72, 91, 76, 0.13)',
     overflow: 'hidden',
   },
   brandSheen: {
@@ -614,14 +614,14 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: '52%',
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: 'rgba(255,255,255,0.42)',
   },
   brandRim: {
     position: 'absolute',
     top: 0,
     left: 0,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.28)',
+    borderColor: 'rgba(255,255,255,0.76)',
   },
   emptyArt: {
     width: 90,
