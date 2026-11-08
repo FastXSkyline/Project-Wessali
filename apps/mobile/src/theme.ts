@@ -159,11 +159,7 @@ export const glow = {
 
 export const gradients = {
   primary: ['#829C83', '#66836A', '#4E6A53'] as const,
-  glass: [
-    'rgba(255,255,255,0.94)',
-    'rgba(255,255,255,0.70)',
-    'rgba(237,240,234,0.35)',
-  ] as const,
+  glass: ['rgba(255,255,255,0.94)', 'rgba(255,255,255,0.70)', 'rgba(237,240,234,0.35)'] as const,
   deepGlass: ['rgba(248,250,246,0.96)', 'rgba(235,239,232,0.90)'] as const,
   canvas: [palette.canvas, palette.canvasDeep] as const,
 };

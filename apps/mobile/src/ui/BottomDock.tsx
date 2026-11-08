@@ -59,11 +59,7 @@ export function BottomDock({
           style={StyleSheet.absoluteFill}
         />
         <LinearGradient
-          colors={[
-            'rgba(255,255,255,0.10)',
-            'rgba(250,251,248,0.42)',
-            'rgba(246,247,243,0.80)',
-          ]}
+          colors={['rgba(255,255,255,0.10)', 'rgba(250,251,248,0.42)', 'rgba(246,247,243,0.80)']}
           locations={[0, 0.44, 1]}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}

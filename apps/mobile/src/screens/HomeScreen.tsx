@@ -202,7 +202,11 @@ export function HomeScreen({
                       style={StyleSheet.absoluteFill}
                     />
                     <View style={styles.serviceImageCounter}>
-                      <AppText variant="caption" tone="white" style={{ fontSize: 8.5, lineHeight: 11 }}>
+                      <AppText
+                        variant="caption"
+                        tone="white"
+                        style={{ fontSize: 8.5, lineHeight: 11 }}
+                      >
                         {String(index + 1).padStart(2, '0')} / 03
                       </AppText>
                     </View>
@@ -211,10 +215,19 @@ export function HomeScreen({
                     </View>
                   </View>
                   <View style={styles.serviceInfo}>
-                    <AppText variant="h3" numberOfLines={2} style={{ fontSize: 15.5, lineHeight: 21 }}>
+                    <AppText
+                      variant="h3"
+                      numberOfLines={2}
+                      style={{ fontSize: 15.5, lineHeight: 21 }}
+                    >
                       {service.labels[locale]}
                     </AppText>
-                    <AppText variant="caption" tone="muted" numberOfLines={2} style={{ lineHeight: 17 }}>
+                    <AppText
+                      variant="caption"
+                      tone="muted"
+                      numberOfLines={2}
+                      style={{ lineHeight: 17 }}
+                    >
                       {description}
                     </AppText>
                     <View style={[styles.serviceFooter, rtlStyle && styles.rowReverse]}>
