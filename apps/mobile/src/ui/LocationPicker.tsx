@@ -20,6 +20,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [resolving, setResolving] = useState(false);
+  const [mapKey, setMapKey] = useState(0);
   const rtl = locale === 'ar';
   const copy = {
     title: locale === 'ar' ? 'حدد موقعك' : locale === 'fr' ? 'Choisir un emplacement' : 'Choose a location',
@@ -45,7 +46,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
       if (!permission.granted) { Alert.alert(copy.title, copy.permission); return; }
       const result = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
       const point = { latitude: result.coords.latitude, longitude: result.coords.longitude };
-      setCenter(point); await resolveAddress(point);
+      setCenter(point); setMapKey((current) => current + 1); await resolveAddress(point);
     } catch { Alert.alert(copy.title, copy.permission); }
     finally { setLoading(false); }
   }
@@ -68,8 +69,8 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
           <View style={{ flex: 1, gap: 2 }}><AppText variant="h2">{copy.title}</AppText><AppText variant="caption" tone="muted">{copy.body}</AppText></View>
         </View>
         <View style={styles.mapWrap}>
-          {Platform.OS === 'ios' ? <AppleMaps.View style={StyleSheet.absoluteFill} cameraPosition={cameraPosition} markers={[{ coordinates: center, title: 'Selected location', tintColor: palette.jadeDeep, systemImage: 'mappin.and.ellipse' }]} properties={{ isMyLocationEnabled: true, selectionEnabled: true }} uiSettings={{ myLocationButtonEnabled: true, compassEnabled: true }} onCameraMove={(event) => updateCenter(event.coordinates)} onMapClick={(event) => updateCenter(event.coordinates)} /> :
-          Platform.OS === 'android' ? <GoogleMaps.View style={StyleSheet.absoluteFill} cameraPosition={cameraPosition} markers={[{ coordinates: center, title: 'Selected location', draggable: true }]} properties={{ isMyLocationEnabled: true }} uiSettings={{ myLocationButtonEnabled: true, compassEnabled: true }} onCameraMove={(event) => updateCenter(event.coordinates)} onMapClick={(event) => updateCenter(event.coordinates)} /> :
+          {Platform.OS === 'ios' ? <AppleMaps.View key={`apple-${mapKey}`} style={StyleSheet.absoluteFill} cameraPosition={cameraPosition} markers={[{ coordinates: center, title: 'Selected location', tintColor: palette.jadeDeep, systemImage: 'mappin.and.ellipse' }]} properties={{ isMyLocationEnabled: true, selectionEnabled: true }} uiSettings={{ myLocationButtonEnabled: true, compassEnabled: true }} onCameraMove={(event) => updateCenter(event.coordinates)} onMapClick={(event) => updateCenter(event.coordinates)} /> :
+          Platform.OS === 'android' ? <GoogleMaps.View key={`google-${mapKey}`} style={StyleSheet.absoluteFill} cameraPosition={cameraPosition} markers={[{ coordinates: center, title: 'Selected location', draggable: true }]} properties={{ isMyLocationEnabled: true }} uiSettings={{ myLocationButtonEnabled: true, compassEnabled: true }} onCameraMove={(event) => updateCenter(event.coordinates)} onMapClick={(event) => updateCenter(event.coordinates)} /> :
           <View style={styles.mapFallback}><AppText variant="body" tone="muted">Maps are available on iOS and Android.</AppText></View>}
           <View pointerEvents="none" style={styles.pin}><Ionicons name="location" size={35} color={palette.jadeDeep} /></View>
           <LinearGradient colors={['rgba(243,243,239,0.9)','rgba(243,243,239,0)']} style={styles.mapTopFade} pointerEvents="none" />

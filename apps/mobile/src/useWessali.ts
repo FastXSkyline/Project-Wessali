@@ -27,8 +27,6 @@ export function useWessali() {
   const [selectedService, setSelectedService] = useState<ServiceKind>('freight');
   const [pickupAddress, setPickupAddress] = useState('');
   const [destinationAddress, setDestinationAddress] = useState('');
-  const [pickupCoordinates, setPickupCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [destinationCoordinates, setDestinationCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
   const [customerNotes, setCustomerNotes] = useState('');
   const [cargoDescription, setCargoDescription] = useState('');
   const [loadingRequirements, setLoadingRequirements] = useState('');
@@ -152,7 +150,7 @@ export function useWessali() {
 
   function selectService(kind: ServiceKind) {
     setSelectedService(kind);
-    if (kind !== 'freight') { setDestinationAddress(''); setDestinationCoordinates(null); }
+    if (kind !== 'freight') setDestinationAddress('');
     if (kind !== 'roadside') {
       setVehicleType('car');
       setIssueCategory('mechanical');
@@ -171,8 +169,6 @@ export function useWessali() {
     setSelectedService(kind);
     setPickupAddress('');
     setDestinationAddress('');
-    setPickupCoordinates(null);
-    setDestinationCoordinates(null);
     setCustomerNotes('');
     setCargoDescription('');
     setLoadingRequirements('');
@@ -209,7 +205,6 @@ export function useWessali() {
     const common = {
       serviceType: selectedService,
       pickupAddress: pickupAddress.trim(),
-      ...(pickupCoordinates ? { pickupLatitude: pickupCoordinates.latitude, pickupLongitude: pickupCoordinates.longitude } : {}),
       customerNotes: customerNotes.trim() || undefined,
       requestedAt: new Date().toISOString(),
     };
@@ -218,7 +213,6 @@ export function useWessali() {
       payload = {
         ...common,
         destinationAddress: destinationAddress.trim(),
-        ...(destinationCoordinates ? { destinationLatitude: destinationCoordinates.latitude, destinationLongitude: destinationCoordinates.longitude } : {}),
         cargoDescription: cargoDescription.trim(),
         weightKg: weight,
         truckType,
@@ -395,12 +389,8 @@ export function useWessali() {
     selectedServiceCopy,
     pickupAddress,
     setPickupAddress,
-    pickupCoordinates,
-    setPickupCoordinates,
     destinationAddress,
     setDestinationAddress,
-    destinationCoordinates,
-    setDestinationCoordinates,
     customerNotes,
     setCustomerNotes,
     cargoDescription,

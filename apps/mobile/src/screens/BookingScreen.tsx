@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
@@ -7,7 +7,6 @@ import type { WessaliApp } from '../useWessali';
 import { AppText, GlassCard, Page, useLocaleValue } from '../ui/base';
 import { ChoiceChips, Field, IconButton, InfoNote, PrimaryButton, ToggleRow } from '../ui/controls';
 import { IconTile } from '../ui/IconTile';
-import { LocationPicker, type PickedLocation } from '../ui/LocationPicker';
 
 export function BookingScreen({
   app,
@@ -21,14 +20,6 @@ export function BookingScreen({
   const { ui, locale, selectedService, selectedServiceCopy, isRtl } = app;
   const { isRtl: rtlStyle } = useLocaleValue();
   const tone = serviceTheme[selectedService];
-  const [locationTarget, setLocationTarget] = useState<'pickup' | 'destination' | null>(null);
-  const [pickerVisible, setPickerVisible] = useState(false);
-  function applyPickedLocation(location: PickedLocation) {
-    if (locationTarget === 'pickup') { app.setPickupAddress(location.address); app.setPickupCoordinates({ latitude: location.latitude, longitude: location.longitude }); }
-    else if (locationTarget === 'destination') { app.setDestinationAddress(location.address); app.setDestinationCoordinates({ latitude: location.latitude, longitude: location.longitude }); }
-    setPickerVisible(false); setLocationTarget(null);
-  }
-  function openLocationPicker(target: 'pickup' | 'destination') { setLocationTarget(target); setPickerVisible(true); }
 
   async function submit() {
     const sent = await app.submitBooking();
@@ -103,22 +94,20 @@ export function BookingScreen({
           <Field
             label={ui.pickupLabel}
             value={app.pickupAddress}
-            onChangeText={(value) => { app.setPickupAddress(value); app.setPickupCoordinates(null); }}
+            onChangeText={app.setPickupAddress}
             placeholder={ui.pickupPlaceholder}
             icon="pin-outline"
             multiline
           />
-          <LocationActionButton locale={locale} selected={Boolean(app.pickupCoordinates)} onPress={() => openLocationPicker('pickup')} />
           {selectedService === 'freight' ? (
             <Field
               label={ui.destinationLabel}
               value={app.destinationAddress}
-              onChangeText={(value) => { app.setDestinationAddress(value); app.setDestinationCoordinates(null); }}
+              onChangeText={app.setDestinationAddress}
               placeholder={ui.destinationPlaceholder}
               icon="flag-outline"
               multiline
             />
-            <LocationActionButton locale={locale} selected={Boolean(app.destinationCoordinates)} onPress={() => openLocationPicker('destination')} />
           ) : null}
         </View>
       </GlassCard>
@@ -291,8 +280,6 @@ export function BookingScreen({
         />
       </GlassCard>
 
-      <LocationPicker visible={pickerVisible} locale={locale} onClose={() => { setPickerVisible(false); setLocationTarget(null); }} onConfirm={applyPickedLocation} />
-
       <PrimaryButton
         label={ui.sendRequest}
         icon={isRtl ? 'arrow-back' : 'arrow-forward'}
@@ -302,11 +289,6 @@ export function BookingScreen({
       />
     </Page>
   );
-}
-
-function LocationActionButton({ locale, selected, onPress }: { locale: string; selected: boolean; onPress: () => void }) {
-  const label = selected ? (locale === 'ar' ? 'تم تحديد الموقع على الخريطة' : locale === 'fr' ? 'Position sélectionnée sur la carte' : 'Location selected on map') : (locale === 'ar' ? 'تحديد الموقع على الخريطة' : locale === 'fr' ? 'Choisir sur la carte' : 'Choose location on map');
-  return <Pressable onPress={onPress} accessibilityRole="button" style={styles.mapButton}><Ionicons name="map-outline" size={17} color={palette.jadeDeep} /><AppText variant="label" style={{ color: palette.jadeDeep, flex: 1 }}>{label}</AppText><Ionicons name="chevron-forward" size={15} color={palette.jadeDeep} /></Pressable>;
 }
 
 function SectionTitle({
@@ -351,7 +333,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 9 },
-  mapButton: { minHeight: 46, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(88,116,94,0.22)', backgroundColor: 'rgba(88,116,94,0.07)', paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 10 },
   sectionIcon: {
     width: 28,
     height: 28,
