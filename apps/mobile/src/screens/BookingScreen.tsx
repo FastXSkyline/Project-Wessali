@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: palette.lineSoft,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: 'rgba(47, 62, 52, 0.035)',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 7,

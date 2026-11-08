@@ -46,8 +46,8 @@ export function ProfileScreen({ app }: { app: WessaliApp }) {
                 styles.rolePill,
                 rtlStyle && styles.rowReverse,
                 {
-                  borderColor: isProvider ? 'rgba(240,216,169,0.3)' : 'rgba(55,225,165,0.3)',
-                  backgroundColor: isProvider ? 'rgba(240,216,169,0.10)' : 'rgba(55,225,165,0.10)',
+                  borderColor: isProvider ? 'rgba(169,130,85,0.24)' : 'rgba(88,116,94,0.24)',
+                  backgroundColor: isProvider ? 'rgba(169,130,85,0.09)' : 'rgba(88,116,94,0.09)',
                 },
               ]}
             >

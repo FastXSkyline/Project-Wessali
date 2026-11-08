@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-ios:
@@ -158,3 +158,26 @@ jobs:
           path: Wessali-unsigned.ipa
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish direct IPA release asset
+        id: publish-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          TAG="wessali-ios-${GITHUB_RUN_NUMBER}-${SHORT_SHA}"
+
+          gh release create "$TAG" "$GITHUB_WORKSPACE/Wessali-unsigned.ipa" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Wessali iOS IPA - build ${GITHUB_RUN_NUMBER}" \
+            --notes "Direct .ipa asset for commit ${GITHUB_SHA}. This build is unsigned and must be signed before installation." \
+            --target "$GITHUB_SHA"
+
+          RELEASE_URL="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url --jq .url)"
+          echo "release_url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
+          echo "## Direct IPA download" >> "$GITHUB_STEP_SUMMARY"
+          echo "[$TAG]($RELEASE_URL)" >> "$GITHUB_STEP_SUMMARY"
+          echo "The release contains Wessali-unsigned.ipa as a direct file asset." >> "$GITHUB_STEP_SUMMARY"
