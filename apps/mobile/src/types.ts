@@ -33,7 +33,11 @@ export type Booking = {
   service_type: ServiceKind;
   status: string;
   pickup_address: string;
+  pickup_latitude?: number | null;
+  pickup_longitude?: number | null;
   destination_address?: string | null;
+  destination_latitude?: number | null;
+  destination_longitude?: number | null;
   requested_at?: string | null;
   created_at?: string | null;
   customer_notes?: string | null;
