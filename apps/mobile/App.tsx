@@ -2529,7 +2529,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(4,18,11,0.6)',
     borderRadius: 25,
   },
-  serviceImageTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  serviceImageTop: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   serviceNumber: {
     color: 'rgba(255,255,255,0.78)',
     fontSize: 8,
@@ -2947,7 +2947,6 @@ const styles = StyleSheet.create({
   servicePhotoRadius: { borderRadius: 0 },
   service3DImage: { width: 76, height: 76, alignSelf: 'flex-end', marginTop: 10 },
   service3DImageWide: { width: 82, height: 82, alignSelf: 'center', marginTop: 18 },
-  serviceImageTop: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   serviceMetaWide: { flex: 1, justifyContent: 'center', paddingHorizontal: 15, paddingVertical: 12 },
   locationPill3DIcon: { width: 17, height: 17 },
   solutionIconImage: { width: 35, height: 35 },
