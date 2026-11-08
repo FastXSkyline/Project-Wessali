@@ -641,13 +641,61 @@ function MotionPressable({
   );
 }
 
-
-function Floating3DIcon({ glyph, size = 62, glow = '#FF6A24' }: { glyph: string; size?: number; glow?: string }) {
+function Floating3DIcon({
+  glyph,
+  size = 62,
+  glow = '#FF6A24',
+}: {
+  glyph: string;
+  size?: number;
+  glow?: string;
+}) {
   return (
-    <View pointerEvents="none" style={{ width: size * 1.48, height: size * 1.3, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={{ position: 'absolute', bottom: size * 0.07, width: size * 0.94, height: size * 0.2, borderRadius: 99, backgroundColor: glow, opacity: 0.2, transform: [{ scaleX: 1.28 }] }} />
-      <Text style={{ fontSize: size * 0.88, lineHeight: size * 1.08, textShadowColor: glow, textShadowOffset: { width: 0, height: size * 0.08 }, textShadowRadius: size * 0.34, elevation: 10 }}>{glyph}</Text>
-      <LinearGradient colors={['rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']} style={{ position: 'absolute', top: size * 0.08, width: size * 0.56, height: size * 0.1, borderRadius: 99, opacity: 0.45, transform: [{ rotate: '-18deg' }] }} />
+    <View
+      pointerEvents="none"
+      style={{
+        width: size * 1.48,
+        height: size * 1.3,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <View
+        style={{
+          position: 'absolute',
+          bottom: size * 0.07,
+          width: size * 0.94,
+          height: size * 0.2,
+          borderRadius: 99,
+          backgroundColor: glow,
+          opacity: 0.2,
+          transform: [{ scaleX: 1.28 }],
+        }}
+      />
+      <Text
+        style={{
+          fontSize: size * 0.88,
+          lineHeight: size * 1.08,
+          textShadowColor: glow,
+          textShadowOffset: { width: 0, height: size * 0.08 },
+          textShadowRadius: size * 0.34,
+          elevation: 10,
+        }}
+      >
+        {glyph}
+      </Text>
+      <LinearGradient
+        colors={['rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']}
+        style={{
+          position: 'absolute',
+          top: size * 0.08,
+          width: size * 0.56,
+          height: size * 0.1,
+          borderRadius: 99,
+          opacity: 0.45,
+          transform: [{ rotate: '-18deg' }],
+        }}
+      />
     </View>
   );
 }
@@ -664,12 +712,21 @@ function Service3DIcon({ kind, size = 62 }: { kind: ServiceKind; size?: number }
 function AmbientBackground() {
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <LinearGradient colors={['#08090D', '#11151D', '#090B10', '#07080C']} locations={[0, 0.38, 0.72, 1]} style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={['#08090D', '#11151D', '#090B10', '#07080C']}
+        locations={[0, 0.38, 0.72, 1]}
+        style={StyleSheet.absoluteFill}
+      />
       <View style={[styles.ambientGlow, styles.ambientGlowTop]} />
       <View style={[styles.ambientGlow, styles.ambientGlowBottom]} />
       <BlurView intensity={26} tint="dark" style={[styles.ambientBlur, styles.ambientBlurTop]} />
       <BlurView intensity={22} tint="dark" style={[styles.ambientBlur, styles.ambientBlurBottom]} />
-      <LinearGradient colors={['rgba(255,105,39,0.08)', 'rgba(255,105,39,0)', 'rgba(255,105,39,0.035)']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={['rgba(255,105,39,0.08)', 'rgba(255,105,39,0)', 'rgba(255,105,39,0.035)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
     </View>
   );
 }
@@ -1171,7 +1228,12 @@ export default function App() {
 
     return (
       <View key={booking.id} style={styles.bookingCard}>
-        <LinearGradient colors={['#1B2028', '#13171E', '#11151B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+        <LinearGradient
+          colors={['#1B2028', '#13171E', '#11151B']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
         <View style={[styles.bookingTop, rowStyle]}>
           <View style={styles.referenceBlock}>
             <Text style={styles.overline}>WESSALI · {booking.public_reference}</Text>
@@ -1250,19 +1312,37 @@ export default function App() {
 
   const renderServiceCard = (kind: ServiceKind, index: number) => {
     return (
-      <MotionPressable key={kind} onPress={() => openServicePreview(kind)} style={styles.serviceCard}>
-        <LinearGradient colors={['#20232B', '#151920', '#101319']} locations={[0, 0.52, 1]} style={StyleSheet.absoluteFill} />
+      <MotionPressable
+        key={kind}
+        onPress={() => openServicePreview(kind)}
+        style={styles.serviceCard}
+      >
+        <LinearGradient
+          colors={['#20232B', '#151920', '#101319']}
+          locations={[0, 0.52, 1]}
+          style={StyleSheet.absoluteFill}
+        />
         <View style={styles.serviceCardTop}>
           <Text style={styles.serviceNumber}>0{index + 1} / 03</Text>
           <Text style={styles.serviceOpenArrow}>↗</Text>
         </View>
         <View style={styles.serviceArt}>
-          <View style={[styles.serviceIconGlow, { backgroundColor: kind === 'water' ? 'rgba(66,169,232,0.18)' : 'rgba(255,106,36,0.2)' }]} />
+          <View
+            style={[
+              styles.serviceIconGlow,
+              {
+                backgroundColor:
+                  kind === 'water' ? 'rgba(66,169,232,0.18)' : 'rgba(255,106,36,0.2)',
+              },
+            ]}
+          />
           <Service3DIcon kind={kind} size={66} />
         </View>
         <View style={styles.serviceMeta}>
           <Text style={[styles.serviceTitle, directionStyle]}>{serviceTitle(kind)}</Text>
-          <Text style={[styles.serviceDescription, directionStyle]}>{serviceDescription(kind)}</Text>
+          <Text style={[styles.serviceDescription, directionStyle]}>
+            {serviceDescription(kind)}
+          </Text>
           <View style={[styles.serviceMetaBottom, rowStyle]}>
             <Text style={[styles.serviceAction, directionStyle]}>{ui.start}</Text>
             <Text style={styles.serviceActionArrow}>{isRtl ? '←' : '↗'}</Text>
@@ -1285,7 +1365,10 @@ export default function App() {
             imageStyle={styles.loginPhotoRadius}
             resizeMode="cover"
           >
-            <LinearGradient colors={['rgba(5,7,10,0.08)', 'rgba(5,7,10,0.4)', 'rgba(5,7,10,0.9)']} style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={['rgba(5,7,10,0.08)', 'rgba(5,7,10,0.4)', 'rgba(5,7,10,0.9)']}
+              style={StyleSheet.absoluteFill}
+            />
             <View style={styles.loginPhotoGlow} />
             <View style={styles.brandChip}>
               <Text style={styles.brandChipMark}>W</Text>
@@ -1995,11 +2078,7 @@ export default function App() {
                 ]}
               >
                 <LinearGradient
-                  colors={[
-                    'rgba(255,112,45,0.34)',
-                    'rgba(255,160,94,0.12)',
-                    'rgba(255,255,255,0)',
-                  ]}
+                  colors={['rgba(255,112,45,0.34)', 'rgba(255,160,94,0.12)', 'rgba(255,255,255,0)']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.previewAura}
@@ -2057,7 +2136,10 @@ export default function App() {
         {session.user.role === 'customer' ? (
           <View style={styles.bottomBarShell}>
             <BlurView intensity={48} tint="dark" style={StyleSheet.absoluteFill} />
-            <LinearGradient colors={['rgba(35,29,27,0.9)', 'rgba(15,18,24,0.94)']} style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={['rgba(35,29,27,0.9)', 'rgba(15,18,24,0.94)']}
+              style={StyleSheet.absoluteFill}
+            />
             <View style={styles.bottomBar}>
               {[
                 ['home', '⌂', ui.home],
@@ -2094,19 +2176,58 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  ambientGlow: { position: 'absolute', width: 250, height: 250, borderRadius: 140, shadowColor: '#FF5B1F', shadowOpacity: 0.72, shadowRadius: 82, elevation: 0 },
+  ambientGlow: {
+    position: 'absolute',
+    width: 250,
+    height: 250,
+    borderRadius: 140,
+    shadowColor: '#FF5B1F',
+    shadowOpacity: 0.72,
+    shadowRadius: 82,
+    elevation: 0,
+  },
   ambientGlowTop: { top: -132, right: -114, backgroundColor: 'rgba(255,91,31,0.14)' },
   ambientGlowBottom: { bottom: 105, left: -166, backgroundColor: 'rgba(219,65,24,0.1)' },
   ambientBlur: { position: 'absolute', width: 250, height: 250, borderRadius: 130 },
   ambientBlurTop: { top: -130, right: -115 },
   ambientBlurBottom: { bottom: 110, left: -165 },
-  loginPhotoGlow: { position: 'absolute', right: -40, bottom: -44, width: 190, height: 190, borderRadius: 100, backgroundColor: 'rgba(255,89,27,0.2)', shadowColor: '#FF5B1F', shadowOpacity: 0.8, shadowRadius: 56 },
+  loginPhotoGlow: {
+    position: 'absolute',
+    right: -40,
+    bottom: -44,
+    width: 190,
+    height: 190,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,89,27,0.2)',
+    shadowColor: '#FF5B1F',
+    shadowOpacity: 0.8,
+    shadowRadius: 56,
+  },
   heroObject: { position: 'absolute', top: 14, right: 8, zIndex: 2, opacity: 0.98 },
   serviceCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   serviceArt: { height: 100, alignItems: 'center', justifyContent: 'center' },
-  serviceIconGlow: { position: 'absolute', width: 92, height: 68, borderRadius: 50, opacity: 0.68, shadowColor: '#FF6A24', shadowOpacity: 0.55, shadowRadius: 28 },
-  serviceMetaBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 },
-  stepCardTop: { minHeight: 49, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  serviceIconGlow: {
+    position: 'absolute',
+    width: 92,
+    height: 68,
+    borderRadius: 50,
+    opacity: 0.68,
+    shadowColor: '#FF6A24',
+    shadowOpacity: 0.55,
+    shadowRadius: 28,
+  },
+  serviceMetaBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
+  stepCardTop: {
+    minHeight: 49,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   homeStack: { gap: 23 },
   sectionHeadingCopy: { flex: 1, gap: 1 },
   heroLocationLine: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
@@ -2117,8 +2238,24 @@ const styles = StyleSheet.create({
   serviceAction: { color: '#FF8A4D', fontSize: 10, fontWeight: '900', marginTop: 2 },
   serviceActionArrow: { color: '#FF8A4D', fontSize: 12 },
   howSection: { gap: 13 },
-  aboutTeaser: { flexDirection: 'row', gap: 13, padding: 17, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', overflow: 'hidden' },
-  aboutTeaserAccent: { width: 3, minHeight: 100, borderRadius: 2, backgroundColor: '#FF6A24', shadowColor: '#FF6A24', shadowOpacity: 0.8, shadowRadius: 12 },
+  aboutTeaser: {
+    flexDirection: 'row',
+    gap: 13,
+    padding: 17,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.09)',
+    overflow: 'hidden',
+  },
+  aboutTeaserAccent: {
+    width: 3,
+    minHeight: 100,
+    borderRadius: 2,
+    backgroundColor: '#FF6A24',
+    shadowColor: '#FF6A24',
+    shadowOpacity: 0.8,
+    shadowRadius: 12,
+  },
   aboutTeaserCopy: { flex: 1, gap: 7 },
   aboutTeaserTitle: { color: '#F2F3F5', fontSize: 15, lineHeight: 21, fontWeight: '900' },
   aboutTeaserText: { color: '#A1AAB5', fontSize: 10, lineHeight: 16 },
@@ -2158,7 +2295,19 @@ const styles = StyleSheet.create({
     borderRadius: 34,
     transform: [{ scale: 1.08 }],
   },
-  previewCard: { width: '100%', borderRadius: 25, overflow: 'hidden', backgroundColor: '#171B22', borderWidth: 1, borderColor: 'rgba(255,255,255,0.14)', shadowColor: '#000000', shadowOpacity: 0.48, shadowRadius: 32, shadowOffset: { width: 0, height: 18 }, elevation: 14 },
+  previewCard: {
+    width: '100%',
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: '#171B22',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+    shadowColor: '#000000',
+    shadowOpacity: 0.48,
+    shadowRadius: 32,
+    shadowOffset: { width: 0, height: 18 },
+    elevation: 14,
+  },
   previewImage: {
     height: 188,
     padding: 17,
@@ -2258,10 +2407,28 @@ const styles = StyleSheet.create({
   loginHeading: { gap: 6 },
   loginTitle: { color: '#F4F5F7', fontSize: 27, fontWeight: '800', letterSpacing: -0.6 },
   loginSubtitle: { color: '#A1AAB5', fontSize: 13, lineHeight: 20 },
-  glassPanel: { backgroundColor: 'rgba(20,23,30,0.88)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', borderRadius: 22, padding: 17, gap: 15, overflow: 'hidden' },
+  glassPanel: {
+    backgroundColor: 'rgba(20,23,30,0.88)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.09)',
+    borderRadius: 22,
+    padding: 17,
+    gap: 15,
+    overflow: 'hidden',
+  },
   field: { gap: 7 },
   fieldLabel: { color: '#E5E8ED', fontSize: 11, fontWeight: '800', letterSpacing: 0.1 },
-  input: { minHeight: 50, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)', backgroundColor: 'rgba(255,255,255,0.055)', paddingHorizontal: 14, paddingVertical: 12, fontSize: 13, color: '#F2F3F5' },
+  input: {
+    minHeight: 50,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.13)',
+    backgroundColor: 'rgba(255,255,255,0.055)',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 13,
+    color: '#F2F3F5',
+  },
   inputRtl: { textAlign: 'right' },
   multilineInput: { minHeight: 82, textAlignVertical: 'top' },
   serverToggle: {
@@ -2290,8 +2457,37 @@ const styles = StyleSheet.create({
   },
   pillText: { color: '#9AA3AE', fontWeight: '800', fontSize: 11 },
   pillTextActive: { color: '#FFFFFF' },
-  primaryButtonLarge: { minHeight: 54, backgroundColor: '#FF681F', borderRadius: 17, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, shadowColor: '#FF5B1F', shadowOpacity: 0.38, shadowRadius: 18, shadowOffset: { width: 0, height: 7 }, elevation: 5 },
-  primaryButton: { minHeight: 47, borderRadius: 15, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FF681F', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, shadowColor: '#FF5B1F', shadowOpacity: 0.24, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 3 },
+  primaryButtonLarge: {
+    minHeight: 54,
+    backgroundColor: '#FF681F',
+    borderRadius: 17,
+    paddingHorizontal: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    shadowColor: '#FF5B1F',
+    shadowOpacity: 0.38,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 5,
+  },
+  primaryButton: {
+    minHeight: 47,
+    borderRadius: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FF681F',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 9,
+    shadowColor: '#FF5B1F',
+    shadowOpacity: 0.24,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 3,
+  },
   primaryButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
   primaryButtonArrow: { color: '#B9E4D8', fontSize: 18, fontWeight: '800' },
   secondaryButton: {
@@ -2312,7 +2508,13 @@ const styles = StyleSheet.create({
   },
   loginMiniFeatures: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
   miniFeature: { flex: 1, alignItems: 'center', gap: 5 },
-  miniFeatureIcon: { color: '#FF8A4D', fontSize: 23, fontWeight: '700', textShadowColor: '#FF6A24', textShadowRadius: 13 },
+  miniFeatureIcon: {
+    color: '#FF8A4D',
+    fontSize: 23,
+    fontWeight: '700',
+    textShadowColor: '#FF6A24',
+    textShadowRadius: 13,
+  },
   miniFeatureText: { color: '#A6AEB9', fontSize: 9, fontWeight: '700', textAlign: 'center' },
   footerText: {
     color: '#818B97',
@@ -2420,8 +2622,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 12,
   },
-  sectionEyebrow: { color: '#FF9868', fontSize: 8, letterSpacing: 1.8, fontWeight: '900', marginBottom: 7 },
-  sectionTitle: { color: '#FFFFFF', fontSize: 21, lineHeight: 27, fontWeight: '900', letterSpacing: -0.4 },
+  sectionEyebrow: {
+    color: '#FF9868',
+    fontSize: 8,
+    letterSpacing: 1.8,
+    fontWeight: '900',
+    marginBottom: 7,
+  },
+  sectionTitle: {
+    color: '#FFFFFF',
+    fontSize: 21,
+    lineHeight: 27,
+    fontWeight: '900',
+    letterSpacing: -0.4,
+  },
   sectionCount: { color: '#78818D', fontSize: 21, fontWeight: '300' },
   serviceCard: {
     width: 244,
@@ -2471,7 +2685,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: 14,
   },
-  stepCard: { width: '48%', minHeight: 150, borderRadius: 18, paddingHorizontal: 12, paddingVertical: 12, gap: 7, borderWidth: 1, borderColor: 'rgba(255,255,255,0.075)' },
+  stepCard: {
+    width: '48%',
+    minHeight: 150,
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    gap: 7,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.075)',
+  },
   stepNumber: { color: '#FF6A24', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
   stepTitle: { color: '#F2F3F5', fontSize: 12, lineHeight: 17, fontWeight: '900' },
   stepDescription: { color: '#A1AAB5', fontSize: 10, lineHeight: 15 },
@@ -2494,7 +2717,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   formHeroRadius: { borderRadius: 24 },
-  formHeroIcon: { width: 78, height: 62, alignItems: 'flex-start', justifyContent: 'center', marginBottom: 2 },
+  formHeroIcon: {
+    width: 78,
+    height: 62,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
   formHeroIconText: { color: '#FF8A4D', fontSize: 20, fontWeight: '900' },
   formHeroTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '900' },
   formHeroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 11 },
@@ -2535,7 +2764,21 @@ const styles = StyleSheet.create({
   errorText: { color: '#FF8D7D', fontSize: 11, lineHeight: 17, fontWeight: '700' },
   successText: { color: '#FF6A24', fontSize: 11, lineHeight: 17, fontWeight: '700' },
 
-  bookingCard: { position: 'relative', overflow: 'hidden', backgroundColor: 'rgba(19,22,29,0.92)', borderRadius: 22, padding: 16, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', shadowColor: '#000000', shadowOpacity: 0.3, shadowRadius: 18, shadowOffset: { width: 0, height: 7 }, elevation: 3 },
+  bookingCard: {
+    position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(19,22,29,0.92)',
+    borderRadius: 22,
+    padding: 16,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    shadowColor: '#000000',
+    shadowOpacity: 0.3,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 3,
+  },
   bookingTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -2561,7 +2804,15 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 8, fontWeight: '900' },
   statusTextActive: { color: '#FF8A4D' },
   statusTextMuted: { color: '#929BA7' },
-  routeBlock: { flexDirection: 'row', gap: 11, backgroundColor: 'rgba(255,255,255,0.055)', borderRadius: 15, padding: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  routeBlock: {
+    flexDirection: 'row',
+    gap: 11,
+    backgroundColor: 'rgba(255,255,255,0.055)',
+    borderRadius: 15,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
   routePinColumn: { alignItems: 'center', width: 8, paddingTop: 2 },
   routePinStart: { width: 7, height: 7, borderRadius: 5, backgroundColor: '#FF6A24' },
   routePinLine: { width: 1, height: 18, backgroundColor: 'rgba(255,255,255,0.07)' },
@@ -2590,8 +2841,18 @@ const styles = StyleSheet.create({
   },
   progressNodeActive: { backgroundColor: '#FF6A24', borderColor: '#FF6A24' },
   progressCheck: { color: '#FFFFFF', fontSize: 9, fontWeight: '900' },
-  progressInner: { width: 4, height: 4, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.07)' },
-  progressLine: { flex: 1, height: 2, backgroundColor: 'rgba(255,255,255,0.1)', marginHorizontal: 2 },
+  progressInner: {
+    width: 4,
+    height: 4,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+  },
+  progressLine: {
+    flex: 1,
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    marginHorizontal: 2,
+  },
   progressLineActive: { backgroundColor: '#FF8A4D' },
   cancelButton: {
     borderRadius: 13,
@@ -2635,7 +2896,15 @@ const styles = StyleSheet.create({
   emptyTitle: { color: '#E8EBF0', fontSize: 15, fontWeight: '900' },
   emptySubtitle: { color: '#929BA7', fontSize: 11, lineHeight: 17 },
 
-  providerHero: { backgroundColor: '#171B22', borderRadius: 25, padding: 20, gap: 7, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)' },
+  providerHero: {
+    backgroundColor: '#171B22',
+    borderRadius: 25,
+    padding: 20,
+    gap: 7,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.09)',
+  },
   providerHeroTitle: { color: '#FFFFFF', fontSize: 25, fontWeight: '900' },
   providerHeroSub: { color: 'rgba(255,255,255,0.72)', fontSize: 11, lineHeight: 18 },
   bodyCopy: { color: '#A6AEB9', fontSize: 12, lineHeight: 20 },
@@ -2652,7 +2921,15 @@ const styles = StyleSheet.create({
   providerServiceCopy: { flex: 1, gap: 3 },
   providerServiceTitle: { color: '#E8EBF0', fontSize: 11, fontWeight: '900' },
   providerServiceSub: { color: '#929BA7', fontSize: 9, lineHeight: 14 },
-  approvalCard: { backgroundColor: 'rgba(255,106,36,0.1)', borderColor: 'rgba(255,106,36,0.22)', borderWidth: 1, borderRadius: 24, padding: 22, alignItems: 'center', gap: 9 },
+  approvalCard: {
+    backgroundColor: 'rgba(255,106,36,0.1)',
+    borderColor: 'rgba(255,106,36,0.22)',
+    borderWidth: 1,
+    borderRadius: 24,
+    padding: 22,
+    alignItems: 'center',
+    gap: 9,
+  },
   approvalIcon: {
     width: 48,
     height: 48,
@@ -2674,7 +2951,16 @@ const styles = StyleSheet.create({
   },
   reviewTrackFill: { height: 5, width: '64%', backgroundColor: '#FF8A4D', borderRadius: 5 },
 
-  aboutHero: { height: 188, borderRadius: 22, padding: 18, justifyContent: 'flex-end', gap: 7, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  aboutHero: {
+    height: 188,
+    borderRadius: 22,
+    padding: 18,
+    justifyContent: 'flex-end',
+    gap: 7,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
   aboutHeroRadius: { borderRadius: 26 },
   aboutHeroTitle: { color: '#FFFFFF', fontSize: 29, fontWeight: '900' },
   aboutHeroSubtitle: { color: 'rgba(255,255,255,0.82)', fontSize: 12 },
@@ -2742,7 +3028,14 @@ const styles = StyleSheet.create({
   workflowNumberText: { color: '#FF8A4D', fontSize: 9, fontWeight: '900' },
   workflowText: { flex: 1, gap: 4 },
   workflowTitle: { color: '#E8EBF0', fontSize: 12, fontWeight: '900' },
-  teamCard: { backgroundColor: 'rgba(20,23,30,0.78)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', borderRadius: 20, padding: 17, gap: 13 },
+  teamCard: {
+    backgroundColor: 'rgba(20,23,30,0.78)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 20,
+    padding: 17,
+    gap: 13,
+  },
   teamTitle: { color: '#F2F3F5', fontSize: 20, fontWeight: '900' },
   teamMember: { flexDirection: 'row', alignItems: 'center', gap: 11 },
   avatar: {
@@ -2779,7 +3072,22 @@ const styles = StyleSheet.create({
   featureNoteTitle: { color: '#896C45', fontSize: 11, fontWeight: '900' },
   featureNoteText: { color: '#9A896F', fontSize: 10, lineHeight: 17 },
 
-  bottomBarShell: { position: 'absolute', left: 14, right: 14, bottom: 7, borderRadius: 23, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.13)', backgroundColor: 'rgba(15,18,24,0.78)', shadowColor: '#000000', shadowOpacity: 0.36, shadowRadius: 22, shadowOffset: { width: 0, height: 7 }, elevation: 8 },
+  bottomBarShell: {
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    bottom: 7,
+    borderRadius: 23,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.13)',
+    backgroundColor: 'rgba(15,18,24,0.78)',
+    shadowColor: '#000000',
+    shadowOpacity: 0.36,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 8,
+  },
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
