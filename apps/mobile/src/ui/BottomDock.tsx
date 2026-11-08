@@ -79,7 +79,7 @@ export function BottomDock({
           'rgba(243,245,240,0.82)',
           'rgba(243,245,240,1.00)',
         ]}
-        locations={[0, 0.30, 0.70, 1]}
+        locations={[0, 0.3, 0.7, 1]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -108,7 +108,7 @@ export function BottomDock({
                 <RadialGlow
                   size={118}
                   color={palette.jade}
-                  opacity={0.10}
+                  opacity={0.1}
                   style={{ position: 'absolute', top: -31, left: -31 }}
                 />
                 <LinearGradient

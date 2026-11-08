@@ -143,7 +143,13 @@ export function HomeScreen({
         </GlassCard>
       )}
 
-      <View style={[styles.statsRow, rtlStyle && styles.rowReverse, compactStats && styles.statsRowCompact]}>
+      <View
+        style={[
+          styles.statsRow,
+          rtlStyle && styles.rowReverse,
+          compactStats && styles.statsRowCompact,
+        ]}
+      >
         <StatTile
           label={ui.statActive}
           value={activeBookings.length}
@@ -410,7 +416,12 @@ function StatTile({
         </View>
         <AppText
           variant="number"
-          style={{ color, fontSize: compact ? 24 : 27, lineHeight: compact ? 28 : 31, letterSpacing: -1 }}
+          style={{
+            color,
+            fontSize: compact ? 24 : 27,
+            lineHeight: compact ? 28 : 31,
+            letterSpacing: -1,
+          }}
         >
           {value}
         </AppText>
