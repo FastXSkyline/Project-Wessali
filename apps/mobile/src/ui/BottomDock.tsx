@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { gradients, palette } from '../theme';
 import { AppText, RadialGlow, useLocaleValue } from './base';
 
@@ -15,9 +16,9 @@ type Item = {
   activeIcon: React.ComponentProps<typeof Ionicons>['name'];
 };
 
-const VISIBLE = 96;
+const DOCK_CONTENT_HEIGHT = 108;
 
-/** A frosted-glass dock with its upper edge dissolved into the page. */
+/** A safe-area-aware frosted dock that fades into the scrolling page. */
 export function BottomDock({
   active,
   onSelect,
@@ -29,7 +30,10 @@ export function BottomDock({
 }) {
   const { isRtl } = useLocaleValue();
   const { width } = useWindowDimensions();
-  const diameter = Math.max(680, width * 1.94);
+  const insets = useSafeAreaInsets();
+  const compact = width < 360;
+  const dockHeight = DOCK_CONTENT_HEIGHT + insets.bottom;
+  const domeWidth = Math.max(width * 1.55, 560);
   const items: Item[] = [
     { tab: 'home', label: labels.home, icon: 'home-outline', activeIcon: 'home' },
     { tab: 'requests', label: labels.requests, icon: 'cube-outline', activeIcon: 'cube' },
@@ -39,54 +43,64 @@ export function BottomDock({
   ];
 
   return (
-    <View pointerEvents="box-none" style={styles.wrap}>
-      <View
-        pointerEvents="none"
-        style={[
-          styles.dome,
-          {
-            width: diameter,
-            height: diameter,
-            borderRadius: diameter / 2,
-            bottom: -(diameter - VISIBLE),
-          },
-        ]}
-      >
-        <BlurView
-          intensity={92}
-          tint="light"
-          blurMethod="dimezisBlurViewSdk31Plus"
-          style={StyleSheet.absoluteFill}
-        />
-        <LinearGradient
-          colors={['rgba(255,255,255,0.10)', 'rgba(250,251,248,0.42)', 'rgba(246,247,243,0.80)']}
-          locations={[0, 0.44, 1]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-        <RadialGlow
-          size={diameter * 0.66}
-          color={palette.jade}
-          opacity={0.045}
-          style={{ position: 'absolute', top: -diameter * 0.43, left: diameter * 0.12 }}
-        />
-        <View style={[styles.domeRim, { borderRadius: diameter / 2 }]} />
+    <View pointerEvents="box-none" style={[styles.wrap, { height: dockHeight }]}>
+      {/* Full-width blur makes the content underneath genuinely frosted, including while scrolling. */}
+      <BlurView
+        intensity={100}
+        tint="light"
+        blurMethod="dimezisBlurViewSdk31Plus"
+        style={StyleSheet.absoluteFill}
+      />
+      <View pointerEvents="none" style={styles.domeClip}>
+        <View style={[styles.dome, { width: domeWidth, left: (width - domeWidth) / 2 }]}>
+          <BlurView
+            intensity={100}
+            tint="light"
+            blurMethod="dimezisBlurViewSdk31Plus"
+            style={StyleSheet.absoluteFill}
+          />
+          <LinearGradient
+            colors={['rgba(255,255,255,0.18)', 'rgba(246,248,243,0.72)', 'rgba(242,245,239,0.92)']}
+            locations={[0, 0.5, 1]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+          <RadialGlow
+            size={domeWidth * 0.7}
+            color={palette.jade}
+            opacity={0.055}
+            style={{ position: 'absolute', top: -domeWidth * 0.28, left: domeWidth * 0.15 }}
+          />
+          <View style={styles.domeRim} />
+        </View>
       </View>
 
+      {/* Transparent at the upper edge, increasingly opaque toward the home indicator. */}
       <LinearGradient
         pointerEvents="none"
         colors={[
-          'rgba(243,243,239,0)',
-          'rgba(243,243,239,0.22)',
-          'rgba(243,243,239,0.72)',
-          'rgba(243,243,239,0.99)',
+          'rgba(243,245,240,0.00)',
+          'rgba(243,245,240,0.24)',
+          'rgba(243,245,240,0.72)',
+          'rgba(243,245,240,0.96)',
         ]}
-        locations={[0, 0.28, 0.66, 1]}
-        style={styles.topFade}
+        locations={[0, 0.30, 0.70, 1]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={StyleSheet.absoluteFill}
       />
 
-      <View style={[styles.row, isRtl && styles.rowReverse]}>
+      <View
+        style={[
+          styles.row,
+          isRtl && styles.rowReverse,
+          {
+            bottom: insets.bottom + 7,
+            paddingHorizontal: compact ? 7 : 12,
+          },
+        ]}
+      >
         {items.map((item) => {
           if (item.tab === 'create') {
             return (
@@ -98,16 +112,16 @@ export function BottomDock({
                 style={styles.createSlot}
               >
                 <RadialGlow
-                  size={110}
+                  size={118}
                   color={palette.jade}
-                  opacity={0.07}
-                  style={{ position: 'absolute', top: -25, left: -28 }}
+                  opacity={0.10}
+                  style={{ position: 'absolute', top: -31, left: -31 }}
                 />
                 <LinearGradient
                   colors={gradients.primary}
                   start={{ x: 0.15, y: 0 }}
                   end={{ x: 0.9, y: 1 }}
-                  style={styles.createOrb}
+                  style={[styles.createOrb, compact && styles.createOrbCompact]}
                 >
                   <LinearGradient
                     colors={[
@@ -137,26 +151,26 @@ export function BottomDock({
               onPress={() => onSelect(item.tab)}
               style={styles.item}
             >
-              <View style={styles.iconSlot}>
+              <View style={[styles.iconSlot, compact && styles.iconSlotCompact]}>
                 {selected ? (
                   <>
                     <LinearGradient
-                      colors={['rgba(88,116,94,0.16)', 'rgba(88,116,94,0.07)']}
+                      colors={['rgba(88,116,94,0.19)', 'rgba(88,116,94,0.09)']}
                       start={{ x: 0.2, y: 0 }}
                       end={{ x: 0.8, y: 1 }}
                       style={styles.activePill}
                     />
                     <RadialGlow
-                      size={58}
+                      size={66}
                       color={palette.jade}
-                      opacity={0.06}
-                      style={{ position: 'absolute', top: -12, left: -10 }}
+                      opacity={0.085}
+                      style={{ position: 'absolute', top: -15, left: -12 }}
                     />
                   </>
                 ) : null}
                 <Ionicons
                   name={selected ? item.activeIcon : item.icon}
-                  size={19}
+                  size={compact ? 18 : 20}
                   color={selected ? palette.jadeDeep : palette.muted}
                 />
               </View>
@@ -165,7 +179,8 @@ export function BottomDock({
                 align="center"
                 numberOfLines={1}
                 style={{
-                  fontSize: 9.5,
+                  width: '100%',
+                  fontSize: compact ? 8.5 : 9.5,
                   lineHeight: 12,
                   letterSpacing: isRtl ? 0 : 0.1,
                   color: selected ? palette.ink : palette.faint,
@@ -187,66 +202,64 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: VISIBLE + 24,
     alignItems: 'center',
+    overflow: 'visible',
+  },
+  domeClip: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
   },
   dome: {
     position: 'absolute',
+    height: 190,
+    bottom: -31,
+    borderRadius: 110,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(83, 103, 87, 0.035)',
-    backgroundColor: 'rgba(248, 249, 246, 0.20)',
+    backgroundColor: 'rgba(246,248,243,0.82)',
   },
   domeRim: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
-  },
-  topFade: {
-    position: 'absolute',
-    top: -18,
-    left: 0,
-    right: 0,
-    height: 92,
+    ...StyleSheet.absoluteFillObject,
+    borderTopWidth: 1,
+    borderColor: 'rgba(255,255,255,0.30)',
+    borderTopLeftRadius: 110,
+    borderTopRightRadius: 110,
   },
   row: {
     position: 'absolute',
-    top: 26,
-    width: '100%',
-    maxWidth: 430,
-    paddingHorizontal: 12,
+    left: 0,
+    right: 0,
+    height: 60,
+    maxWidth: 560,
+    alignSelf: 'center',
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   rowReverse: { flexDirection: 'row-reverse' },
-  item: { flex: 1, alignItems: 'center', gap: 5 },
+  item: { flex: 1, minWidth: 0, alignItems: 'center', justifyContent: 'center', gap: 4 },
   iconSlot: {
-    width: 42,
-    height: 34,
-    borderRadius: 13,
+    width: 48,
+    height: 38,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  iconSlotCompact: { width: 42, height: 35 },
   activePill: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: 13,
+    borderRadius: 15,
     borderWidth: 1,
-    borderColor: 'rgba(88, 116, 94, 0.18)',
+    borderColor: 'rgba(88,116,94,0.20)',
   },
-  createSlot: { flex: 1, alignItems: 'center', justifyContent: 'flex-start' },
+  createSlot: { flex: 1, minWidth: 0, alignItems: 'center', justifyContent: 'center' },
   createOrb: {
-    marginTop: -10,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    marginTop: -7,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -258,6 +271,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 7 },
     elevation: 7,
   },
+  createOrbCompact: { width: 52, height: 52, borderRadius: 26 },
   orbRim: {
     position: 'absolute',
     top: 2,
