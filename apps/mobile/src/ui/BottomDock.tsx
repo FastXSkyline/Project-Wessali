@@ -206,7 +206,11 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   domeClip: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     overflow: 'hidden',
   },
   dome: {
@@ -218,7 +222,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(246,248,243,0.82)',
   },
   domeRim: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     borderTopWidth: 1,
     borderColor: 'rgba(255,255,255,0.30)',
     borderTopLeftRadius: 110,
