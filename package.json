@@ -20,7 +20,7 @@
     "dev:core": "turbo run dev --parallel --filter=@wessali/admin --filter=@wessali/api --filter=@wessali/mobile"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.6.6",
     "prettier": "3.9.10",
     "tsx": "4.20.6",
     "turbo": "2.11.10",
