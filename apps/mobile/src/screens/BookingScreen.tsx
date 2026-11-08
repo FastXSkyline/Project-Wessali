@@ -1,11 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import {
-  Animated,
-  Easing,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,7 +10,8 @@ import { ChoiceChips, Field, IconButton, InfoNote, PrimaryButton, ToggleRow } fr
 import { IconTile } from '../ui/IconTile';
 import { LocationPicker, type PickedLocation } from '../ui/LocationPicker';
 
-type FlowStep = 'service' | 'pickup' | 'destination' | 'freight' | 'vehicle' | 'issue' | 'water' | 'notes';
+type FlowStep =
+  'service' | 'pickup' | 'destination' | 'freight' | 'vehicle' | 'issue' | 'water' | 'notes';
 
 function stepCopy(locale: string) {
   if (locale === 'ar') {
@@ -75,7 +70,8 @@ function stepCopy(locale: string) {
       serviceTitle: 'De quel service avez-vous besoin ?',
       serviceBody: 'Choisissez un service. Nous vous guiderons étape par étape.',
       pickupTitle: 'Où devons-nous vous rejoindre ?',
-      pickupBody: 'Indiquez le point de départ en saisissant une adresse ou en choisissant sur la carte.',
+      pickupBody:
+        'Indiquez le point de départ en saisissant une adresse ou en choisissant sur la carte.',
       destinationTitle: 'Quelle est la destination ?',
       destinationBody: 'Indiquez où la marchandise doit être livrée.',
       freightTitle: 'Parlez-nous du chargement',
@@ -314,7 +310,10 @@ export function BookingScreen({
     if (sent) onSent();
   }
 
-  const stepMeta: Record<FlowStep, { title: string; body: string; icon: React.ComponentProps<typeof Ionicons>['name'] }> = {
+  const stepMeta: Record<
+    FlowStep,
+    { title: string; body: string; icon: React.ComponentProps<typeof Ionicons>['name'] }
+  > = {
     service: { title: copy.serviceTitle, body: copy.serviceBody, icon: 'grid-outline' },
     pickup: { title: copy.pickupTitle, body: copy.pickupBody, icon: 'navigate-outline' },
     destination: { title: copy.destinationTitle, body: copy.destinationBody, icon: 'flag-outline' },
@@ -452,7 +451,12 @@ export function BookingScreen({
         }}
       >
         <View style={styles.stepHeading}>
-          <View style={[styles.stepIcon, { backgroundColor: `${tone.accent}14`, borderColor: `${tone.accent}35` }]}>
+          <View
+            style={[
+              styles.stepIcon,
+              { backgroundColor: `${tone.accent}14`, borderColor: `${tone.accent}35` },
+            ]}
+          >
             <Ionicons name={meta.icon} size={18} color={tone.accent} />
           </View>
           <AppText variant="h2">{meta.title}</AppText>
@@ -466,7 +470,10 @@ export function BookingScreen({
             <ServiceChoice
               selected={selectedService === 'freight'}
               kind="freight"
-              label={SERVICE_CATEGORIES.find((item) => item.id === 'freight')?.labels[locale] ?? 'Freight'}
+              label={
+                SERVICE_CATEGORIES.find((item) => item.id === 'freight')?.labels[locale] ??
+                'Freight'
+              }
               description={copy.serviceFreight}
               onPress={() => {
                 app.selectService('freight');
@@ -476,7 +483,10 @@ export function BookingScreen({
             <ServiceChoice
               selected={selectedService === 'roadside'}
               kind="roadside"
-              label={SERVICE_CATEGORIES.find((item) => item.id === 'roadside')?.labels[locale] ?? 'Roadside'}
+              label={
+                SERVICE_CATEGORIES.find((item) => item.id === 'roadside')?.labels[locale] ??
+                'Roadside'
+              }
               description={copy.serviceRoadside}
               onPress={() => {
                 app.selectService('roadside');
@@ -486,7 +496,9 @@ export function BookingScreen({
             <ServiceChoice
               selected={selectedService === 'water'}
               kind="water"
-              label={SERVICE_CATEGORIES.find((item) => item.id === 'water')?.labels[locale] ?? 'Water'}
+              label={
+                SERVICE_CATEGORIES.find((item) => item.id === 'water')?.labels[locale] ?? 'Water'
+              }
               description={copy.serviceWater}
               onPress={() => {
                 app.selectService('water');
@@ -720,9 +732,18 @@ export function BookingScreen({
           <View style={{ gap: 12 }}>
             <GlassCard padding={17} radius={24}>
               <View style={{ gap: 11 }}>
-                <SectionTitle icon="clipboard-outline" title={copy.detailsLabel} color={tone.accent} />
+                <SectionTitle
+                  icon="clipboard-outline"
+                  title={copy.detailsLabel}
+                  color={tone.accent}
+                />
                 {reviewRows.map((row, index) => (
-                  <ReviewRow key={row.label} label={row.label} value={row.value} last={index === reviewRows.length - 1} />
+                  <ReviewRow
+                    key={row.label}
+                    label={row.label}
+                    value={row.value}
+                    last={index === reviewRows.length - 1}
+                  />
                 ))}
               </View>
             </GlassCard>
@@ -760,7 +781,11 @@ export function BookingScreen({
           disabled={transitioning || app.busy}
           style={styles.backButton}
         >
-          <Ionicons name={isRtl ? 'arrow-forward' : 'arrow-back'} size={17} color={palette.inkSoft} />
+          <Ionicons
+            name={isRtl ? 'arrow-forward' : 'arrow-back'}
+            size={17}
+            color={palette.inkSoft}
+          />
           <AppText variant="label" tone="muted">
             {copy.back}
           </AppText>
@@ -872,7 +897,9 @@ function SectionTitle({
   const { isRtl } = useLocaleValue();
   return (
     <View style={[styles.sectionTitle, isRtl && styles.rowReverse]}>
-      <View style={[styles.sectionIcon, { backgroundColor: `${color}14`, borderColor: `${color}2E` }]}>
+      <View
+        style={[styles.sectionIcon, { backgroundColor: `${color}14`, borderColor: `${color}2E` }]}
+      >
         <Ionicons name={icon} size={14} color={color} />
       </View>
       <AppText variant="h3" style={{ fontSize: 16 }}>
@@ -904,7 +931,12 @@ const styles = StyleSheet.create({
   rowReverse: { flexDirection: 'row-reverse' },
   progressBlock: { gap: 8, marginTop: 1, marginBottom: 4 },
   progressMeta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  progressTrack: { height: 6, borderRadius: 999, overflow: 'hidden', backgroundColor: 'rgba(72,91,76,0.10)' },
+  progressTrack: {
+    height: 6,
+    borderRadius: 999,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(72,91,76,0.10)',
+  },
   progressFill: { height: '100%', borderRadius: 999 },
   stepHeading: { gap: 8, marginBottom: 5 },
   stepIcon: {

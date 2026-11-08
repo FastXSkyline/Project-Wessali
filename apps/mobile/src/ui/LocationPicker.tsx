@@ -12,11 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { AppleMaps, GoogleMaps } from 'expo-maps';
 import * as Location from 'expo-location';
-import {
-  Location as PreciseLocation,
-  LocationAccuracy,
-  LocationProfile,
-} from 'expo-location/next';
+import { Location as PreciseLocation, LocationAccuracy, LocationProfile } from 'expo-location/next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { palette } from '../theme';
 import { AppText } from './base';
@@ -69,7 +65,8 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
           : locale === 'fr'
             ? 'Déplacez la carte pour placer le repère.'
             : 'Move the map to place the pin exactly where needed.',
-      current: locale === 'ar' ? 'موقعي الحالي' : locale === 'fr' ? 'Ma position' : 'Use my location',
+      current:
+        locale === 'ar' ? 'موقعي الحالي' : locale === 'fr' ? 'Ma position' : 'Use my location',
       confirm:
         locale === 'ar'
           ? 'تأكيد الموقع'
@@ -96,7 +93,11 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
             ? 'Autorisez Wessali à accéder à votre position précise pour afficher votre emplacement réel sur la carte.'
             : 'Allow Wessali to use your precise location so the map can show where you actually are.',
       settings:
-        locale === 'ar' ? 'فتح الإعدادات' : locale === 'fr' ? 'Ouvrir les réglages' : 'Open Settings',
+        locale === 'ar'
+          ? 'فتح الإعدادات'
+          : locale === 'fr'
+            ? 'Ouvrir les réglages'
+            : 'Open Settings',
       cancel: locale === 'ar' ? 'إلغاء' : locale === 'fr' ? 'Annuler' : 'Cancel',
       unavailable:
         locale === 'ar'
@@ -117,11 +118,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
             ? 'Impossible d’obtenir votre position. Vérifiez les services de localisation et réessayez.'
             : 'Could not get your location. Check that Location Services are on and try again.',
       accuracy:
-        locale === 'ar'
-          ? 'دقة الموقع'
-          : locale === 'fr'
-            ? 'Précision'
-            : 'Location accuracy',
+        locale === 'ar' ? 'دقة الموقع' : locale === 'fr' ? 'Précision' : 'Location accuracy',
       meters: locale === 'ar' ? 'م' : locale === 'fr' ? 'm' : 'm',
     }),
     [locale],
@@ -326,9 +323,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
               style={StyleSheet.absoluteFill}
               cameraPosition={cameraPosition}
               userLocation={
-                userLocation
-                  ? { coordinates: userLocation, followUserLocation: false }
-                  : undefined
+                userLocation ? { coordinates: userLocation, followUserLocation: false } : undefined
               }
               properties={{ isMyLocationEnabled: Boolean(userLocation) }}
               uiSettings={{ myLocationButtonEnabled: true, compassEnabled: true }}
