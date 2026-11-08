@@ -51,7 +51,8 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Wessali uses your location to place accurate pickup and delivery pins."
+          "locationWhenInUsePermission": "Wessali uses your location to place accurate pickup and delivery pins.",
+          "locationFullAccuracyPermission": "Wessali uses your precise location to put the pickup and delivery pin at the correct place."
         }
       ],
       [
