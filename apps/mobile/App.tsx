@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  Image,
   ImageBackground,
   Modal,
   Pressable,
@@ -16,6 +17,7 @@ import {
   View,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { DEFAULT_LOCALE, getDirection, getMessages, type Locale } from '@wessali/i18n';
@@ -55,6 +57,16 @@ const photo = {
   water:
     'https://images.pexels.com/photos/37899833/pexels-photo-37899833/free-photo-of-yellow-water-tanker-truck-by-seaside-in-foca.jpeg?auto=compress&cs=tinysrgb&w=1400',
 };
+
+const RADIAL_GLOW_SOURCE = { uri: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAFs0lEQVR42u2d3XITRxCFHWP+wq8VogAxdoyNQgJODAZiSOCO9+LheLBIVdtVp051z87OzuzMWn1xblaqcul83afH0u7Mztfv33Ya1w8j1fTnu4qGzwrINhjeNJBtNr4JENtuenUYbnxlEHMwf3ekmobQovG7hdUUiFbM362k6hDmYPy1kWoaRC3zSxo+BsjkEKY2P9X4vUSVBtEEgDHG5zY8FcgYENUAjKn6IaZfH6khMCbvhhaqPtbwGwMVC6RqN5QCkMN4zdSbkYoBkgKiCQBjzQ8Z32f2rUj1QYkFURxCafNDVR9jPBt7O1IhIDEg+rohG4SpzO8z3jKdjf0xUiEgGowYEEUg1DJfq3jNdDT1zkBZQBiE1hGTQcgBINV8y3jN8Lugez3C92pA+kDkhJAFwFjzOXJijdcMvx8pDcgQEFokFYEwlfmhqkfj2XQx9AHoYY/wvQwEYSCI2G7IDiEXgKHmY9VjxaPxbPg+aGEI38NAGAR2BHZDKoTsAFKqP9Z8rno2nk0Xg38CPSLhawwEYWgguBtiIYzughLm7ynmc+Rw1WvGLxSzfyYtO/F1hrIIgNC6ASMJIezlhlA6erTKD1U9Go+mi9G/gB6T8DUEgzAQRKgbbgcGc9YoKhk9feaHjMcKR7OfgJ6S8DWEsqTOCIFIhZDcBTmqv4T5aDya/WunA0PyOkJhEFNAKAIgJno492PNDxkvhj/rdNgjed8BwLBADIWgzYOhURQEkKv6taGrmc9Vbxm/Mfao02+djklyXd53GADB3aBBCA3lbF0wdfVb5mPVa8aL4c87nRiS148BBoPAbrAgTNYFparfih4tdsR8qXrL+I3Bp2u9AK064bVTgKGBkG5gCBhHMVGUpQuGVv9uoPqtwYvRE2s+Gn9KZv/e6SVJriOUUwIRCyEURTyQU1dESQBSq1+iR1Y7mPlovlQ9VvwKDP+j05+G5PWXAAM7QrqBIchMkNVRbBSN6YJsAKzs16JHcn9Jmc/mS9Wj8RuDX631utMZSa6/AhgCAruBIeBg5nmAUTRkFgwGkDJ8U6ofo+eJEjua+Wj8xui/Ov1NkutnBMKCcEgQOIpSumDwMC4ZP1r1c/QcBMyXqkfjN0afr/XG0DnAEBDSDRaEAyOKuAuKxFCO+OHhO7T6j7oheULmS9Wz8W/XujD0VgEh3YAQTrq/eZTQBSnDuDgALX5w5cPZb1U/xg6aj8a/W+u9oXcEAiFgHPV1Ac4CWRH1xVAygBL5b8WPVf2y2gmZL8Z/6PQPSa4LiBAEWR2FuiA1hgbNgRL5b8VPqPo5es4C5m/MvlzrI+kSQGgQzpQo6usCLYayzoHcy0/O/30DAGe/Vv3nZD4b/4nEIBDCudEFPAs0APs9c2DUcnSq/Lfi5znEj1b9F1D5l2D8v4Y+AQTphAujC1YwC/piqNgcKAEgJv+t+NGqX2IHzf/PEEKQONK6wIqhsXOgOQALBQDmPy49MX6s6kfzP5MQgtUFGEO4JMU5wAAWcwcg638ewLj2l/zX4kerfjH9SyeEwF2gxZDMAfyfgAcx/z8wawDLAIBVIoAvpBQAqwCApQNwAB5BVwGAD2Ffhm7XMtT/EfOvIrbjqwj/Mq7Cl3H+dXSBr6P9B5nKP8j4T5Iz/knSf5Sv8KO835ZS4LYUvzGr8o1ZfmviTG5N9JtzK9yc67enT3R7uj+gUfkBDX9EqYFHlPwhvcoP6fljqg0/puoPak/0oLZvVVB5qwLfrKOBzTp8u5rK29X4hk0NbNjkW5Y1sGWZb9pXedM+37aygW0rfePWBjZu9a2LK29d7Jt3N7B5t29f38D29X6Aw0xO0PAjTPwQn6t9iI8fY9XAMVZ+kJsfZehHGfphnn6crR9n6wc6+5HmfqR5aQi1tHNVAMwNxGSeTA2gZRhVfKgJoBUQVT9/CwCmBtLU520RQG4gTX++/wGHb7JNpAannwAAAABJRU5ErkJggg==' };
+const threeDIcons = {
+  freight: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/f71a3e-bag/dynamic/200/color.webp',
+  roadside: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/ff5be0-tools/dynamic/200/color.webp',
+  water: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/deb9ff-can/dynamic/200/color.webp',
+  mapPin: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/1858b9-map-pin/dynamic/200/color.webp',
+  clock: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/8ef1fa-clock/dynamic/200/color.webp',
+  notebook: 'https://bvconuycpdvgzbvbkijl.supabase.co/storage/v1/object/public/sizes/628100-notebook/dynamic/200/color.webp',
+} as const;
 
 const words = {
   ar: {
@@ -550,9 +562,9 @@ const words = {
 } as const;
 
 const serviceContent: Record<ServiceKind, { photo: string; icon: string; accent: string }> = {
-  freight: { photo: photo.freight, icon: '📦', accent: '#FF6A24' },
-  roadside: { photo: photo.roadside, icon: '🛠️', accent: '#FF7A36' },
-  water: { photo: photo.water, icon: '💧', accent: '#42A9E8' },
+  freight: { photo: photo.freight, icon: threeDIcons.freight, accent: '#48C982' },
+  roadside: { photo: photo.roadside, icon: threeDIcons.roadside, accent: '#63D89C' },
+  water: { photo: photo.water, icon: threeDIcons.water, accent: '#35B879' },
 };
 
 const statusSteps = [
@@ -641,92 +653,23 @@ function MotionPressable({
   );
 }
 
-function Floating3DIcon({
-  glyph,
-  size = 62,
-  glow = '#FF6A24',
-}: {
-  glyph: string;
-  size?: number;
-  glow?: string;
-}) {
+function Floating3DIcon({ glyph, size = 62 }: { glyph: string; size?: number; glow?: string }) {
   return (
-    <View
-      pointerEvents="none"
-      style={{
-        width: size * 1.48,
-        height: size * 1.3,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <View
-        style={{
-          position: 'absolute',
-          bottom: size * 0.07,
-          width: size * 0.94,
-          height: size * 0.2,
-          borderRadius: 99,
-          backgroundColor: glow,
-          opacity: 0.2,
-          transform: [{ scaleX: 1.28 }],
-        }}
-      />
-      <Text
-        style={{
-          fontSize: size * 0.88,
-          lineHeight: size * 1.08,
-          textShadowColor: glow,
-          textShadowOffset: { width: 0, height: size * 0.08 },
-          textShadowRadius: size * 0.34,
-          elevation: 10,
-        }}
-      >
-        {glyph}
-      </Text>
-      <LinearGradient
-        colors={['rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']}
-        style={{
-          position: 'absolute',
-          top: size * 0.08,
-          width: size * 0.56,
-          height: size * 0.1,
-          borderRadius: 99,
-          opacity: 0.45,
-          transform: [{ rotate: '-18deg' }],
-        }}
-      />
-    </View>
+    <ExpoImage source={{ uri: glyph }} contentFit="contain" style={{ width: size, height: size }} transition={160} />
   );
 }
 
 function Service3DIcon({ kind, size = 62 }: { kind: ServiceKind; size?: number }) {
-  const config = {
-    freight: { glyph: '📦', glow: '#FF6A24' },
-    roadside: { glyph: '🛠️', glow: '#FF7A36' },
-    water: { glyph: '💧', glow: '#42A9E8' },
-  }[kind];
-  return <Floating3DIcon glyph={config.glyph} size={size} glow={config.glow} />;
+  return <Floating3DIcon glyph={serviceContent[kind].icon} size={size} />;
 }
 
 function AmbientBackground() {
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <LinearGradient
-        colors={['#08090D', '#11151D', '#090B10', '#07080C']}
-        locations={[0, 0.38, 0.72, 1]}
-        style={StyleSheet.absoluteFill}
-      />
-      <View style={[styles.ambientGlow, styles.ambientGlowTop]} />
-      <View style={[styles.ambientGlow, styles.ambientGlowBottom]} />
-      <BlurView intensity={26} tint="dark" style={[styles.ambientBlur, styles.ambientBlurTop]} />
-      <BlurView intensity={22} tint="dark" style={[styles.ambientBlur, styles.ambientBlurBottom]} />
-      <LinearGradient
-        colors={['rgba(255,105,39,0.08)', 'rgba(255,105,39,0)', 'rgba(255,105,39,0.035)']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
+      <LinearGradient colors={['#07170F', '#0B2117', '#091910', '#06120C']} locations={[0, 0.38, 0.74, 1]} style={StyleSheet.absoluteFill} />
+      <Image source={RADIAL_GLOW_SOURCE} resizeMode="stretch" style={styles.ambientGlowTop} />
+      <Image source={RADIAL_GLOW_SOURCE} resizeMode="stretch" style={styles.ambientGlowBottom} />
+      <LinearGradient colors={['rgba(60,190,122,0.055)', 'rgba(60,190,122,0)', 'rgba(6,24,15,0.16)']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
     </View>
   );
 }
@@ -1310,47 +1253,26 @@ export default function App() {
     </View>
   );
 
-  const renderServiceCard = (kind: ServiceKind, index: number) => {
-    return (
-      <MotionPressable
-        key={kind}
-        onPress={() => openServicePreview(kind)}
-        style={styles.serviceCard}
-      >
-        <LinearGradient
-          colors={['#20232B', '#151920', '#101319']}
-          locations={[0, 0.52, 1]}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.serviceCardTop}>
+  const renderServiceCard = (kind: ServiceKind, index: number) => (
+    <MotionPressable key={kind} onPress={() => openServicePreview(kind)} style={[styles.serviceCard, kind === 'water' ? styles.serviceCardWide : styles.serviceCardSmall]}>
+      <LinearGradient colors={['#173D2B', '#10281D', '#0D2118']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+      <ImageBackground source={{ uri: serviceContent[kind].photo }} style={[styles.servicePhoto, kind === 'water' && styles.servicePhotoWide]} imageStyle={styles.servicePhotoRadius} resizeMode="cover">
+        <LinearGradient colors={['rgba(5,23,14,0.08)', 'rgba(5,23,14,0.78)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
+        <View style={styles.serviceImageTop}>
           <Text style={styles.serviceNumber}>0{index + 1} / 03</Text>
-          <Text style={styles.serviceOpenArrow}>↗</Text>
+          <ExpoImage source={{ uri: serviceContent[kind].icon }} style={[styles.service3DImage, kind === 'water' && styles.service3DImageWide]} contentFit="contain" transition={180} />
         </View>
-        <View style={styles.serviceArt}>
-          <View
-            style={[
-              styles.serviceIconGlow,
-              {
-                backgroundColor:
-                  kind === 'water' ? 'rgba(66,169,232,0.18)' : 'rgba(255,106,36,0.2)',
-              },
-            ]}
-          />
-          <Service3DIcon kind={kind} size={66} />
+      </ImageBackground>
+      <View style={[styles.serviceMeta, kind === 'water' && styles.serviceMetaWide]}>
+        <Text style={[styles.serviceTitle, directionStyle]}>{serviceTitle(kind)}</Text>
+        <Text style={[styles.serviceDescription, directionStyle]}>{serviceDescription(kind)}</Text>
+        <View style={[styles.serviceMetaBottom, rowStyle]}>
+          <Text style={[styles.serviceAction, directionStyle]}>{ui.start}</Text>
+          <Text style={styles.serviceActionArrow}>{isRtl ? '←' : '↗'}</Text>
         </View>
-        <View style={styles.serviceMeta}>
-          <Text style={[styles.serviceTitle, directionStyle]}>{serviceTitle(kind)}</Text>
-          <Text style={[styles.serviceDescription, directionStyle]}>
-            {serviceDescription(kind)}
-          </Text>
-          <View style={[styles.serviceMetaBottom, rowStyle]}>
-            <Text style={[styles.serviceAction, directionStyle]}>{ui.start}</Text>
-            <Text style={styles.serviceActionArrow}>{isRtl ? '←' : '↗'}</Text>
-          </View>
-        </View>
-      </MotionPressable>
-    );
-  };
+      </View>
+    </MotionPressable>
+  );
 
   const renderLogin = () => (
     <SafeAreaView style={styles.safeArea}>
@@ -1369,7 +1291,6 @@ export default function App() {
               colors={['rgba(5,7,10,0.08)', 'rgba(5,7,10,0.4)', 'rgba(5,7,10,0.9)']}
               style={StyleSheet.absoluteFill}
             />
-            <View style={styles.loginPhotoGlow} />
             <View style={styles.brandChip}>
               <Text style={styles.brandChipMark}>W</Text>
               <Text style={styles.brandChipText}>{brandTitle}</Text>
@@ -1428,15 +1349,15 @@ export default function App() {
 
         <View style={styles.loginMiniFeatures}>
           <View style={styles.miniFeature}>
-            <Text style={styles.miniFeatureIcon}>📦</Text>
+            <ExpoImage source={{ uri: threeDIcons.freight }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
             <Text style={styles.miniFeatureText}>{ui.freight}</Text>
           </View>
           <View style={styles.miniFeature}>
-            <Text style={styles.miniFeatureIcon}>🛠️</Text>
+            <ExpoImage source={{ uri: threeDIcons.roadside }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
             <Text style={styles.miniFeatureText}>{ui.roadside}</Text>
           </View>
           <View style={styles.miniFeature}>
-            <Text style={styles.miniFeatureIcon}>💧</Text>
+            <ExpoImage source={{ uri: threeDIcons.water }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
             <Text style={styles.miniFeatureText}>{ui.water}</Text>
           </View>
         </View>
@@ -1455,7 +1376,7 @@ export default function App() {
           resizeMode="cover"
         >
           <LinearGradient
-            colors={['rgba(7,8,12,0.12)', 'rgba(7,8,12,0.38)', 'rgba(7,8,12,0.92)']}
+            colors={['rgba(5,21,13,0.12)', 'rgba(5,21,13,0.38)', 'rgba(5,21,13,0.92)']}
             locations={[0, 0.42, 1]}
             style={StyleSheet.absoluteFill}
           />
@@ -1472,7 +1393,7 @@ export default function App() {
             <Text style={[styles.heroTitle, isRtl && styles.arabicHero]}>{ui.welcome}</Text>
             <Text style={[styles.heroSubtitle, isRtl && styles.arabicHero]}>{ui.welcomeSub}</Text>
             <View style={styles.heroLocationLine}>
-              <Text style={styles.locationPillIcon}>⌖</Text>
+              <ExpoImage source={{ uri: threeDIcons.mapPin }} style={styles.locationPill3DIcon} contentFit="contain" transition={160} />
               <Text style={styles.heroLocationText}>{ui.corridor}</Text>
             </View>
           </Animated.View>
@@ -1487,15 +1408,11 @@ export default function App() {
         <Text style={styles.sectionCount}>03</Text>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.servicesRail}
-      >
+      <View style={styles.servicesGrid}>
         {renderServiceCard('freight', 0)}
         {renderServiceCard('roadside', 1)}
         {renderServiceCard('water', 2)}
-      </ScrollView>
+      </View>
 
       <View style={styles.howSection}>
         <View style={styles.sectionHeaderBlock}>
@@ -1507,15 +1424,15 @@ export default function App() {
         </View>
         <View style={styles.stepsGrid}>
           {[
-            ['01', ui.step1, ui.step1d, '📦'],
-            ['02', ui.step2, ui.step2d, '📍'],
-            ['03', ui.step3, ui.step3d, '🚚'],
-            ['04', ui.step4, ui.step4d, '✨'],
+            ['01', ui.step1, ui.step1d, threeDIcons.freight],
+            ['02', ui.step2, ui.step2d, threeDIcons.mapPin],
+            ['03', ui.step3, ui.step3d, threeDIcons.roadside],
+            ['04', ui.step4, ui.step4d, threeDIcons.clock],
           ].map(([number, title, description, glyph]) => (
-            <LinearGradient key={number} colors={['#1C2028', '#12161D']} style={styles.stepCard}>
+            <LinearGradient key={number} colors={['#1B3827', '#13271D']} style={styles.stepCard}>
               <View style={styles.stepCardTop}>
                 <Text style={styles.stepNumber}>{number}</Text>
-                <Floating3DIcon glyph={glyph} size={30} glow="#FF6A24" />
+                <Floating3DIcon glyph={glyph} size={30} glow="#48C982" />
               </View>
               <Text style={[styles.stepTitle, directionStyle]}>{title}</Text>
               <Text style={[styles.stepDescription, directionStyle]}>{description}</Text>
@@ -1525,7 +1442,7 @@ export default function App() {
       </View>
 
       <LinearGradient
-        colors={['rgba(39,31,28,0.96)', 'rgba(20,23,29,0.98)', '#141820']}
+        colors={['rgba(12,47,29,0.96)', 'rgba(20,23,29,0.98)', '#102319']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.aboutTeaser}
@@ -1647,7 +1564,7 @@ export default function App() {
               <Switch
                 value={needsTowing}
                 onValueChange={setNeedsTowing}
-                trackColor={{ true: '#FF6A24', false: 'rgba(255,255,255,0.16)' }}
+                trackColor={{ true: '#48C982', false: 'rgba(255,255,255,0.16)' }}
               />
             </View>
             {needsTowing
@@ -1768,7 +1685,7 @@ export default function App() {
               <Switch
                 value={providerServices.includes(service.id)}
                 onValueChange={() => toggleProviderService(service.id)}
-                trackColor={{ true: '#FF6A24', false: 'rgba(255,255,255,0.16)' }}
+                trackColor={{ true: '#48C982', false: 'rgba(255,255,255,0.16)' }}
               />
             </View>
           ))}
@@ -1897,14 +1814,14 @@ export default function App() {
       </View>
       <View style={styles.problemGrid}>
         {[
-          ['01', ui.problem1, ui.problem1d, '↗'],
-          ['02', ui.problem2, ui.problem2d, '⌁'],
-          ['03', ui.problem3, ui.problem3d, '◌'],
+          ['01', ui.problem1, ui.problem1d, threeDIcons.freight],
+          ['02', ui.problem2, ui.problem2d, threeDIcons.roadside],
+          ['03', ui.problem3, ui.problem3d, threeDIcons.water],
         ].map(([number, title, description, glyph]) => (
           <View key={number} style={styles.informationCard}>
             <View style={styles.infoCardTop}>
               <Text style={styles.infoCardNumber}>{number}</Text>
-              <Text style={styles.infoCardGlyph}>{glyph}</Text>
+              <ExpoImage source={{ uri: glyph }} style={styles.infoCardGlyph} contentFit="contain" transition={160} />
             </View>
             <Text style={[styles.infoCardTitle, directionStyle]}>{title}</Text>
             <Text style={[styles.bodyCopy, directionStyle]}>{description}</Text>
@@ -1916,13 +1833,13 @@ export default function App() {
         <Text style={[styles.sectionEyebrow, directionStyle]}>03 / OUR RESPONSE</Text>
         <Text style={[styles.sectionTitle, directionStyle]}>{ui.solutions}</Text>
         {[
-          ['↗', ui.solution1],
-          ['⌁', ui.solution2],
-          ['◌', ui.solution3],
+          [threeDIcons.freight, ui.solution1],
+          [threeDIcons.roadside, ui.solution2],
+          [threeDIcons.water, ui.solution3],
         ].map(([glyph, value], index) => (
           <View key={String(index)} style={[styles.solutionRow, rowStyle]}>
             <View style={styles.solutionIcon}>
-              <Text style={styles.solutionIconText}>{glyph}</Text>
+              <ExpoImage source={{ uri: glyph }} style={styles.solutionIconImage} contentFit="contain" transition={160} />
             </View>
             <Text style={[styles.solutionText, directionStyle]}>{value}</Text>
           </View>
@@ -2042,7 +1959,7 @@ export default function App() {
           {error && screen !== 'booking' && screen !== 'history' ? (
             <Text style={styles.errorText}>{error}</Text>
           ) : null}
-          {busy ? <ActivityIndicator color="#FF6A24" style={styles.globalSpinner} /> : null}
+          {busy ? <ActivityIndicator color="#48C982" style={styles.globalSpinner} /> : null}
           <Text style={styles.footerText}>{ui.footer} · 0.3.0</Text>
         </Animated.ScrollView>
 
@@ -2057,7 +1974,7 @@ export default function App() {
             <Animated.View style={[StyleSheet.absoluteFill, { opacity: previewOpacity }]}>
               <BlurView intensity={78} tint="dark" style={StyleSheet.absoluteFill} />
               <LinearGradient
-                colors={['rgba(5,7,11,0.62)', 'rgba(10,13,19,0.82)', 'rgba(24,15,13,0.84)']}
+                colors={['rgba(4,18,11,0.62)', 'rgba(10,13,19,0.82)', 'rgba(7,34,20,0.84)']}
                 style={StyleSheet.absoluteFill}
               />
             </Animated.View>
@@ -2078,7 +1995,7 @@ export default function App() {
                 ]}
               >
                 <LinearGradient
-                  colors={['rgba(255,112,45,0.34)', 'rgba(255,160,94,0.12)', 'rgba(255,255,255,0)']}
+                  colors={['rgba(63,196,128,0.34)', 'rgba(113,221,158,0.12)', 'rgba(255,255,255,0)']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.previewAura}
@@ -2091,7 +2008,7 @@ export default function App() {
                     resizeMode="cover"
                   >
                     <LinearGradient
-                      colors={['rgba(6,22,24,0.06)', 'rgba(6,22,24,0.68)']}
+                      colors={['rgba(4,21,13,0.06)', 'rgba(4,21,13,0.68)']}
                       style={StyleSheet.absoluteFill}
                     />
                     <Text style={styles.previewImageEyebrow}>
@@ -2112,7 +2029,7 @@ export default function App() {
                       onPress={startPreviewBooking}
                     >
                       <LinearGradient
-                        colors={['#FF873B', '#F04A16', '#B92D0D']}
+                        colors={['#58D893', '#35B978', '#176B43']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={StyleSheet.absoluteFill}
@@ -2137,14 +2054,14 @@ export default function App() {
           <View style={styles.bottomBarShell}>
             <BlurView intensity={48} tint="dark" style={StyleSheet.absoluteFill} />
             <LinearGradient
-              colors={['rgba(35,29,27,0.9)', 'rgba(15,18,24,0.94)']}
+              colors={['rgba(8,31,19,0)', 'rgba(8,31,19,0.28)', 'rgba(4,17,10,0.98)']}
               style={StyleSheet.absoluteFill}
             />
             <View style={styles.bottomBar}>
               {[
-                ['home', '⌂', ui.home],
-                ['history', '◷', ui.history],
-                ['about', 'ⓘ', ui.about],
+                ['home', threeDIcons.mapPin, ui.home],
+                ['history', threeDIcons.clock, ui.history],
+                ['about', threeDIcons.notebook, ui.about],
               ].map(([id, glyph, label]) => (
                 <MotionPressable
                   key={id}
@@ -2157,9 +2074,7 @@ export default function App() {
                   style={styles.bottomTab}
                 >
                   <View style={styles.bottomGlyphWrap}>
-                    <Text style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]}>
-                      {glyph}
-                    </Text>
+                    <ExpoImage source={{ uri: glyph }} style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]} contentFit="contain" transition={160} />
                   </View>
                   <Text style={[styles.bottomLabel, screen === id && styles.bottomLabelActive]}>
                     {label}
@@ -2176,46 +2091,17 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  ambientGlow: {
-    position: 'absolute',
-    width: 250,
-    height: 250,
-    borderRadius: 140,
-    shadowColor: '#FF5B1F',
-    shadowOpacity: 0.72,
-    shadowRadius: 82,
-    elevation: 0,
-  },
-  ambientGlowTop: { top: -132, right: -114, backgroundColor: 'rgba(255,91,31,0.14)' },
-  ambientGlowBottom: { bottom: 105, left: -166, backgroundColor: 'rgba(219,65,24,0.1)' },
-  ambientBlur: { position: 'absolute', width: 250, height: 250, borderRadius: 130 },
-  ambientBlurTop: { top: -130, right: -115 },
-  ambientBlurBottom: { bottom: 110, left: -165 },
-  loginPhotoGlow: {
-    position: 'absolute',
-    right: -40,
-    bottom: -44,
-    width: 190,
-    height: 190,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255,89,27,0.2)',
-    shadowColor: '#FF5B1F',
-    shadowOpacity: 0.8,
-    shadowRadius: 56,
-  },
+  ambientGlow: { position: 'absolute', width: 0, height: 0, opacity: 0 },
+  ambientGlowTop: { position: 'absolute', top: -176, right: -166, width: 410, height: 410, opacity: 0.76 },
+  ambientGlowBottom: { position: 'absolute', bottom: 86, left: -178, width: 370, height: 370, opacity: 0.58 },
+  ambientBlur: { position: 'absolute', width: 0, height: 0, opacity: 0 },
+  ambientBlurTop: { top: -100, right: -100 },
+  ambientBlurBottom: { bottom: 100, left: -100 },
+  loginPhotoGlow: { display: 'none' },
   heroObject: { position: 'absolute', top: 14, right: 8, zIndex: 2, opacity: 0.98 },
   serviceCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   serviceArt: { height: 100, alignItems: 'center', justifyContent: 'center' },
-  serviceIconGlow: {
-    position: 'absolute',
-    width: 92,
-    height: 68,
-    borderRadius: 50,
-    opacity: 0.68,
-    shadowColor: '#FF6A24',
-    shadowOpacity: 0.55,
-    shadowRadius: 28,
-  },
+  serviceIconGlow: { display: 'none' },
   serviceMetaBottom: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2234,9 +2120,9 @@ const styles = StyleSheet.create({
   heroLocationText: { color: 'rgba(255,255,255,0.82)', fontSize: 9, fontWeight: '700' },
   servicesRail: { gap: 13, paddingRight: 18 },
   serviceOpenArrow: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  serviceMeta: { gap: 5, paddingHorizontal: 2 },
-  serviceAction: { color: '#FF8A4D', fontSize: 10, fontWeight: '900', marginTop: 2 },
-  serviceActionArrow: { color: '#FF8A4D', fontSize: 12 },
+  serviceMeta: { gap: 6, paddingHorizontal: 13, paddingTop: 12, paddingBottom: 13 },
+  serviceAction: { color: '#48C982', fontSize: 10, fontWeight: '900', marginTop: 2 },
+  serviceActionArrow: { color: '#48C982', fontSize: 12, fontWeight: '900' },
   howSection: { gap: 13 },
   aboutTeaser: {
     flexDirection: 'row',
@@ -2251,13 +2137,13 @@ const styles = StyleSheet.create({
     width: 3,
     minHeight: 100,
     borderRadius: 2,
-    backgroundColor: '#FF6A24',
-    shadowColor: '#FF6A24',
+    backgroundColor: '#48C982',
+    shadowColor: '#48C982',
     shadowOpacity: 0.8,
     shadowRadius: 12,
   },
   aboutTeaserCopy: { flex: 1, gap: 7 },
-  aboutTeaserTitle: { color: '#F2F3F5', fontSize: 15, lineHeight: 21, fontWeight: '900' },
+  aboutTeaserTitle: { color: '#F1F8F3', fontSize: 15, lineHeight: 21, fontWeight: '900' },
   aboutTeaserText: { color: '#A1AAB5', fontSize: 10, lineHeight: 16 },
   aboutTeaserLink: {
     alignSelf: 'flex-start',
@@ -2266,13 +2152,13 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 5,
   },
-  aboutTeaserLinkText: { color: '#FF8A4D', fontSize: 10, fontWeight: '900' },
-  aboutTeaserArrow: { color: '#FF8A4D', fontSize: 13, fontWeight: '900' },
+  aboutTeaserLinkText: { color: '#7BE0A8', fontSize: 10, fontWeight: '900' },
+  aboutTeaserArrow: { color: '#7BE0A8', fontSize: 13, fontWeight: '900' },
   bottomActiveMark: {
     width: 13,
     height: 2,
     borderRadius: 1,
-    backgroundColor: '#FF6A24',
+    backgroundColor: '#48C982',
     marginTop: 1,
   },
   previewModalRoot: {
@@ -2299,7 +2185,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 25,
     overflow: 'hidden',
-    backgroundColor: '#171B22',
+    backgroundColor: '#12251A',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.14)',
     shadowColor: '#000000',
@@ -2323,7 +2209,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   previewImageTitle: { color: '#FFFFFF', fontSize: 23, lineHeight: 29, fontWeight: '900' },
-  previewCardBody: { padding: 18, gap: 13, backgroundColor: '#171B22' },
+  previewCardBody: { padding: 18, gap: 13, backgroundColor: '#12251A' },
   previewDescription: { color: '#B0B7C1', fontSize: 12, lineHeight: 19 },
   previewDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.1)' },
   previewPrimaryButton: {
@@ -2334,19 +2220,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    shadowColor: '#FF5B1F',
+    shadowColor: '#39B978',
     shadowOpacity: 0.24,
     shadowRadius: 13,
     shadowOffset: { width: 0, height: 5 },
     elevation: 4,
   },
   previewPrimaryText: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
-  previewPrimaryArrow: { color: '#FFC19B', fontSize: 16, fontWeight: '900' },
+  previewPrimaryArrow: { color: '#B6ECCB', fontSize: 16, fontWeight: '900' },
   previewCloseButton: { minHeight: 36, alignItems: 'center', justifyContent: 'center' },
   previewCloseText: { color: '#A4ACB7', fontSize: 11, fontWeight: '800' },
-  safeArea: { flex: 1, backgroundColor: '#080A0E' },
+  safeArea: { flex: 1, backgroundColor: '#07130E' },
   appShell: { flex: 1, backgroundColor: 'transparent' },
-  content: { paddingHorizontal: 18, paddingTop: 13, paddingBottom: 132, gap: 21 },
+  content: { paddingHorizontal: 18, paddingTop: 14, paddingBottom: 176, gap: 22 },
   loginScroll: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -2370,7 +2256,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.12)',
   },
   languageButton: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: 18 },
-  languageButtonActive: { backgroundColor: '#FF681F' },
+  languageButtonActive: { backgroundColor: '#34B978' },
   languageText: { color: '#A1AAB5', fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
   languageTextActive: { color: '#FFFFFF' },
 
@@ -2401,11 +2287,11 @@ const styles = StyleSheet.create({
   brandChipMark: { color: '#FFFFFF', fontWeight: '900', fontSize: 17 },
   brandChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
   loginPhotoCopy: { gap: 9, maxWidth: 310 },
-  loginPhotoEyebrow: { color: '#FFC19B', fontSize: 9, letterSpacing: 2.2, fontWeight: '800' },
+  loginPhotoEyebrow: { color: '#B6ECCB', fontSize: 9, letterSpacing: 2.2, fontWeight: '800' },
   loginPhotoTitle: { color: '#FFFFFF', fontSize: 30, lineHeight: 37, fontWeight: '800' },
   loginPhotoSub: { color: 'rgba(255,255,255,0.84)', fontSize: 12, lineHeight: 19 },
   loginHeading: { gap: 6 },
-  loginTitle: { color: '#F4F5F7', fontSize: 27, fontWeight: '800', letterSpacing: -0.6 },
+  loginTitle: { color: '#F0F7F2', fontSize: 27, fontWeight: '800', letterSpacing: -0.6 },
   loginSubtitle: { color: '#A1AAB5', fontSize: 13, lineHeight: 20 },
   glassPanel: {
     backgroundColor: 'rgba(20,23,30,0.88)',
@@ -2427,7 +2313,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 13,
-    color: '#F2F3F5',
+    color: '#F1F8F3',
   },
   inputRtl: { textAlign: 'right' },
   multilineInput: { minHeight: 82, textAlignVertical: 'top' },
@@ -2438,7 +2324,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   serverToggleText: { color: '#A6AEB9', fontSize: 11, fontWeight: '700' },
-  serverToggleGlyph: { color: '#FF6A24', fontSize: 18, fontWeight: '700' },
+  serverToggleGlyph: { color: '#48C982', fontSize: 18, fontWeight: '700' },
   roleSwitch: { backgroundColor: 'rgba(255,255,255,0.07)', padding: 4, borderRadius: 17, gap: 5 },
   pill: {
     flex: 1,
@@ -2449,8 +2335,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   pillActive: {
-    backgroundColor: '#FF681F',
-    shadowColor: '#FF5B1F',
+    backgroundColor: '#34B978',
+    shadowColor: '#39B978',
     shadowOpacity: 0.18,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -2459,14 +2345,14 @@ const styles = StyleSheet.create({
   pillTextActive: { color: '#FFFFFF' },
   primaryButtonLarge: {
     minHeight: 54,
-    backgroundColor: '#FF681F',
+    backgroundColor: '#34B978',
     borderRadius: 17,
     paddingHorizontal: 18,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    shadowColor: '#FF5B1F',
+    shadowColor: '#39B978',
     shadowOpacity: 0.38,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 7 },
@@ -2477,19 +2363,19 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#FF681F',
+    backgroundColor: '#34B978',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 9,
-    shadowColor: '#FF5B1F',
+    shadowColor: '#39B978',
     shadowOpacity: 0.24,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 5 },
     elevation: 3,
   },
   primaryButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
-  primaryButtonArrow: { color: '#FFC19B', fontSize: 18, fontWeight: '800' },
+  primaryButtonArrow: { color: '#B6ECCB', fontSize: 18, fontWeight: '800' },
   secondaryButton: {
     minHeight: 44,
     borderRadius: 15,
@@ -2508,13 +2394,7 @@ const styles = StyleSheet.create({
   },
   loginMiniFeatures: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
   miniFeature: { flex: 1, alignItems: 'center', gap: 5 },
-  miniFeatureIcon: {
-    color: '#FF8A4D',
-    fontSize: 23,
-    fontWeight: '700',
-    textShadowColor: '#FF6A24',
-    textShadowRadius: 13,
-  },
+  miniFeatureIcon: { width: 42, height: 42 },
   miniFeatureText: { color: '#A6AEB9', fontSize: 9, fontWeight: '700', textAlign: 'center' },
   footerText: {
     color: '#818B97',
@@ -2537,13 +2417,13 @@ const styles = StyleSheet.create({
     width: 39,
     height: 39,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,106,36,0.18)',
+    backgroundColor: 'rgba(61,190,121,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  accountAvatarText: { color: '#FF8A4D', fontSize: 15, fontWeight: '900' },
+  accountAvatarText: { color: '#7BE0A8', fontSize: 15, fontWeight: '900' },
   accountEyebrow: { color: '#929BA7', fontSize: 9, fontWeight: '700' },
-  accountName: { color: '#F2F3F5', fontSize: 12, fontWeight: '800' },
+  accountName: { color: '#F1F8F3', fontSize: 12, fontWeight: '800' },
   accountActions: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   logoutButton: {
     width: 34,
@@ -2564,7 +2444,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: 'rgba(5,7,11,0.82)',
+    backgroundColor: 'rgba(4,18,11,0.82)',
     borderRadius: 29,
   },
   heroHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -2577,7 +2457,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  brandSquareText: { color: '#FF8A4D', fontSize: 21, fontWeight: '900' },
+  brandSquareText: { color: '#7BE0A8', fontSize: 21, fontWeight: '900' },
   brandName: { color: '#FFFFFF', fontWeight: '900', fontSize: 15 },
   brandTagline: { color: 'rgba(255,255,255,0.7)', fontSize: 8, marginTop: 2 },
   heroHeaderButton: {
@@ -2592,7 +2472,7 @@ const styles = StyleSheet.create({
   },
   heroHeaderButtonText: { color: '#FFFFFF', fontSize: 17 },
   heroTextBlock: { gap: 8, maxWidth: 320, zIndex: 3 },
-  heroEyebrow: { color: '#FFAD80', fontSize: 9, letterSpacing: 2.1, fontWeight: '900' },
+  heroEyebrow: { color: '#BCEFD0', fontSize: 9, letterSpacing: 2.1, fontWeight: '900' },
   heroTitle: {
     color: '#FFFFFF',
     fontSize: 25,
@@ -2600,13 +2480,13 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: -0.35,
   },
-  heroSubtitle: { color: 'rgba(255,255,255,0.12)', fontSize: 11, lineHeight: 17 },
+  heroSubtitle: { color: 'rgba(241,249,244,0.88)', fontSize: 11, lineHeight: 17 },
   locationPill: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255,106,36,0.14)',
+    backgroundColor: 'rgba(61,190,121,0.14)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.24)',
     borderRadius: 20,
@@ -2614,7 +2494,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginTop: 3,
   },
-  locationPillIcon: { color: '#FFC19B', fontSize: 15 },
+  locationPillIcon: { color: '#B6ECCB', fontSize: 15 },
   locationPillText: { color: '#FFFFFF', fontSize: 9, fontWeight: '800' },
   sectionHeaderBlock: {
     flexDirection: 'row',
@@ -2623,7 +2503,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   sectionEyebrow: {
-    color: '#FF9868',
+    color: '#82DFAE',
     fontSize: 8,
     letterSpacing: 1.8,
     fontWeight: '900',
@@ -2637,21 +2517,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
   sectionCount: { color: '#78818D', fontSize: 21, fontWeight: '300' },
-  serviceCard: {
-    width: 244,
-    minHeight: 238,
-    borderRadius: 22,
-    overflow: 'hidden',
-    padding: 15,
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.09)',
-    shadowColor: '#FF5B1F',
-    shadowOpacity: 0.13,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
-  },
+  serviceCard: { borderRadius: 22, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(137,220,166,0.16)', shadowColor: '#07130E', shadowOpacity: 0.32, shadowRadius: 20, shadowOffset: { width: 0, height: 10 }, elevation: 5 },
   serviceImage: { height: 132, padding: 12, justifyContent: 'space-between', overflow: 'hidden' },
   serviceImageRadius: { borderRadius: 17 },
   imageShade: {
@@ -2660,18 +2526,18 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: 'rgba(5,7,11,0.6)',
+    backgroundColor: 'rgba(4,18,11,0.6)',
     borderRadius: 25,
   },
-  serviceImageTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  serviceImageTop: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   serviceNumber: {
-    color: 'rgba(255,255,255,0.12)',
+    color: 'rgba(255,255,255,0.78)',
     fontSize: 8,
     fontWeight: '900',
     letterSpacing: 1.6,
   },
-  serviceTitle: { color: '#F2F3F5', fontSize: 15, lineHeight: 20, fontWeight: '900' },
-  serviceDescription: { color: '#9AA3AE', fontSize: 10, lineHeight: 15 },
+  serviceTitle: { color: '#F0F8F2', fontSize: 14, lineHeight: 19, fontWeight: '900' },
+  serviceDescription: { color: '#B3C6B9', fontSize: 10, lineHeight: 15 },
   softPanel: {
     backgroundColor: 'transparent',
     borderWidth: 0,
@@ -2685,18 +2551,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: 14,
   },
-  stepCard: {
-    width: '48%',
-    minHeight: 150,
-    borderRadius: 18,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    gap: 7,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.075)',
-  },
-  stepNumber: { color: '#FF6A24', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
-  stepTitle: { color: '#F2F3F5', fontSize: 12, lineHeight: 17, fontWeight: '900' },
+  stepCard: { width: '48.4%', minHeight: 150, borderRadius: 19, paddingHorizontal: 13, paddingVertical: 13, gap: 8, borderWidth: 1, borderColor: 'rgba(137,220,166,0.13)', overflow: 'hidden' },
+  stepNumber: { color: '#48C982', fontSize: 9, fontWeight: '900', letterSpacing: 1.4 },
+  stepTitle: { color: '#F1F8F3', fontSize: 12, lineHeight: 17, fontWeight: '900' },
   stepDescription: { color: '#A1AAB5', fontSize: 10, lineHeight: 15 },
   pageContent: { gap: 17 },
   backButton: {
@@ -2706,7 +2563,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 4,
   },
-  backGlyph: { color: '#FF6A24', fontSize: 19, fontWeight: '900' },
+  backGlyph: { color: '#48C982', fontSize: 19, fontWeight: '900' },
   backText: { color: '#A6AEB9', fontSize: 11, fontWeight: '800' },
   formHero: {
     height: 190,
@@ -2724,7 +2581,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 2,
   },
-  formHeroIconText: { color: '#FF8A4D', fontSize: 20, fontWeight: '900' },
+  formHeroIconText: { color: '#7BE0A8', fontSize: 20, fontWeight: '900' },
   formHeroTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '900' },
   formHeroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 11 },
   formSectionHeading: { gap: 1 },
@@ -2737,9 +2594,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  choiceActive: { backgroundColor: 'rgba(255,106,36,0.2)', borderColor: '#FF8A4D' },
+  choiceActive: { backgroundColor: 'rgba(61,190,121,0.2)', borderColor: '#7BE0A8' },
   choiceText: { color: '#A1AAB5', fontSize: 10, fontWeight: '800' },
-  choiceTextActive: { color: '#FFB18A' },
+  choiceTextActive: { color: '#9AE4B8' },
   switchCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2754,7 +2611,7 @@ const styles = StyleSheet.create({
   switchTitle: { color: '#E5E8ED', fontSize: 11, fontWeight: '800' },
   switchSub: { color: '#8D96A2', fontSize: 9 },
   infoNote: {
-    backgroundColor: 'rgba(255,106,36,0.12)',
+    backgroundColor: 'rgba(61,190,121,0.12)',
     borderRadius: 14,
     color: '#A1AAB5',
     fontSize: 10,
@@ -2762,7 +2619,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   errorText: { color: '#FF8D7D', fontSize: 11, lineHeight: 17, fontWeight: '700' },
-  successText: { color: '#FF6A24', fontSize: 11, lineHeight: 17, fontWeight: '700' },
+  successText: { color: '#48C982', fontSize: 11, lineHeight: 17, fontWeight: '700' },
 
   bookingCard: {
     position: 'relative',
@@ -2787,7 +2644,7 @@ const styles = StyleSheet.create({
   },
   referenceBlock: { flex: 1, gap: 4 },
   overline: { color: '#8D96A2', fontSize: 8, letterSpacing: 1.3, fontWeight: '900' },
-  bookingService: { color: '#F2F3F5', fontSize: 14, fontWeight: '900' },
+  bookingService: { color: '#F1F8F3', fontSize: 14, fontWeight: '900' },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2796,13 +2653,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 14,
   },
-  statusBadgeActive: { backgroundColor: 'rgba(255,106,36,0.16)' },
+  statusBadgeActive: { backgroundColor: 'rgba(61,190,121,0.16)' },
   statusBadgeMuted: { backgroundColor: 'rgba(255,255,255,0.055)' },
   statusDot: { width: 5, height: 5, borderRadius: 5 },
-  statusDotActive: { backgroundColor: '#FF6A24' },
+  statusDotActive: { backgroundColor: '#48C982' },
   statusDotMuted: { backgroundColor: '#929BA7' },
   statusText: { fontSize: 8, fontWeight: '900' },
-  statusTextActive: { color: '#FF8A4D' },
+  statusTextActive: { color: '#7BE0A8' },
   statusTextMuted: { color: '#929BA7' },
   routeBlock: {
     flexDirection: 'row',
@@ -2814,14 +2671,14 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.06)',
   },
   routePinColumn: { alignItems: 'center', width: 8, paddingTop: 2 },
-  routePinStart: { width: 7, height: 7, borderRadius: 5, backgroundColor: '#FF6A24' },
+  routePinStart: { width: 7, height: 7, borderRadius: 5, backgroundColor: '#48C982' },
   routePinLine: { width: 1, height: 18, backgroundColor: 'rgba(255,255,255,0.07)' },
-  routePinEnd: { width: 7, height: 7, borderRadius: 2, backgroundColor: '#D19B5D' },
+  routePinEnd: { width: 7, height: 7, borderRadius: 2, backgroundColor: '#63C98E' },
   routeLabels: { flex: 1, gap: 3 },
   routeCaption: { color: '#929BA7', fontSize: 8, fontWeight: '800' },
   routeAddress: { color: '#E5E8ED', fontSize: 11, lineHeight: 16, fontWeight: '700' },
   bookingDetail: { color: '#A1AAB5', fontSize: 10, lineHeight: 16 },
-  providerName: { color: '#FF8A4D', fontSize: 10, fontWeight: '800' },
+  providerName: { color: '#7BE0A8', fontSize: 10, fontWeight: '800' },
   progressWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2839,7 +2696,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  progressNodeActive: { backgroundColor: '#FF6A24', borderColor: '#FF6A24' },
+  progressNodeActive: { backgroundColor: '#48C982', borderColor: '#48C982' },
   progressCheck: { color: '#FFFFFF', fontSize: 9, fontWeight: '900' },
   progressInner: {
     width: 4,
@@ -2853,28 +2710,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.1)',
     marginHorizontal: 2,
   },
-  progressLineActive: { backgroundColor: '#FF8A4D' },
+  progressLineActive: { backgroundColor: '#7BE0A8' },
   cancelButton: {
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: 'rgba(255,106,36,0.2)',
-    backgroundColor: 'rgba(255,106,36,0.08)',
+    borderColor: 'rgba(61,190,121,0.2)',
+    backgroundColor: 'rgba(61,190,121,0.08)',
     minHeight: 38,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cancelButtonText: { color: '#FF9A83', fontWeight: '800', fontSize: 10 },
+  cancelButtonText: { color: '#8EE1B2', fontWeight: '800', fontSize: 10 },
   refreshButton: {
     flexDirection: 'row',
     gap: 6,
     alignItems: 'center',
     paddingHorizontal: 11,
     paddingVertical: 8,
-    backgroundColor: 'rgba(255,106,36,0.13)',
+    backgroundColor: 'rgba(61,190,121,0.13)',
     borderRadius: 16,
   },
-  refreshGlyph: { color: '#FF6A24', fontSize: 15, fontWeight: '900' },
-  refreshText: { color: '#FF8A4D', fontSize: 9, fontWeight: '900' },
+  refreshGlyph: { color: '#48C982', fontSize: 15, fontWeight: '900' },
+  refreshText: { color: '#7BE0A8', fontSize: 9, fontWeight: '900' },
   emptyState: {
     alignItems: 'center',
     padding: 30,
@@ -2888,16 +2745,16 @@ const styles = StyleSheet.create({
     width: 53,
     height: 53,
     borderRadius: 18,
-    backgroundColor: 'rgba(255,106,36,0.13)',
+    backgroundColor: 'rgba(61,190,121,0.13)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyIconText: { color: '#FF8A4D', fontSize: 25 },
-  emptyTitle: { color: '#E8EBF0', fontSize: 15, fontWeight: '900' },
+  emptyIconText: { color: '#7BE0A8', fontSize: 25 },
+  emptyTitle: { color: '#E4F3E9', fontSize: 15, fontWeight: '900' },
   emptySubtitle: { color: '#929BA7', fontSize: 11, lineHeight: 17 },
 
   providerHero: {
-    backgroundColor: '#171B22',
+    backgroundColor: '#12251A',
     borderRadius: 25,
     padding: 20,
     gap: 7,
@@ -2917,13 +2774,13 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.07)',
   },
   providerServiceIcon: { width: 58, height: 48, alignItems: 'center', justifyContent: 'center' },
-  providerServiceIconText: { color: '#FF8A4D', fontSize: 19, fontWeight: '900' },
+  providerServiceIconText: { color: '#7BE0A8', fontSize: 19, fontWeight: '900' },
   providerServiceCopy: { flex: 1, gap: 3 },
-  providerServiceTitle: { color: '#E8EBF0', fontSize: 11, fontWeight: '900' },
+  providerServiceTitle: { color: '#E4F3E9', fontSize: 11, fontWeight: '900' },
   providerServiceSub: { color: '#929BA7', fontSize: 9, lineHeight: 14 },
   approvalCard: {
-    backgroundColor: 'rgba(255,106,36,0.1)',
-    borderColor: 'rgba(255,106,36,0.22)',
+    backgroundColor: 'rgba(61,190,121,0.1)',
+    borderColor: 'rgba(61,190,121,0.22)',
     borderWidth: 1,
     borderRadius: 24,
     padding: 22,
@@ -2938,18 +2795,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  approvalIconText: { color: '#FF6A24', fontSize: 25, fontWeight: '800' },
-  approvalTitle: { color: '#FF8A4D', fontSize: 16, fontWeight: '900', textAlign: 'center' },
+  approvalIconText: { color: '#48C982', fontSize: 25, fontWeight: '800' },
+  approvalTitle: { color: '#7BE0A8', fontSize: 16, fontWeight: '900', textAlign: 'center' },
   approvalText: { color: '#A1AAB5', fontSize: 11 },
   reviewTrack: {
     height: 5,
     width: '100%',
     borderRadius: 5,
-    backgroundColor: 'rgba(255,106,36,0.2)',
+    backgroundColor: 'rgba(61,190,121,0.2)',
     overflow: 'hidden',
     marginTop: 6,
   },
-  reviewTrackFill: { height: 5, width: '64%', backgroundColor: '#FF8A4D', borderRadius: 5 },
+  reviewTrackFill: { height: 5, width: '64%', backgroundColor: '#7BE0A8', borderRadius: 5 },
 
   aboutHero: {
     height: 188,
@@ -2975,9 +2832,9 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     marginTop: 7,
   },
-  corridorGlyph: { color: '#FF6A24', fontSize: 24, fontWeight: '900' },
+  corridorGlyph: { color: '#48C982', fontSize: 24, fontWeight: '900' },
   corridorCopy: { flex: 1, gap: 3 },
-  corridorTitle: { color: '#FF8A4D', fontSize: 12, fontWeight: '900' },
+  corridorTitle: { color: '#7BE0A8', fontSize: 12, fontWeight: '900' },
   corridorSub: { color: '#8D96A2', fontSize: 7, letterSpacing: 1.3, fontWeight: '900' },
   problemGrid: {
     flexDirection: 'row',
@@ -2993,9 +2850,9 @@ const styles = StyleSheet.create({
     borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   infoCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  infoCardNumber: { color: '#FF8A4D', fontSize: 9, fontWeight: '900', letterSpacing: 1.3 },
-  infoCardGlyph: { color: '#FF6A24', fontSize: 20, fontWeight: '900' },
-  infoCardTitle: { color: '#F2F3F5', fontSize: 14, fontWeight: '900' },
+  infoCardNumber: { color: '#7BE0A8', fontSize: 9, fontWeight: '900', letterSpacing: 1.3 },
+  infoCardGlyph: { width: 42, height: 42 },
+  infoCardTitle: { color: '#F1F8F3', fontSize: 14, fontWeight: '900' },
   solutionRow: { flexDirection: 'row', alignItems: 'center', gap: 11, paddingVertical: 7 },
   solutionIcon: {
     width: 28,
@@ -3005,7 +2862,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  solutionIconText: { color: '#FF6A24', fontSize: 18, fontWeight: '900' },
+  solutionIconText: { color: '#48C982', fontSize: 18, fontWeight: '900' },
   solutionText: { flex: 1, color: '#A6AEB9', fontSize: 11, lineHeight: 18, fontWeight: '600' },
   workflowRow: {
     flexDirection: 'row',
@@ -3025,9 +2882,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  workflowNumberText: { color: '#FF8A4D', fontSize: 9, fontWeight: '900' },
+  workflowNumberText: { color: '#7BE0A8', fontSize: 9, fontWeight: '900' },
   workflowText: { flex: 1, gap: 4 },
-  workflowTitle: { color: '#E8EBF0', fontSize: 12, fontWeight: '900' },
+  workflowTitle: { color: '#E4F3E9', fontSize: 12, fontWeight: '900' },
   teamCard: {
     backgroundColor: 'rgba(20,23,30,0.78)',
     borderWidth: 1,
@@ -3036,71 +2893,62 @@ const styles = StyleSheet.create({
     padding: 17,
     gap: 13,
   },
-  teamTitle: { color: '#F2F3F5', fontSize: 20, fontWeight: '900' },
+  teamTitle: { color: '#F1F8F3', fontSize: 20, fontWeight: '900' },
   teamMember: { flexDirection: 'row', alignItems: 'center', gap: 11 },
   avatar: {
     width: 38,
     height: 38,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,106,36,0.12)',
+    backgroundColor: 'rgba(61,190,121,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: '#FF8A4D', fontSize: 10, fontWeight: '900' },
+  avatarText: { color: '#7BE0A8', fontSize: 10, fontWeight: '900' },
   teamMemberText: { flex: 1, gap: 3 },
-  teamMemberName: { color: '#F2F3F5', fontSize: 12, fontWeight: '900' },
+  teamMemberName: { color: '#F1F8F3', fontSize: 12, fontWeight: '900' },
   teamMemberRole: { color: '#929BA7', fontSize: 9 },
   teamDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.1)' },
-  supervisorText: { color: '#FF8A4D', fontSize: 11, fontWeight: '800' },
+  supervisorText: { color: '#7BE0A8', fontSize: 11, fontWeight: '800' },
   featureNoteCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
     paddingTop: 15,
     borderTopWidth: 1,
-    borderTopColor: '#E9E4D6',
+    borderTopColor: '#234936',
   },
   featureNoteMark: {
     width: 18,
     height: 18,
-    color: '#9A713E',
+    color: '#64C88E',
     fontSize: 13,
     fontWeight: '900',
     textAlign: 'center',
   },
   featureNoteCopy: { flex: 1, gap: 5 },
-  featureNoteTitle: { color: '#896C45', fontSize: 11, fontWeight: '900' },
-  featureNoteText: { color: '#9A896F', fontSize: 10, lineHeight: 17 },
+  featureNoteTitle: { color: '#77B98E', fontSize: 11, fontWeight: '900' },
+  featureNoteText: { color: '#8EAA96', fontSize: 10, lineHeight: 17 },
 
-  bottomBarShell: {
-    position: 'absolute',
-    left: 14,
-    right: 14,
-    bottom: 7,
-    borderRadius: 23,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.13)',
-    backgroundColor: 'rgba(15,18,24,0.78)',
-    shadowColor: '#000000',
-    shadowOpacity: 0.36,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 7 },
-    elevation: 8,
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 17,
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-  bottomTab: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 2 },
-  bottomGlyphWrap: { width: 30, height: 25, alignItems: 'center', justifyContent: 'center' },
-  bottomGlyph: { color: '#929BA7', fontSize: 18, fontWeight: '800' },
-  bottomGlyphActive: { color: '#FF8A4D', textShadowColor: '#FF6A24', textShadowRadius: 12 },
-  bottomLabel: { color: '#8D96A2', fontSize: 8, fontWeight: '700' },
-  bottomLabelActive: { color: '#FF8A4D', fontWeight: '900' },
+  bottomBarShell: { position: 'absolute', left: -30, right: -30, bottom: -108, height: 222, borderRadius: 180, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(116,216,153,0.2)', backgroundColor: 'rgba(8,29,18,0.28)', shadowColor: '#45C881', shadowOpacity: 0.12, shadowRadius: 34, shadowOffset: { width: 0, height: -8 }, elevation: 16 },
+  bottomBar: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-around', paddingHorizontal: 48, paddingTop: 20, paddingBottom: 112 },
+  bottomTab: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 2, minHeight: 72 },
+  bottomGlyphWrap: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
+  bottomGlyph: { width: 31, height: 31, opacity: 0.68 },
+  bottomGlyphActive: { opacity: 1 },
+  bottomLabel: { color: '#A8BBAE', fontSize: 9, fontWeight: '800' },
+  bottomLabelActive: { color: '#8EE4AE', fontWeight: '900' },
   globalSpinner: { marginVertical: 8 },
+
+  servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 14 },
+  serviceCardSmall: { width: '48.4%', minHeight: 252 },
+  serviceCardWide: { width: '100%', minHeight: 164, flexDirection: 'row' },
+  servicePhoto: { height: 122, width: '100%', padding: 11, justifyContent: 'flex-start', overflow: 'hidden' },
+  servicePhotoWide: { width: 132, height: 164, flexShrink: 0 },
+  servicePhotoRadius: { borderRadius: 0 },
+  service3DImage: { width: 76, height: 76, alignSelf: 'flex-end', marginTop: 10 },
+  service3DImageWide: { width: 82, height: 82, alignSelf: 'center', marginTop: 18 },
+  serviceMetaWide: { flex: 1, justifyContent: 'center', paddingHorizontal: 15, paddingVertical: 12 },
+  locationPill3DIcon: { width: 17, height: 17 },
+  solutionIconImage: { width: 35, height: 35 },
+
 });
