@@ -185,17 +185,61 @@ export function HomeScreen({
               style={({ pressed }) => [pressed && { transform: [{ scale: 0.985 }], opacity: 0.94 }]}
             >
               <View style={[styles.serviceCard, { borderColor: `${tone.accent}48` }]}>
-                <ExpoImage source={{ uri: servicePhotos[service.id] }} style={StyleSheet.absoluteFill} contentFit="cover" transition={420} cachePolicy="memory-disk" />
-                <LinearGradient colors={['rgba(10,18,14,0.02)', 'rgba(10,18,14,0.18)', 'rgba(10,18,14,0.92)']} locations={[0, 0.42, 1]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
-                <LinearGradient colors={[`${tone.accent}42`, 'rgba(255,255,255,0)', 'rgba(255,255,255,0)']} locations={[0, 0.48, 1]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-                <View style={styles.serviceImageCounter}><AppText variant="caption" tone="white" style={{ fontSize: 9, lineHeight: 12 }}>{String(index + 1).padStart(2, '0')} / 03</AppText></View>
+                <ExpoImage
+                  source={{ uri: servicePhotos[service.id] }}
+                  style={StyleSheet.absoluteFill}
+                  contentFit="cover"
+                  transition={420}
+                  cachePolicy="memory-disk"
+                />
+                <LinearGradient
+                  colors={['rgba(10,18,14,0.02)', 'rgba(10,18,14,0.18)', 'rgba(10,18,14,0.92)']}
+                  locations={[0, 0.42, 1]}
+                  start={{ x: 0.5, y: 0 }}
+                  end={{ x: 0.5, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <LinearGradient
+                  colors={[`${tone.accent}42`, 'rgba(255,255,255,0)', 'rgba(255,255,255,0)']}
+                  locations={[0, 0.48, 1]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={styles.serviceImageCounter}>
+                  <AppText variant="caption" tone="white" style={{ fontSize: 9, lineHeight: 12 }}>
+                    {String(index + 1).padStart(2, '0')} / 03
+                  </AppText>
+                </View>
                 <View style={[styles.serviceCardBottom, rtlStyle && styles.rowReverse]}>
-                  <View style={styles.serviceCardIcon}><IconTile tone={service.id} size="md" glow /></View>
-                  <View style={{ flex: 1, gap: 4 }}>
-                    <AppText variant="h3" tone="white" numberOfLines={1} style={{ fontSize: 18 }}>{service.labels[locale]}</AppText>
-                    <AppText variant="caption" tone="white" numberOfLines={2} style={{ lineHeight: 16, opacity: 0.86 }}>{description}</AppText>
+                  <View style={styles.serviceCardIcon}>
+                    <IconTile tone={service.id} size="md" glow />
                   </View>
-                  <View style={[styles.serviceArrow, { backgroundColor: `${tone.accent}30`, borderColor: `${tone.accent}80` }]}><Ionicons name={isRtl ? 'arrow-back' : 'arrow-forward'} size={16} color="#FFFFFF" /></View>
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <AppText variant="h3" tone="white" numberOfLines={1} style={{ fontSize: 18 }}>
+                      {service.labels[locale]}
+                    </AppText>
+                    <AppText
+                      variant="caption"
+                      tone="white"
+                      numberOfLines={2}
+                      style={{ lineHeight: 16, opacity: 0.86 }}
+                    >
+                      {description}
+                    </AppText>
+                  </View>
+                  <View
+                    style={[
+                      styles.serviceArrow,
+                      { backgroundColor: `${tone.accent}30`, borderColor: `${tone.accent}80` },
+                    ]}
+                  >
+                    <Ionicons
+                      name={isRtl ? 'arrow-back' : 'arrow-forward'}
+                      size={16}
+                      color="#FFFFFF"
+                    />
+                  </View>
                 </View>
                 <View style={[styles.serviceGlow, { backgroundColor: tone.accent }]} />
               </View>
@@ -452,10 +496,42 @@ const styles = StyleSheet.create({
   kickerDot: { width: 5, height: 5, borderRadius: 999, backgroundColor: palette.jade },
   statsRow: { flexDirection: 'row', gap: 9 },
   statTop: { flexDirection: 'row', alignItems: 'center' },
-  serviceCard: { height: 218, borderRadius: 27, overflow: 'hidden', borderWidth: 1, backgroundColor: palette.canvasDeep, justifyContent: 'flex-end', shadowColor: '#1E3025', shadowOpacity: 0.13, shadowRadius: 18, shadowOffset: { width: 0, height: 9 }, elevation: 5 },
-  serviceCardBottom: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, paddingHorizontal: 16, paddingBottom: 16 },
-  serviceCardIcon: { borderRadius: 19, padding: 3, backgroundColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
-  serviceGlow: { position: 'absolute', width: 110, height: 110, borderRadius: 55, right: -54, top: -55, opacity: 0.18 },
+  serviceCard: {
+    height: 218,
+    borderRadius: 27,
+    overflow: 'hidden',
+    borderWidth: 1,
+    backgroundColor: palette.canvasDeep,
+    justifyContent: 'flex-end',
+    shadowColor: '#1E3025',
+    shadowOpacity: 0.13,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 9 },
+    elevation: 5,
+  },
+  serviceCardBottom: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  serviceCardIcon: {
+    borderRadius: 19,
+    padding: 3,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  serviceGlow: {
+    position: 'absolute',
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    right: -54,
+    top: -55,
+    opacity: 0.18,
+  },
   servicePhoto: {
     width: 116,
     height: 108,

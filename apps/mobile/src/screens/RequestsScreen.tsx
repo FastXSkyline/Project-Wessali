@@ -503,16 +503,52 @@ function JobCard({ app, booking }: { app: WessaliApp; booking: Booking }) {
 }
 
 function CoordinateNavigation({ booking, locale }: { booking: Booking; locale: string }) {
-  const pickupReady = typeof booking.pickup_latitude === 'number' && typeof booking.pickup_longitude === 'number';
-  const destinationReady = typeof booking.destination_latitude === 'number' && typeof booking.destination_longitude === 'number';
+  const pickupReady =
+    typeof booking.pickup_latitude === 'number' && typeof booking.pickup_longitude === 'number';
+  const destinationReady =
+    typeof booking.destination_latitude === 'number' &&
+    typeof booking.destination_longitude === 'number';
   if (!pickupReady && !destinationReady) return null;
-  const open = (latitude: number, longitude: number) => Linking.openURL(`https://maps.google.com/?q=${latitude},${longitude}`);
-  const pickup = locale === 'ar' ? 'فتح موقع الاستلام' : locale === 'fr' ? 'Ouvrir le retrait' : 'Open pickup pin';
-  const destination = locale === 'ar' ? 'فتح موقع التسليم' : locale === 'fr' ? 'Ouvrir la destination' : 'Open destination pin';
-  return <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 11 }}>
-    {pickupReady ? <Pressable onPress={() => void open(booking.pickup_latitude!, booking.pickup_longitude!)} style={styles.mapLink}><Ionicons name="navigate-outline" size={14} color={palette.jadeDeep} /><AppText variant="caption" style={{ color: palette.jadeDeep }}>{pickup}</AppText></Pressable> : null}
-    {destinationReady ? <Pressable onPress={() => void open(booking.destination_latitude!, booking.destination_longitude!)} style={styles.mapLink}><Ionicons name="flag-outline" size={14} color={palette.jadeDeep} /><AppText variant="caption" style={{ color: palette.jadeDeep }}>{destination}</AppText></Pressable> : null}
-  </View>;
+  const open = (latitude: number, longitude: number) =>
+    Linking.openURL(`https://maps.google.com/?q=${latitude},${longitude}`);
+  const pickup =
+    locale === 'ar'
+      ? 'فتح موقع الاستلام'
+      : locale === 'fr'
+        ? 'Ouvrir le retrait'
+        : 'Open pickup pin';
+  const destination =
+    locale === 'ar'
+      ? 'فتح موقع التسليم'
+      : locale === 'fr'
+        ? 'Ouvrir la destination'
+        : 'Open destination pin';
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 11 }}>
+      {pickupReady ? (
+        <Pressable
+          onPress={() => void open(booking.pickup_latitude!, booking.pickup_longitude!)}
+          style={styles.mapLink}
+        >
+          <Ionicons name="navigate-outline" size={14} color={palette.jadeDeep} />
+          <AppText variant="caption" style={{ color: palette.jadeDeep }}>
+            {pickup}
+          </AppText>
+        </Pressable>
+      ) : null}
+      {destinationReady ? (
+        <Pressable
+          onPress={() => void open(booking.destination_latitude!, booking.destination_longitude!)}
+          style={styles.mapLink}
+        >
+          <Ionicons name="flag-outline" size={14} color={palette.jadeDeep} />
+          <AppText variant="caption" style={{ color: palette.jadeDeep }}>
+            {destination}
+          </AppText>
+        </Pressable>
+      ) : null}
+    </View>
+  );
 }
 
 function QueueEmpty({
@@ -544,7 +580,17 @@ const styles = StyleSheet.create({
   rowReverse: { flexDirection: 'row-reverse' },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 11 },
   routeWrap: { marginTop: 14 },
-  mapLink: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 11, paddingVertical: 9, borderRadius: 13, borderWidth: 1, borderColor: 'rgba(88,116,94,0.22)', backgroundColor: 'rgba(88,116,94,0.07)' },
+  mapLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 11,
+    paddingVertical: 9,
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: 'rgba(88,116,94,0.22)',
+    backgroundColor: 'rgba(88,116,94,0.07)',
+  },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 },
   metaChip: {
     flexDirection: 'row',
