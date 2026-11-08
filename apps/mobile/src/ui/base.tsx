@@ -421,6 +421,9 @@ export function Page({
   refreshControl,
 }: PageProps) {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const horizontalPadding = Math.min(26, Math.max(14, width * 0.055));
+  const maxContentWidth = width >= 720 ? 680 : layout.maxWidth;
   const paddingTop = insets.top + topSpace;
   const paddingBottom = insets.bottom + bottomSpace + 18;
 
@@ -433,16 +436,28 @@ export function Page({
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingTop, paddingBottom },
+            { paddingTop, paddingBottom, paddingHorizontal: horizontalPadding },
             contentStyle,
           ]}
           refreshControl={refreshControl}
           automaticallyAdjustKeyboardInsets
         >
-          <View style={styles.pageInner}>{children}</View>
+          <View style={[styles.pageInner, { maxWidth: maxContentWidth }]}>{children}</View>
         </ScrollView>
       ) : (
-        <View style={[styles.pageInner, { paddingTop, paddingBottom, flex: 1 }, contentStyle]}>
+        <View
+          style={[
+            styles.pageInner,
+            {
+              paddingTop,
+              paddingBottom,
+              flex: 1,
+              maxWidth: maxContentWidth,
+              paddingHorizontal: horizontalPadding,
+            },
+            contentStyle,
+          ]}
+        >
           {children}
         </View>
       )}

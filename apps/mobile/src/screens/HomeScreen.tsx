@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { Pressable, RefreshControl, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
@@ -60,6 +60,8 @@ export function HomeScreen({
   onOpenPartner,
 }: Props) {
   const { isRtl, locale, ui, session, activeBooking, bookings, activeBookings } = app;
+  const { width } = useWindowDimensions();
+  const compactStats = width < 350;
   const { isRtl: rtlStyle } = useLocaleValue();
   const week = weeklyRequestCounts(bookings, locale);
   const dayLabels = lastSevenDays(locale).map((day) => day.label);
@@ -141,13 +143,14 @@ export function HomeScreen({
         </GlassCard>
       )}
 
-      <View style={[styles.statsRow, rtlStyle && styles.rowReverse]}>
+      <View style={[styles.statsRow, rtlStyle && styles.rowReverse, compactStats && styles.statsRowCompact]}>
         <StatTile
           label={ui.statActive}
           value={activeBookings.length}
           color={palette.jade}
           icon="navigate-outline"
           isRtl={isRtl}
+          compact={compactStats}
         />
         <StatTile
           label={ui.statCompleted}
@@ -155,6 +158,7 @@ export function HomeScreen({
           color={palette.aqua}
           icon="checkmark-circle-outline"
           isRtl={isRtl}
+          compact={compactStats}
         />
         <StatTile
           label={ui.statTotal}
@@ -162,6 +166,7 @@ export function HomeScreen({
           color={palette.sand}
           icon="layers-outline"
           isRtl={isRtl}
+          compact={compactStats}
         />
       </View>
 
@@ -369,15 +374,21 @@ function StatTile({
   color,
   icon,
   isRtl,
+  compact = false,
 }: {
   label: string;
   value: number;
   color: string;
   icon: React.ComponentProps<typeof Ionicons>['name'];
   isRtl: boolean;
+  compact?: boolean;
 }) {
   return (
-    <GlassCard padding={13} radius={20} style={{ flex: 1 }}>
+    <GlassCard
+      padding={compact ? 10 : 13}
+      radius={20}
+      style={compact ? { width: '48%', flex: 0 } : { flex: 1 }}
+    >
       <View style={{ gap: 6, alignItems: isRtl ? 'flex-end' : 'flex-start' }}>
         <View style={[styles.statTop, { justifyContent: 'space-between' }]}>
           <LinearGradient
@@ -399,7 +410,7 @@ function StatTile({
         </View>
         <AppText
           variant="number"
-          style={{ color, fontSize: 27, lineHeight: 31, letterSpacing: -1 }}
+          style={{ color, fontSize: compact ? 24 : 27, lineHeight: compact ? 28 : 31, letterSpacing: -1 }}
         >
           {value}
         </AppText>
@@ -495,6 +506,7 @@ const styles = StyleSheet.create({
   },
   kickerDot: { width: 5, height: 5, borderRadius: 999, backgroundColor: palette.jade },
   statsRow: { flexDirection: 'row', gap: 9 },
+  statsRowCompact: { flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 9 },
   statTop: { flexDirection: 'row', alignItems: 'center' },
   serviceCard: {
     height: 218,
