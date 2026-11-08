@@ -16,7 +16,7 @@ type Item = {
   activeIcon: React.ComponentProps<typeof Ionicons>['name'];
 };
 
-const DOCK_CONTENT_HEIGHT = 108;
+const DOCK_CONTENT_HEIGHT = 92;
 
 /** A safe-area-aware frosted dock that fades into the scrolling page. */
 export function BottomDock({
@@ -44,13 +44,7 @@ export function BottomDock({
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { height: dockHeight }]}>
-      {/* Full-width blur makes the content underneath genuinely frosted, including while scrolling. */}
-      <BlurView
-        intensity={100}
-        tint="light"
-        blurMethod="dimezisBlurViewSdk31Plus"
-        style={StyleSheet.absoluteFill}
-      />
+      {/* One continuous glass surface reaches the bottom edge; no second blur strip below the controls. */}
       <View pointerEvents="none" style={styles.domeClip}>
         <View style={[styles.dome, { width: domeWidth, left: (width - domeWidth) / 2 }]}>
           <BlurView
@@ -81,9 +75,9 @@ export function BottomDock({
         pointerEvents="none"
         colors={[
           'rgba(243,245,240,0.00)',
-          'rgba(243,245,240,0.24)',
-          'rgba(243,245,240,0.72)',
-          'rgba(243,245,240,0.96)',
+          'rgba(243,245,240,0.28)',
+          'rgba(243,245,240,0.82)',
+          'rgba(243,245,240,1.00)',
         ]}
         locations={[0, 0.30, 0.70, 1]}
         start={{ x: 0.5, y: 0 }}
@@ -96,7 +90,7 @@ export function BottomDock({
           styles.row,
           isRtl && styles.rowReverse,
           {
-            bottom: insets.bottom + 7,
+            bottom: Math.max(8, insets.bottom - 18),
             paddingHorizontal: compact ? 7 : 12,
           },
         ]}
@@ -203,7 +197,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     alignItems: 'center',
-    overflow: 'visible',
+    overflow: 'hidden',
   },
   domeClip: {
     position: 'absolute',
