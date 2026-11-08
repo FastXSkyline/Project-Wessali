@@ -17,6 +17,7 @@ import {
   View,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { DEFAULT_LOCALE, getDirection, getMessages, type Locale } from '@wessali/i18n';
@@ -654,7 +655,7 @@ function MotionPressable({
 
 function Floating3DIcon({ glyph, size = 62 }: { glyph: string; size?: number; glow?: string }) {
   return (
-    <Image source={{ uri: glyph }} resizeMode="contain" style={{ width: size, height: size }} accessibilityIgnoresInvertColors />
+    <ExpoImage source={{ uri: glyph }} contentFit="contain" style={{ width: size, height: size }} transition={160} />
   );
 }
 
@@ -1259,7 +1260,7 @@ export default function App() {
         <LinearGradient colors={['rgba(5,23,14,0.08)', 'rgba(5,23,14,0.78)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
         <View style={styles.serviceImageTop}>
           <Text style={styles.serviceNumber}>0{index + 1} / 03</Text>
-          <Image source={{ uri: serviceContent[kind].icon }} style={[styles.service3DImage, kind === 'water' && styles.service3DImageWide]} resizeMode="contain" accessibilityIgnoresInvertColors />
+          <ExpoImage source={{ uri: serviceContent[kind].icon }} style={[styles.service3DImage, kind === 'water' && styles.service3DImageWide]} contentFit="contain" transition={180} />
         </View>
       </ImageBackground>
       <View style={[styles.serviceMeta, kind === 'water' && styles.serviceMetaWide]}>
@@ -1348,15 +1349,15 @@ export default function App() {
 
         <View style={styles.loginMiniFeatures}>
           <View style={styles.miniFeature}>
-            <Image source={{ uri: threeDIcons.freight }} style={styles.miniFeatureIcon} resizeMode="contain" />
+            <ExpoImage source={{ uri: threeDIcons.freight }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
             <Text style={styles.miniFeatureText}>{ui.freight}</Text>
           </View>
           <View style={styles.miniFeature}>
-            <Image source={{ uri: threeDIcons.roadside }} style={styles.miniFeatureIcon} resizeMode="contain" />
+            <ExpoImage source={{ uri: threeDIcons.roadside }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
             <Text style={styles.miniFeatureText}>{ui.roadside}</Text>
           </View>
           <View style={styles.miniFeature}>
-            <Image source={{ uri: threeDIcons.water }} style={styles.miniFeatureIcon} resizeMode="contain" />
+            <ExpoImage source={{ uri: threeDIcons.water }} style={styles.miniFeatureIcon} contentFit="contain" transition={160} />
             <Text style={styles.miniFeatureText}>{ui.water}</Text>
           </View>
         </View>
@@ -1392,7 +1393,7 @@ export default function App() {
             <Text style={[styles.heroTitle, isRtl && styles.arabicHero]}>{ui.welcome}</Text>
             <Text style={[styles.heroSubtitle, isRtl && styles.arabicHero]}>{ui.welcomeSub}</Text>
             <View style={styles.heroLocationLine}>
-              <Image source={{ uri: threeDIcons.mapPin }} style={styles.locationPill3DIcon} resizeMode="contain" />
+              <ExpoImage source={{ uri: threeDIcons.mapPin }} style={styles.locationPill3DIcon} contentFit="contain" transition={160} />
               <Text style={styles.heroLocationText}>{ui.corridor}</Text>
             </View>
           </Animated.View>
@@ -1820,7 +1821,7 @@ export default function App() {
           <View key={number} style={styles.informationCard}>
             <View style={styles.infoCardTop}>
               <Text style={styles.infoCardNumber}>{number}</Text>
-              <Image source={{ uri: glyph }} style={styles.infoCardGlyph} resizeMode="contain" />
+              <ExpoImage source={{ uri: glyph }} style={styles.infoCardGlyph} contentFit="contain" transition={160} />
             </View>
             <Text style={[styles.infoCardTitle, directionStyle]}>{title}</Text>
             <Text style={[styles.bodyCopy, directionStyle]}>{description}</Text>
@@ -1838,7 +1839,7 @@ export default function App() {
         ].map(([glyph, value], index) => (
           <View key={String(index)} style={[styles.solutionRow, rowStyle]}>
             <View style={styles.solutionIcon}>
-              <Image source={{ uri: glyph }} style={styles.solutionIconImage} resizeMode="contain" />
+              <ExpoImage source={{ uri: glyph }} style={styles.solutionIconImage} contentFit="contain" transition={160} />
             </View>
             <Text style={[styles.solutionText, directionStyle]}>{value}</Text>
           </View>
@@ -2073,7 +2074,7 @@ export default function App() {
                   style={styles.bottomTab}
                 >
                   <View style={styles.bottomGlyphWrap}>
-                    <Image source={{ uri: glyph }} style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]} resizeMode="contain" accessibilityIgnoresInvertColors />
+                    <ExpoImage source={{ uri: glyph }} style={[styles.bottomGlyph, screen === id && styles.bottomGlyphActive]} contentFit="contain" transition={160} />
                   </View>
                   <Text style={[styles.bottomLabel, screen === id && styles.bottomLabelActive]}>
                     {label}
