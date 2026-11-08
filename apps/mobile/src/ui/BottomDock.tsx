@@ -29,7 +29,7 @@ export function BottomDock({
 }) {
   const { isRtl } = useLocaleValue();
   const { width } = useWindowDimensions();
-  const diameter = Math.max(560, width * 1.72);
+  const diameter = Math.max(680, width * 1.94);
   const items: Item[] = [
     { tab: 'home', label: labels.home, icon: 'home-outline', activeIcon: 'home' },
     { tab: 'requests', label: labels.requests, icon: 'cube-outline', activeIcon: 'cube' },
@@ -77,12 +77,12 @@ export function BottomDock({
       <LinearGradient
         pointerEvents="none"
         colors={[
-          'rgba(243,243,239,0.99)',
-          'rgba(243,243,239,0.94)',
-          'rgba(243,243,239,0.56)',
           'rgba(243,243,239,0)',
+          'rgba(243,243,239,0.22)',
+          'rgba(243,243,239,0.72)',
+          'rgba(243,243,239,0.99)',
         ]}
-        locations={[0, 0.38, 0.72, 1]}
+        locations={[0, 0.28, 0.66, 1]}
         style={styles.topFade}
       />
 
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(83, 103, 87, 0.09)',
+    borderColor: 'rgba(83, 103, 87, 0.035)',
     backgroundColor: 'rgba(248, 249, 246, 0.20)',
   },
   domeRim: {
@@ -204,14 +204,14 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.52)',
+    borderColor: 'rgba(255,255,255,0.18)',
   },
   topFade: {
     position: 'absolute',
-    top: -31,
+    top: -18,
     left: 0,
     right: 0,
-    height: 82,
+    height: 92,
   },
   row: {
     position: 'absolute',
