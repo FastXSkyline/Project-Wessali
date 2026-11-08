@@ -2028,7 +2028,7 @@ export default function App() {
                       onPress={startPreviewBooking}
                     >
                       <LinearGradient
-                        colors={['#FF873B', '#238E5B', '#14583B']}
+                        colors={['#58D893', '#35B978', '#176B43']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={StyleSheet.absoluteFill}
@@ -2530,7 +2530,7 @@ const styles = StyleSheet.create({
   },
   serviceImageTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   serviceNumber: {
-    color: 'rgba(255,255,255,0.12)',
+    color: 'rgba(255,255,255,0.78)',
     fontSize: 8,
     fontWeight: '900',
     letterSpacing: 1.6,
@@ -2942,7 +2942,7 @@ const styles = StyleSheet.create({
   serviceCardSmall: { width: '48.4%', minHeight: 252 },
   serviceCardWide: { width: '100%', minHeight: 164, flexDirection: 'row' },
   servicePhoto: { height: 122, width: '100%', padding: 11, justifyContent: 'flex-start', overflow: 'hidden' },
-  servicePhotoWide: { width: 132, height: '100%', flexShrink: 0 },
+  servicePhotoWide: { width: 132, height: 164, flexShrink: 0 },
   servicePhotoRadius: { borderRadius: 0 },
   service3DImage: { width: 76, height: 76, alignSelf: 'flex-end', marginTop: 10 },
   service3DImageWide: { width: 82, height: 82, alignSelf: 'center', marginTop: 18 },
