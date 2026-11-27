@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useId } from 'react';
+import React, { createContext, useContext, useEffect, useId, useRef } from 'react';
 import {
+  Animated,
+  Easing,
   ScrollView,
   StyleSheet,
   Text as RNText,
@@ -15,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { MotionPressable } from './motion';
 import type { Locale } from '@wessali/i18n';
 import {
   fontFamily,
@@ -194,7 +197,7 @@ export function AmbientField({ variant = 'app' }: { variant?: 'app' | 'auth' }) 
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <View style={[StyleSheet.absoluteFill, { backgroundColor: palette.canvas }]} />
       <LinearGradient
-        colors={['rgba(226, 234, 224, 0.86)', 'rgba(243, 243, 239, 0)']}
+        colors={['rgba(225, 237, 251, 0.88)', 'rgba(244, 247, 251, 0)']}
         start={{ x: 0.1, y: 0 }}
         end={{ x: 0.8, y: 0.8 }}
         style={StyleSheet.absoluteFill}
@@ -226,7 +229,7 @@ export function AmbientField({ variant = 'app' }: { variant?: 'app' | 'auth' }) 
         style={{ position: 'absolute', bottom: -230, right: -150 }}
       />
       <LinearGradient
-        colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)', 'rgba(75, 89, 77, 0.035)']}
+        colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)', 'rgba(48, 88, 135, 0.025)']}
         locations={[0, 0.34, 1]}
         style={StyleSheet.absoluteFill}
       />
@@ -273,7 +276,7 @@ export function GlassCard({
         <LinearGradient
           colors={
             tone === 'deep'
-              ? (['rgba(242, 246, 240, 0.96)', 'rgba(231, 237, 229, 0.90)'] as const)
+              ? (['rgba(248, 251, 255, 0.99)', 'rgba(239, 246, 254, 0.96)'] as const)
               : tone === 'light'
                 ? (['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.72)'] as const)
                 : ([glassTokens.fillTop, glassTokens.fillBottom] as const)
@@ -311,8 +314,8 @@ export function BrandMark({ size = 44 }: { size?: number }) {
     <View style={{ width: size, height: size }}>
       <RadialGlow
         size={size * 2.1}
-        color={palette.jade}
-        opacity={0.28}
+        color={palette.jadeBright}
+        opacity={0.14}
         style={{ position: 'absolute', top: -size * 0.55, left: -size * 0.55 }}
       />
       <LinearGradient
@@ -323,16 +326,22 @@ export function BrandMark({ size = 44 }: { size?: number }) {
       >
         <Svg width={size} height={size} viewBox="0 0 40 40">
           <Path
-            d="M10.4 27.5 L16 13.5 L21 24.8 L27 11.8"
+            d="M5 17.5 H22.5 V28 H5 Z M22.5 21 H29 L34 25.5 V28 H22.5"
             stroke={palette.onAccent}
-            strokeWidth={3.1}
+            strokeWidth={2.25}
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"
-            opacity={0.94}
           />
-          <Circle cx={10.4} cy={27.5} r={2.05} fill={palette.onAccent} opacity={0.7} />
-          <Circle cx={27} cy={11.8} r={2.3} fill={palette.onAccent} />
+          <Circle cx={11} cy={28.5} r={2.7} fill={palette.onAccent} />
+          <Circle cx={28} cy={28.5} r={2.7} fill={palette.onAccent} />
+          <Path
+            d="M29 3.5 C25.6 3.5 23 6.1 23 9.4 C23 13.2 29 19.5 29 19.5 C29 19.5 35 13.2 35 9.4 C35 6.1 32.4 3.5 29 3.5 Z"
+            fill={palette.onAccent}
+          />
+          <Circle cx={29} cy={9.4} r={2.05} fill={palette.jadeDeep} />
+          <Path d="M2 21 H5" stroke={palette.onAccent} strokeWidth={1.8} strokeLinecap="round" opacity={0.9} />
+          <Path d="M1.5 25 H5" stroke={palette.onAccent} strokeWidth={1.8} strokeLinecap="round" opacity={0.58} />
         </Svg>
         <View style={[styles.brandSheen, { borderRadius: size * 0.32 }]} />
       </LinearGradient>
@@ -371,7 +380,7 @@ export function Avatar({
         style={{ position: 'absolute', top: -size * 0.45, left: -size * 0.45 }}
       />
       <LinearGradient
-        colors={provider ? ['#E7D9C5', '#B38B5B'] : ['#D7E3D7', '#77947C']}
+        colors={provider ? ['#DDEBFA', '#6E9CCB'] : ['#D8EAFE', '#78A9DC']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
@@ -389,7 +398,7 @@ export function Avatar({
           weight="bold"
           align="center"
           style={{
-            color: provider ? '#5B4225' : '#334F39',
+            color: provider ? '#16436D' : '#16436D',
             fontSize: size * 0.32,
             lineHeight: size * 0.4,
           }}
@@ -426,6 +435,37 @@ export function Page({
   const maxContentWidth = width >= 720 ? 680 : layout.maxWidth;
   const paddingTop = insets.top + topSpace;
   const paddingBottom = insets.bottom + bottomSpace + 18;
+  const entranceOpacity = useRef(new Animated.Value(0)).current;
+  const entranceY = useRef(new Animated.Value(12)).current;
+
+  useEffect(() => {
+    const animation = Animated.sequence([
+      Animated.delay(35),
+      Animated.parallel([
+        Animated.timing(entranceOpacity, {
+          toValue: 1,
+          duration: 320,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.spring(entranceY, {
+          toValue: 0,
+          damping: 24,
+          stiffness: 190,
+          mass: 0.85,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]);
+    animation.start();
+    return () => animation.stop();
+  }, [entranceOpacity, entranceY]);
+
+  const pageInnerStyle = [
+    styles.pageInner,
+    { maxWidth: maxContentWidth },
+    { opacity: entranceOpacity, transform: [{ translateY: entranceY }] },
+  ];
 
   return (
     <View style={styles.page}>
@@ -442,24 +482,23 @@ export function Page({
           refreshControl={refreshControl}
           automaticallyAdjustKeyboardInsets
         >
-          <View style={[styles.pageInner, { maxWidth: maxContentWidth }]}>{children}</View>
+          <Animated.View style={pageInnerStyle}>{children}</Animated.View>
         </ScrollView>
       ) : (
-        <View
+        <Animated.View
           style={[
-            styles.pageInner,
+            pageInnerStyle,
             {
               paddingTop,
               paddingBottom,
               flex: 1,
-              maxWidth: maxContentWidth,
               paddingHorizontal: horizontalPadding,
             },
             contentStyle,
           ]}
         >
           {children}
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -488,9 +527,11 @@ export function SectionHeading({
         ) : null}
       </View>
       {action && onAction ? (
-        <AppText variant="label" tone="jade" onPress={onAction} suppressHighlighting>
-          {action}
-        </AppText>
+        <MotionPressable onPress={onAction} style={styles.sectionAction}>
+          <AppText variant="label" tone="jade" suppressHighlighting>
+            {action}
+          </AppText>
+        </MotionPressable>
       ) : null}
     </View>
   );
@@ -514,19 +555,19 @@ export function RouteDoodle({
       <Svg width="100%" height="100%" viewBox="0 0 360 160" preserveAspectRatio="xMidYMid slice">
         <Path
           d="M-20 112 C 42 70, 86 138, 152 104 S 258 48, 390 84"
-          stroke="rgba(84, 107, 89, 0.12)"
+          stroke="rgba(38, 87, 143, 0.12)"
           strokeWidth={1}
           fill="none"
         />
         <Path
           d="M-20 132 C 46 92, 96 154, 158 124 S 272 68, 390 108"
-          stroke="rgba(84, 107, 89, 0.085)"
+          stroke="rgba(38, 87, 143, 0.08)"
           strokeWidth={1}
           fill="none"
         />
         <Path
           d="M-20 92 C 48 52, 104 116, 168 84 S 272 30, 390 62"
-          stroke="rgba(84, 107, 89, 0.07)"
+          stroke="rgba(38, 87, 143, 0.065)"
           strokeWidth={1}
           fill="none"
         />
@@ -586,6 +627,7 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     gap: 18,
   },
+  sectionAction: { alignSelf: 'center', paddingVertical: 4, paddingHorizontal: 5 },
   sectionHeading: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -620,7 +662,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(72, 91, 76, 0.13)',
+    borderColor: 'rgba(28, 72, 120, 0.13)',
     overflow: 'hidden',
   },
   brandSheen: {
@@ -629,7 +671,7 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: '52%',
-    backgroundColor: 'rgba(255,255,255,0.42)',
+    backgroundColor: 'rgba(255,255,255,0.26)',
   },
   brandRim: {
     position: 'absolute',

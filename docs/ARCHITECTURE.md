@@ -1,142 +1,112 @@
-# Wessali — System Architecture
+# Wessali — Production Architecture
 
-**Version:** 0.1 · **Status:** Proposed implementation architecture
+**Status:** Cloudflare production foundation deployed; external communications and payment providers remain unconfigured.
 
-## Technology
-
-| Layer | Technology | Responsibility |
-|---|---|---|
-| Mobile | React Native + Expo + TypeScript | Android/iOS customer and provider experiences |
-| Admin | Next.js App Router + TypeScript | Operations dashboard |
-| API | NestJS + TypeScript | REST API and business rules |
-| Worker | Node.js + BullMQ | Background queue consumers |
-| Contracts | Zod + TypeScript | Shared validation and types |
-| Database | PostgreSQL + PostGIS | Transactions and spatial search |
-| Queue/cache | Redis + BullMQ | Background work and coordination |
-| Realtime (planned) | WebSockets / Socket.IO | Authorized booking/tracking updates |
-| Storage (planned) | Private S3-compatible storage | Documents and attachments |
-| Workspace | pnpm + Turborepo | Monorepo management |
-| Local infrastructure | Docker Compose | PostgreSQL/PostGIS and Redis |
-| CI | GitHub Actions | Install, lint, typecheck, tests, builds |
-
-## System shape
-
-Start with a **modular monolith** API plus a separately runnable worker. Keep freight, roadside, and water rules in separate backend modules while sharing identity, bookings, matching infrastructure, notification events, and auditing. Do not split into microservices until measured load or team ownership justifies it.
+## Production topology
 
 ~~~mermaid
-flowchart TD
-    M[Expo mobile app<br/>Customer and Provider modes]
-    W[Next.js admin web]
-    API[NestJS API]
-    WORKER[BullMQ worker]
-    DB[(PostgreSQL + PostGIS)]
-    REDIS[(Redis)]
-    STORE[(Private object storage)]
-    MAPS[Maps / Geocoding / Routing]
-    PUSH[Push / SMS providers]
-    M -->|HTTPS REST| API
-    W -->|HTTPS REST| API
-    API --> DB
-    API --> REDIS
-    API --> STORE
-    API --> MAPS
-    WORKER --> REDIS
-    WORKER --> PUSH
+flowchart LR
+    APP[Expo iOS / Android]
+    ADMIN[Operations dashboard]
+    EDGE[Cloudflare Worker API]
+    D1[(Cloudflare D1)]
+    R2[(Private Cloudflare R2)]
+    MAP[OpenStreetMap tiles / native maps]
+    APP -->|HTTPS + bearer session| EDGE
+    ADMIN -->|Same-origin HTTPS + HttpOnly admin cookie| EDGE
+    EDGE --> D1
+    EDGE --> R2
+    ADMIN --> MAP
+    APP --> MAP
 ~~~
 
-## Monorepo layout
+The production API and dashboard are served from:
 
-~~~text
-Project-Wessali/
-├── apps/
-│   ├── mobile/                 # Expo Android/iOS app
-│   ├── admin/                  # Next.js operations dashboard
-│   ├── api/                    # NestJS REST API
-│   └── worker/                 # BullMQ queue consumers
-├── packages/
-│   ├── contracts/              # Shared Zod schemas and domain types
-│   ├── i18n/                   # ar, fr, en translations
-│   └── design-tokens/          # Brand, spacing, and radius tokens
-├── infra/db/migrations/        # Versioned PostgreSQL migrations
-└── docs/
-~~~
+- API base: https://wessali-platform.anesteb8.workers.dev/v1
+- Dashboard: https://wessali-platform.anesteb8.workers.dev/admin
 
-Share API contracts, translations, design tokens, and platform-independent utilities. Do not force React Native UI components into the Next.js app.
+The app no longer depends on a PC-hosted server for its default production connection. The former NestJS/PostgreSQL/Redis implementation remains in the repository as a local development/reference stack; it is not the mobile app's production API.
 
-## Backend module boundaries
+## Cloudflare resources
 
-Auth/Users, Providers, Vehicles/Equipment, Service Catalog, Service Areas, Availability, Bookings, Freight, Roadside, Water, Matching, Tracking, Pricing, Payments, Notifications, Reviews, Support, Admin, and Audit should have distinct domain boundaries. Controllers delegate to domain services.
+| Resource | Name | Purpose |
+|---|---|---|
+| Worker | wessali-platform | REST API, admin dashboard, scheduled retention cleanup |
+| D1 | wessali-production | Accounts, auth sessions, providers, orders, events, tracking, audit, payment records |
+| R2 | wessali-private-files | Private provider documents and future attachments |
+| Worker observability | enabled | Invocation logs and sampled traces |
 
-## Data and transaction rules
+D1 and R2 were created with Western Europe placement. Existing Skyline Workers, D1 databases, and buckets were not reused or modified.
 
-Use UUID identifiers, UTC timestamps, explicit currency (DZD initially), and integer minor-unit amounts. Service-specific fields belong in typed detail tables rather than unvalidated JSON blobs when they need filtering/reporting.
+## Identity and authentication
 
-PostGIS uses consistent SRID 4326 GPS inputs and indexed spatial columns. Use GiST indexes and index-aware operations such as ST_DWithin. Straight-line distance and driving ETA are distinct metrics.
+- Customer/provider accounts register with an international E.164 phone number, display name, selected role, and password.
+- Passwords are salted and derived using PBKDF2-HMAC-SHA-256 through Web Crypto; plaintext passwords are never stored.
+- User sessions are random bearer tokens. Only SHA-256 token hashes are stored in D1. Mobile stores the issued session in Expo SecureStore.
+- Login is rate-limited by IP and account identifier. Suspended accounts cannot create sessions.
+- Phone number ownership is **not** verified by SMS in this deployment. Add an OTP provider before relying on phone numbers as verified identities.
+- The administrator initializes the console once using a one-time bootstrap key, then signs in with an email/password. The dashboard uses an HttpOnly, Secure, SameSite=Strict cookie; it does not put admin bearer tokens in localStorage.
+- Admin mutations require same-origin requests and are written to the audit trail.
 
-Use transactions for provider assignment and ledger changes. Concurrent offer acceptance must result in one winning assignment only.
+## Application data
 
-## Matching
+The initial D1 migration creates tables for:
 
-1. Read booking and service-specific requirements.
-2. Filter approved providers and approved capabilities.
-3. Exclude suspended, offline, unavailable, or capacity-incompatible providers.
-4. Filter by coverage and geographic/route compatibility.
-5. Rank candidates using configurable server-side policy.
-6. Create offers/notifications.
-7. Atomically accept one provider.
-8. Record the decision and booking event.
+- Users, profiles, sessions, administrator users and sessions, and rate limits.
+- Provider profiles, approved service capabilities, and provider documents.
+- Orders and freight/roadside/water detail tables.
+- Provider offers, order events, and live-tracking consent state.
+- Location samples, payment records, ledger entries, support cases, notifications, and administrative audit events.
 
-Freight ranking can include route direction/return-trip fit. Roadside prioritizes capability and response proximity. Water prioritizes tanker capacity, coverage, quantity, and declared water category.
+Coordinates are checked for valid latitude/longitude ranges. Booking data is associated with its owning customer and, once accepted, its assigned provider. Customer endpoints return only the caller's own bookings; providers can only query matching work and jobs assigned to their provider profile.
 
-## API conventions
+## Location privacy and retention
 
-- REST prefix: /v1.
-- JSON request/response bodies.
-- OpenAPI is the API contract.
-- Server-side validation and authorization for protected operations.
-- Stable machine-readable error codes.
-- Idempotency support for booking creation and retry-sensitive changes.
+Provider live GPS is not collected continuously by default. A provider must explicitly start sharing from an active assigned job. The mobile app requests foreground location permission and sends a location sample approximately every 15 seconds while the app remains active. Providers can stop sharing; sharing is disabled automatically when a job completes and the mobile watcher is removed on sign-out.
 
-Initial endpoint groups: auth, me, providers, vehicles, service-areas, availability, bookings, freight, roadside, water, offers, tracking, payments, reviews, support, and admin.
+Only the owner customer can read the live position for their booking. The admin map can display saved pickup/destination points and a provider's most recent fix only while sharing is enabled and the fix is less than 10 minutes old. The scheduled Worker task deletes location samples older than 30 days.
 
-The initial API scaffold currently exposes only /v1/health and /v1/services. Remaining routes are planned, not implemented.
+The initial mobile client does not request background location permission. Live sharing therefore pauses when the app is not active; background tracking is intentionally not enabled.
 
-## Background jobs
+## Operations dashboard
 
-BullMQ is intended for push/SMS dispatch, offer/request expiry, reminders, attachment processing, periodic coverage tasks, payment reconciliation, and metrics. Processors must be retry-safe and idempotent. The current worker is a queue listener shell; notification delivery integrations are not configured.
+The Worker-hosted dashboard includes:
 
-## Localization
+- Overview metrics and order activity/status/service charts.
+- Live map showing active order pickup/destination points and opted-in fresh provider positions.
+- Searchable orders, order event history, and current state.
+- Customer/provider account list with account suspension/reactivation.
+- Provider review queue with approve/reject/suspend actions.
+- Payment-record view, audit history, and document retrieval endpoints.
 
-Shared dictionaries live in packages/i18n. Arabic switches the interface to RTL; French and English use LTR. API returns stable codes/identifiers, and clients render localized strings. Missing keys should be caught by type checks/tests.
+Dashboard routes are protected by administrator authentication. Sensitive account details, coordinates, and private documents are not public assets.
 
-## External providers
+## API surface
 
-Keep map/routing, SMS, push, and object-storage services behind adapters. Evaluate against Algerian coverage, Arabic/French quality, cost, rate limits, licensing, and operational support.
+| Group | Production routes |
+|---|---|
+| Health | GET /v1/health |
+| Auth | POST /v1/auth/register, /v1/auth/login, /v1/auth/logout |
+| Customer bookings | GET /v1/bookings/mine, POST /v1/bookings, POST /v1/bookings/:id/cancel |
+| Customer tracking | GET /v1/bookings/:id/tracking |
+| Provider profile | GET /v1/providers/me, POST /v1/providers/apply |
+| Provider jobs | GET /v1/providers/requests, /v1/providers/jobs, POST /v1/providers/bookings/:id/accept, /advance |
+| Provider location | POST /v1/providers/bookings/:id/tracking/start, /stop, /location |
+| Provider files | POST /v1/providers/documents |
+| Admin | /v1/admin/setup, /auth/login, /me, /overview, /bookings, /users, /providers, /locations, /payments, /audit |
 
-## Security boundaries
+## Current boundaries / next integrations
 
-- Browser and mobile clients are untrusted.
-- Authentication identifies the caller; backend authorization determines permitted actions.
-- Provider eligibility is checked server-side.
-- Admin roles are least-privilege.
-- Documents are stored privately and served with short-lived authorization.
-- Precise provider location is available only to authorized participants during an active booking.
-- Secrets are injected at runtime and never committed.
-- Audit important admin, booking, and financial operations.
-- Define retention/deletion rules for documents and location samples.
+The cloud foundation does not yet include:
+- SMS OTP / phone verification.
+- Push notification delivery.
+- Payment collection, card/CIB/Edahabia gateway integration, or automatic provider payouts.
+- Automated proximity/ETA matching and turn-by-turn route calculations.
+- Custom domain and branded DNS; production currently uses the account's workers.dev subdomain.
+- A dedicated staff-role hierarchy beyond the initial administrator account.
 
-## Testing and deployment
+These require external provider selection, credentials, operational policies, and additional integration tests. The dashboard's payment section reads payment records but does not process payments.
 
-Use local, staging, and production environments. Local development uses Docker Compose for PostGIS and Redis. Production also needs API/worker runtimes, backed-up PostgreSQL, Redis, private storage, admin hosting, TLS, logs, metrics, monitoring, and incident procedures.
+## Local development
 
-Test domain rules, authorization, schema validation, state transitions, PostGIS queries, concurrent acceptance, booking workflows, RTL/LTR rendering, and WebSocket access when realtime is introduced. Never log OTPs, tokens, identity documents, or unnecessary precise location.
-
-## Architecture rules
-
-1. Business rules live in backend domain services.
-2. Keep shared lifecycle separate from service-specific details.
-3. Every database change is a migration.
-4. Never commit secrets or personal documents.
-5. Treat location as sensitive information.
-6. Do not add microservices without a demonstrated need.
-7. Record material changes in DECISIONS.md.
+The former NestJS API and PostgreSQL/PostGIS migrations remain for local development and reference. Production mobile defaults to the Cloudflare Worker. Redis is not needed by the production Worker API. Never enable the local development session endpoint on a public deployment.

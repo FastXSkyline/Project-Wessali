@@ -10,34 +10,39 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { accentForTone, gradients, palette, statusTone } from '../theme';
 import { AppText, RadialGlow, useLocaleValue } from './base';
+import { animateLayout, MotionPressable } from './motion';
 
 function tap() {
   Haptics.selectionAsync().catch(() => undefined);
 }
 
 export function usePressScale() {
-  const scale = useRef(new Animated.Value(1)).current;
+  const progress = useRef(new Animated.Value(0)).current;
+  const scale = progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0.992] });
+  const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [0, 1.5] });
   return {
     scale,
+    translateY,
     pressIn: () =>
-      Animated.spring(scale, {
-        toValue: 0.965,
-        useNativeDriver: true,
-        speed: 35,
-        bounciness: 0,
-      }).start(),
-    pressOut: () =>
-      Animated.spring(scale, {
+      Animated.spring(progress, {
         toValue: 1,
         useNativeDriver: true,
-        speed: 28,
-        bounciness: 7,
+        damping: 24,
+        stiffness: 340,
+        mass: 0.65,
+      }).start(),
+    pressOut: () =>
+      Animated.spring(progress, {
+        toValue: 0,
+        useNativeDriver: true,
+        damping: 22,
+        stiffness: 280,
+        mass: 0.7,
       }).start(),
   };
 }
@@ -61,7 +66,7 @@ export function PrimaryButton({
   style,
   compact = false,
 }: PrimaryButtonProps) {
-  const { scale, pressIn, pressOut } = usePressScale();
+  const { scale, translateY, pressIn, pressOut } = usePressScale();
   const inactive = disabled || loading;
   const { isRtl } = useLocaleValue();
 
@@ -80,11 +85,11 @@ export function PrimaryButton({
       }}
       style={[{ opacity: disabled ? 0.5 : 1 }, style]}
     >
-      <Animated.View style={{ transform: [{ scale }] }}>
+      <Animated.View style={{ transform: [{ translateY }, { scale }] }}>
         <RadialGlow
-          size={230}
-          color={palette.jade}
-          opacity={0.22}
+          size={180}
+          color={palette.jadeBright}
+          opacity={0.11}
           style={{ position: 'absolute', top: -55, left: '12%' }}
         />
         <LinearGradient
@@ -93,7 +98,6 @@ export function PrimaryButton({
           end={{ x: 1, y: 1 }}
           style={[styles.primaryButton, compact && styles.primaryButtonCompact]}
         >
-          <View pointerEvents="none" style={styles.primarySheen} />
           {loading ? (
             <ActivityIndicator color={palette.onAccent} />
           ) : (
@@ -131,11 +135,12 @@ export function SecondaryButton({
 }) {
   const { isRtl } = useLocaleValue();
   return (
-    <Pressable
+    <MotionPressable
       accessibilityRole="button"
       accessibilityLabel={label}
       disabled={disabled}
       onPress={() => {
+        if (disabled) return;
         tap();
         onPress();
       }}
@@ -145,16 +150,15 @@ export function SecondaryButton({
         disabled && { opacity: 0.5 },
         style,
       ]}
+      contentStyle={[styles.buttonRow, isRtl && styles.rowReverse]}
     >
-      <View style={[styles.buttonRow, isRtl && styles.rowReverse]}>
-        {icon ? (
-          <Ionicons name={icon} size={16} color={danger ? palette.danger : palette.ink} />
-        ) : null}
-        <AppText variant="button" tone={danger ? 'danger' : 'ink'} align="center">
-          {label}
-        </AppText>
-      </View>
-    </Pressable>
+      {icon ? (
+        <Ionicons name={icon} size={16} color={danger ? palette.danger : palette.ink} />
+      ) : null}
+      <AppText variant="button" tone={danger ? 'danger' : 'ink'} align="center">
+        {label}
+      </AppText>
+    </MotionPressable>
   );
 }
 
@@ -172,28 +176,21 @@ export function IconButton({
   tint?: string;
 }) {
   return (
-    <Pressable
+    <MotionPressable
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={() => {
         tap();
         onPress();
       }}
-      style={({ pressed }) => [
+      style={[
         styles.iconButton,
-        { width: size, height: size, borderRadius: size / 2 },
-        pressed && { opacity: 0.7 },
+        { width: size, height: size, borderRadius: Math.min(15, size * 0.36) },
       ]}
+      contentStyle={styles.iconButtonContent}
     >
-      <BlurView
-        intensity={30}
-        tint="light"
-        blurMethod="dimezisBlurViewSdk31Plus"
-        style={[StyleSheet.absoluteFill, { borderRadius: size / 2 }]}
-      />
-      <View style={[StyleSheet.absoluteFill, styles.iconButtonFill, { borderRadius: size / 2 }]} />
       <Ionicons name={icon} size={size * 0.43} color={tint} />
-    </Pressable>
+    </MotionPressable>
   );
 }
 
@@ -281,6 +278,62 @@ export function Field({
 
 type Choice = { label: string; value: string };
 
+function ChoiceChip({
+  option,
+  active,
+  accent,
+  onSelect,
+}: {
+  option: Choice;
+  active: boolean;
+  accent: string;
+  onSelect: () => void;
+}) {
+  const progress = useRef(new Animated.Value(active ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(progress, {
+      toValue: active ? 1 : 0,
+      duration: 190,
+          useNativeDriver: true,
+    }).start();
+  }, [active, progress]);
+
+  return (
+    <MotionPressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+      onPress={onSelect}
+      style={[
+        styles.chip,
+        active && { borderColor: `${accent}80` },
+      ]}
+      contentStyle={styles.choiceChipContent}
+    >
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          { borderRadius: 999, backgroundColor: `${accent}1F`, opacity: progress },
+        ]}
+      />
+      <Animated.View
+        style={{
+          opacity: progress,
+          transform: [
+            { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] }) },
+          ],
+        }}
+      >
+        <View style={[styles.chipDot, { backgroundColor: accent }]} />
+      </Animated.View>
+      <AppText variant="label" tone={active ? 'ink' : 'muted'}>
+        {option.label}
+      </AppText>
+    </MotionPressable>
+  );
+}
+
 export function ChoiceChips({
   options,
   value,
@@ -295,32 +348,18 @@ export function ChoiceChips({
   const { isRtl } = useLocaleValue();
   return (
     <View style={[styles.chipWrap, isRtl && styles.rowReverse]}>
-      {options.map((option) => {
-        const active = option.value === value;
-        return (
-          <Pressable
-            key={option.value}
-            accessibilityRole="button"
-            accessibilityState={{ selected: active }}
-            onPress={() => {
-              tap();
-              onChange(option.value);
-            }}
-            style={[
-              styles.chip,
-              active && {
-                backgroundColor: `${accent}1F`,
-                borderColor: `${accent}80`,
-              },
-            ]}
-          >
-            {active ? <View style={[styles.chipDot, { backgroundColor: accent }]} /> : null}
-            <AppText variant="label" tone={active ? 'ink' : 'muted'}>
-              {option.label}
-            </AppText>
-          </Pressable>
-        );
-      })}
+      {options.map((option) => (
+        <ChoiceChip
+          key={option.value}
+          option={option}
+          active={option.value === value}
+          accent={accent}
+          onSelect={() => {
+            tap();
+            onChange(option.value);
+          }}
+        />
+      ))}
     </View>
   );
 }
@@ -337,29 +376,65 @@ export function Segmented({
   accent?: string;
 }) {
   const { isRtl } = useLocaleValue();
+  const [containerWidth, setContainerWidth] = useState(0);
+  const indicatorX = useRef(new Animated.Value(0)).current;
+  const activeIndex = Math.max(0, options.findIndex((option) => option.value === value));
+  const physicalIndex = isRtl ? options.length - 1 - activeIndex : activeIndex;
+  const segmentWidth = options.length
+    ? Math.max(0, (containerWidth - 8 - (options.length - 1) * 3) / options.length)
+    : 0;
+
+  useEffect(() => {
+    if (!segmentWidth) return;
+    Animated.spring(indicatorX, {
+      toValue: physicalIndex * (segmentWidth + 3),
+      damping: 25,
+      stiffness: 220,
+      mass: 0.82,
+      useNativeDriver: true,
+    }).start();
+  }, [indicatorX, physicalIndex, segmentWidth]);
+
   return (
-    <View style={[styles.segmented, isRtl && styles.rowReverse]}>
+    <View
+      onLayout={(event) => setContainerWidth(event.nativeEvent.layout.width)}
+      style={[styles.segmented, isRtl && styles.rowReverse]}
+    >
+      {segmentWidth > 0 ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.segmentIndicator,
+            {
+              width: segmentWidth,
+              transform: [{ translateX: indicatorX }],
+            },
+          ]}
+        >
+          <LinearGradient
+            colors={[`${accent}F2`, `${accent}B8`]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        </Animated.View>
+      ) : null}
       {options.map((option) => {
         const active = option.value === value;
         return (
-          <Pressable
+          <MotionPressable
             key={option.value}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
             onPress={() => {
+              if (active) return;
+              animateLayout();
               tap();
               onChange(option.value);
             }}
             style={styles.segment}
+            contentStyle={styles.segmentContent}
           >
-            {active ? (
-              <LinearGradient
-                colors={[`${accent}F2`, `${accent}B8`]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-            ) : null}
             <AppText
               variant="label"
               align="center"
@@ -368,7 +443,7 @@ export function Segmented({
             >
               {option.label}
             </AppText>
-          </Pressable>
+          </MotionPressable>
         );
       })}
     </View>
@@ -399,15 +474,16 @@ export function ToggleRow({
   const translateX = slide.interpolate({ inputRange: [0, 1], outputRange: [0, 18] });
 
   return (
-    <Pressable
+    <MotionPressable
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}
       accessibilityLabel={label}
       onPress={() => {
+        animateLayout();
         tap();
         onChange(!value);
       }}
-      style={[styles.toggleRow, isRtl && styles.rowReverse]}
+      contentStyle={[styles.toggleRow, isRtl && styles.rowReverse]}
     >
       <View style={{ flex: 1, gap: 2 }}>
         <AppText variant="bodyStrong">{label}</AppText>
@@ -420,7 +496,7 @@ export function ToggleRow({
       <View style={[styles.track, value && styles.trackOn]}>
         <Animated.View style={[styles.knob, { transform: [{ translateX }] }]} />
       </View>
-    </Pressable>
+    </MotionPressable>
   );
 }
 
@@ -475,66 +551,79 @@ export const controlStyles = StyleSheet.create({});
 
 const styles = StyleSheet.create({
   primaryButton: {
-    minHeight: 56,
-    borderRadius: 999,
+    minHeight: 54,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     paddingHorizontal: 22,
-    paddingVertical: 16,
-    shadowColor: palette.jade,
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 7 },
-    elevation: 9,
+    paddingVertical: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+    shadowColor: '#0C3C66',
+    shadowOpacity: 0.11,
+    shadowRadius: 13,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
   },
-  primaryButtonCompact: { minHeight: 46, paddingVertical: 12, paddingHorizontal: 18 },
-  primarySheen: {
-    position: 'absolute',
-    top: 1,
-    left: 12,
-    right: 12,
-    height: '48%',
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.22)',
-  },
+  primaryButtonCompact: { minHeight: 46, paddingVertical: 12, paddingHorizontal: 18, borderRadius: 16 },
   buttonRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
   rowReverse: { flexDirection: 'row-reverse' },
   secondaryButton: {
-    minHeight: 52,
-    borderRadius: 999,
+    minHeight: 50,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingVertical: 13,
     borderWidth: 1,
-    borderColor: palette.line,
-    backgroundColor: 'rgba(255,255,255,0.76)',
+    borderColor: 'rgba(20, 63, 105, 0.14)',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#16466C',
+    shadowOpacity: 0.035,
+    shadowRadius: 7,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
+  iconButtonContent: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  choiceChipContent: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  segmentIndicator: {
+    position: 'absolute',
+    top: 4,
+    bottom: 4,
+    left: 4,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  segmentContent: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' },
   iconButton: {
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: palette.line,
+    borderColor: 'rgba(26, 66, 110, 0.13)',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#163E63',
+    shadowOpacity: 0.055,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
-  iconButtonFill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
-  },
+  iconButtonPressed: { opacity: 0.76, transform: [{ scale: 0.95 }] },
   fieldShell: {
     minHeight: 54,
     borderRadius: 17,
     borderWidth: 1,
     borderColor: palette.line,
-    backgroundColor: 'rgba(255, 255, 255, 0.82)',
+    backgroundColor: 'rgba(255, 255, 255, 0.86)',
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
   fieldShellFocused: {
-    borderColor: 'rgba(88, 116, 94, 0.42)',
-    backgroundColor: 'rgba(255, 255, 255, 0.96)',
+    borderColor: 'rgba(36, 124, 199, 0.42)',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
   },
   fieldShellMultiline: { alignItems: 'flex-start', paddingTop: 14, minHeight: 92 },
   input: {
@@ -551,7 +640,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: palette.lineSoft,
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    backgroundColor: 'rgba(255,255,255,0.84)',
     paddingHorizontal: 13,
     paddingVertical: 9,
     flexDirection: 'row',
@@ -565,7 +654,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: palette.lineSoft,
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    backgroundColor: 'rgba(255,255,255,0.82)',
     gap: 3,
   },
   segment: {
@@ -588,20 +677,20 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 999,
     padding: 3,
-    backgroundColor: 'rgba(67, 82, 70, 0.12)',
+    backgroundColor: 'rgba(30, 70, 115, 0.12)',
     borderWidth: 1,
     borderColor: palette.lineSoft,
   },
-  trackOn: { backgroundColor: palette.jade, borderColor: 'rgba(88,116,94,0.32)' },
+  trackOn: { backgroundColor: palette.jade, borderColor: 'rgba(36,124,199,0.32)' },
   knob: {
     width: 22,
     height: 22,
     borderRadius: 999,
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
   },
   statusPill: {
     flexDirection: 'row',

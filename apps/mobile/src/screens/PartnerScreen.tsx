@@ -1,6 +1,7 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { palette, serviceTheme } from '../theme';
 import type { WessaliApp } from '../useWessali';
@@ -16,6 +17,7 @@ import {
 import { Field, IconButton, InfoNote, PrimaryButton } from '../ui/controls';
 import { IconTile } from '../ui/IconTile';
 import { formatShortDate } from '../utils';
+import { ContentTransition, MotionPressable, StaggeredItem } from '../ui/motion';
 
 export function PartnerScreen({
   app,
@@ -45,7 +47,7 @@ export function PartnerScreen({
           <View style={{ gap: 10 }}>
             <View style={[styles.sessionTitle, rtlStyle && styles.rowReverse]}>
               <View style={styles.sessionIcon}>
-                <Ionicons name="key-outline" size={15} color={palette.sand} />
+                <Ionicons name="key-outline" size={15} color={palette.jadeBright} />
               </View>
               <AppText variant="bodyStrong" style={{ flex: 1 }}>
                 {ui.providerSessionTitle}
@@ -100,20 +102,22 @@ export function PartnerScreen({
         />
       </View>
 
-      {approved ? (
-        <ApprovedBusiness app={app} onOpenQueue={onOpenQueue} />
-      ) : status === 'not_applied' ? (
-        <>
-          <PartnerIntro app={app} onOpenQueue={onOpenQueue} />
-          <ApplicationForm app={app} />
-        </>
-      ) : (
-        <>
-          <StatusTimeline app={app} rejected={rejected} />
-          <ServiceApprovalList app={app} />
-          {rejected ? <ApplicationForm app={app} /> : null}
-        </>
-      )}
+      <ContentTransition transitionKey={status} direction="forward" style={{ width: '100%' }}>
+        {approved ? (
+          <ApprovedBusiness app={app} onOpenQueue={onOpenQueue} />
+        ) : status === 'not_applied' ? (
+          <>
+            <PartnerIntro app={app} onOpenQueue={onOpenQueue} />
+            <ApplicationForm app={app} />
+          </>
+        ) : (
+          <>
+            <StatusTimeline app={app} rejected={rejected} />
+            <ServiceApprovalList app={app} />
+            {rejected ? <ApplicationForm app={app} /> : null}
+          </>
+        )}
+      </ContentTransition>
     </Page>
   );
 }
@@ -138,42 +142,59 @@ function PartnerIntro({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: () =
       icon: 'map-outline' as const,
       title: ui.benefitNetworkTitle,
       body: ui.benefitNetworkBody,
-      tone: palette.sand,
+      tone: palette.jadeBright,
     },
   ];
   return (
     <>
-      <GlassCard padding={20} tone="deep" radius={30} style={{ overflow: 'hidden' }}>
-        <RouteDoodle height={180} opacity={0.6} color={palette.sand} />
-        <RadialGlow
-          size={260}
-          color={palette.sand}
-          opacity={0.16}
-          style={{ position: 'absolute', top: -140, right: -90 }}
-        />
-        <View style={{ gap: 13 }}>
-          <View style={[styles.introTop, isRtl && styles.rowReverse]}>
-            <View style={[styles.kicker, isRtl && styles.rowReverse]}>
-              <View style={[styles.kickerDot, { backgroundColor: palette.sand }]} />
-              <AppText variant="caption" style={{ color: palette.sand }}>
-                {ui.brand} · {ui.partnerTitle}
-              </AppText>
+      <View style={styles.heroShell}>
+        <LinearGradient
+          colors={['#092844', '#104B78', '#1769A3']}
+          start={{ x: 0.04, y: 0 }}
+          end={{ x: 0.96, y: 1 }}
+          style={styles.partnerHero}
+        >
+          <RouteDoodle height={190} opacity={0.22} color="#83C6F5" />
+          <RadialGlow
+            size={290}
+            color="#56B8FF"
+            opacity={0.24}
+            style={{ position: 'absolute', top: -142, right: -102 }}
+          />
+          <RadialGlow
+            size={210}
+            color="#39B9D5"
+            opacity={0.12}
+            style={{ position: 'absolute', bottom: -118, left: -92 }}
+          />
+          <View style={{ gap: 15 }}>
+            <View style={[styles.introTop, isRtl && styles.rowReverse]}>
+              <View style={[styles.kicker, styles.kickerDark, isRtl && styles.rowReverse]}>
+                <View style={[styles.kickerDot, { backgroundColor: '#82D2FF' }]} />
+                <AppText variant="caption" style={{ color: '#D1ECFF' }}>
+                  {ui.brand} · {ui.partnerTitle}
+                </AppText>
+              </View>
+              <IconTile tone="jade" icon="account-hard-hat" size="lg" glow={false} />
             </View>
-            <IconTile tone="sand" icon="account-hard-hat" size="lg" />
+            <AppText variant="h1" tone="white" style={{ maxWidth: '92%' }}>
+              {ui.partnerIntroTitle}
+            </AppText>
+            <AppText
+              variant="body"
+              style={{ color: 'rgba(232,244,255,0.82)', maxWidth: '94%', lineHeight: 23 }}
+            >
+              {ui.partnerIntroBody}
+            </AppText>
           </View>
-          <AppText variant="h1" style={{ maxWidth: '90%' }}>
-            {ui.partnerIntroTitle}
-          </AppText>
-          <AppText variant="body" tone="soft" style={{ maxWidth: '92%' }}>
-            {ui.partnerIntroBody}
-          </AppText>
-        </View>
-      </GlassCard>
+        </LinearGradient>
+      </View>
 
       <GlassCard padding={16} radius={24}>
         <View style={{ gap: 13 }}>
           {benefits.map((benefit, index) => (
-            <React.Fragment key={benefit.title}>
+            <StaggeredItem key={benefit.title} index={index}>
+              <>
               <View style={[styles.benefitRow, isRtl && styles.rowReverse]}>
                 <View
                   style={[
@@ -191,7 +212,8 @@ function PartnerIntro({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: () =
                 </View>
               </View>
               {index < benefits.length - 1 ? <Divider /> : null}
-            </React.Fragment>
+              </>
+            </StaggeredItem>
           ))}
         </View>
       </GlassCard>
@@ -235,7 +257,7 @@ function ApplicationForm({ app }: { app: WessaliApp }) {
           const selected = app.providerServices.includes(service.id);
           const tone = serviceTheme[service.id];
           return (
-            <Pressable
+            <MotionPressable
               key={service.id}
               accessibilityRole="button"
               accessibilityState={{ selected }}
@@ -243,12 +265,12 @@ function ApplicationForm({ app }: { app: WessaliApp }) {
               onPress={() => app.toggleProviderService(service.id as ServiceKind)}
               style={[
                 styles.serviceOption,
-                rtlStyle && styles.rowReverse,
                 selected && {
                   borderColor: `${tone.accent}66`,
                   backgroundColor: `${tone.accent}0F`,
                 },
               ]}
+              contentStyle={[styles.serviceOptionContent, rtlStyle && styles.rowReverse]}
             >
               <IconTile tone={service.id} size="sm" glow={selected} />
               <View style={{ flex: 1, gap: 1 }}>
@@ -271,7 +293,7 @@ function ApplicationForm({ app }: { app: WessaliApp }) {
               >
                 {selected ? <Ionicons name="checkmark" size={13} color={palette.onAccent} /> : null}
               </View>
-            </Pressable>
+            </MotionPressable>
           );
         })}
       </View>
@@ -309,8 +331,8 @@ function StatusTimeline({ app, rejected }: { app: WessaliApp; rejected: boolean 
           style={[
             styles.statusBadge,
             {
-              borderColor: rejected ? 'rgba(255,180,94,0.35)' : 'rgba(88,116,94,0.30)',
-              backgroundColor: rejected ? 'rgba(255,180,94,0.10)' : 'rgba(88,116,94,0.09)',
+              borderColor: rejected ? 'rgba(255,180,94,0.35)' : 'rgba(20,86,148,0.30)',
+              backgroundColor: rejected ? 'rgba(255,180,94,0.10)' : 'rgba(20,86,148,0.09)',
             },
           ]}
         >
@@ -444,45 +466,57 @@ function ApprovedBusiness({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: 
   const stats = [
     { label: ui.availableRequests, value: app.providerRequests.length, color: palette.jade },
     { label: ui.activeJobs, value: app.providerJobs.length, color: palette.aqua },
-    { label: ui.serviceApprovals, value: approvedServices.length, color: palette.sand },
+    { label: ui.serviceApprovals, value: approvedServices.length, color: palette.jadeBright },
   ];
   return (
     <>
-      <GlassCard padding={20} tone="deep" radius={30} style={{ overflow: 'hidden' }}>
-        <RouteDoodle height={170} opacity={0.5} color={palette.jade} />
-        <RadialGlow
-          size={260}
-          color={palette.jade}
-          opacity={0.2}
-          style={{ position: 'absolute', top: -130, right: -90 }}
-        />
-        <View style={{ gap: 13 }}>
-          <View style={[styles.introTop, rtlStyle && styles.rowReverse]}>
-            <View style={[styles.kicker, rtlStyle && styles.rowReverse]}>
-              <View style={styles.kickerDot} />
-              <AppText variant="caption" tone="jade">
-                {ui.approvedTitle}
-              </AppText>
+      <View style={styles.heroShell}>
+        <LinearGradient
+          colors={['#092844', '#104B78', '#1769A3']}
+          start={{ x: 0.04, y: 0 }}
+          end={{ x: 0.96, y: 1 }}
+          style={styles.partnerHero}
+        >
+          <RouteDoodle height={180} opacity={0.20} color="#83C6F5" />
+          <RadialGlow
+            size={290}
+            color="#56B8FF"
+            opacity={0.22}
+            style={{ position: 'absolute', top: -142, right: -102 }}
+          />
+          <View style={{ gap: 15 }}>
+            <View style={[styles.introTop, rtlStyle && styles.rowReverse]}>
+              <View style={[styles.kicker, styles.kickerDark, rtlStyle && styles.rowReverse]}>
+                <View style={[styles.kickerDot, { backgroundColor: '#82D2FF' }]} />
+                <AppText variant="caption" style={{ color: '#D1ECFF' }}>
+                  {ui.approvedTitle}
+                </AppText>
+              </View>
+              <IconTile tone="jade" icon="shield-check-outline" size="lg" glow={false} />
             </View>
-            <IconTile tone="jade" icon="shield-check-outline" size="lg" />
-          </View>
-          <AppText variant="h1">{providerProfile?.business_name ?? ui.partnerTitle}</AppText>
-          <View style={[styles.approvedMeta, rtlStyle && styles.rowReverse]}>
-            <View style={styles.approvedPill}>
-              <Ionicons name="checkmark-circle" size={14} color={palette.jade} />
-              <AppText variant="caption" tone="jade" style={{ fontSize: 10 }}>
-                {ui.approved}
-              </AppText>
+            <AppText variant="h1" tone="white">
+              {providerProfile?.business_name ?? ui.partnerTitle}
+            </AppText>
+            <View style={[styles.approvedMeta, rtlStyle && styles.rowReverse]}>
+              <View style={[styles.approvedPill, styles.approvedPillDark]}>
+                <Ionicons name="checkmark-circle" size={14} color="#8BD3FF" />
+                <AppText variant="caption" style={{ color: '#E2F3FF', fontSize: 10 }}>
+                  {ui.approved}
+                </AppText>
+              </View>
+              {providerProfile?.approved_at || providerProfile?.created_at ? (
+                <AppText
+                  variant="caption"
+                  style={{ color: 'rgba(225,241,255,0.72)', fontSize: 10 }}
+                >
+                  {ui.businessSince}{' '}
+                  {formatShortDate(providerProfile.approved_at ?? providerProfile.created_at, locale)}
+                </AppText>
+              ) : null}
             </View>
-            {providerProfile?.approved_at || providerProfile?.created_at ? (
-              <AppText variant="caption" tone="muted" style={{ fontSize: 10 }}>
-                {ui.businessSince}{' '}
-                {formatShortDate(providerProfile.approved_at ?? providerProfile.created_at, locale)}
-              </AppText>
-            ) : null}
           </View>
-        </View>
-      </GlassCard>
+        </LinearGradient>
+      </View>
 
       <View style={[styles.statRow, rtlStyle && styles.rowReverse]}>
         {stats.map((stat) => (
@@ -513,6 +547,30 @@ function ApprovedBusiness({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: 
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  heroShell: {
+    borderRadius: 30,
+    shadowColor: '#0A3C68',
+    shadowOpacity: 0.14,
+    shadowRadius: 21,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
+  },
+  partnerHero: {
+    minHeight: 208,
+    padding: 20,
+    borderRadius: 30,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(124,190,239,0.30)',
+  },
+  kickerDark: {
+    borderColor: 'rgba(165,215,252,0.24)',
+    backgroundColor: 'rgba(220,241,255,0.10)',
+  },
+  approvedPillDark: {
+    borderColor: 'rgba(139,211,255,0.30)',
+    backgroundColor: 'rgba(139,211,255,0.12)',
+  },
   rowReverse: { flexDirection: 'row-reverse' },
   introTop: {
     flexDirection: 'row',
@@ -528,8 +586,8 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(88, 116, 94, 0.17)',
-    backgroundColor: 'rgba(88, 116, 94, 0.07)',
+    borderColor: 'rgba(20, 86, 148, 0.17)',
+    backgroundColor: 'rgba(20, 86, 148, 0.07)',
   },
   kickerDot: { width: 5, height: 5, borderRadius: 999, backgroundColor: palette.jade },
   benefitRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -548,20 +606,18 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(169, 130, 85, 0.09)',
+    backgroundColor: 'rgba(54, 136, 217, 0.09)',
     borderWidth: 1,
-    borderColor: 'rgba(169, 130, 85, 0.18)',
+    borderColor: 'rgba(54, 136, 217, 0.18)',
   },
   serviceOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 11,
     borderWidth: 1,
     borderColor: palette.lineSoft,
     borderRadius: 18,
     padding: 10,
-    backgroundColor: 'rgba(47, 62, 52, 0.035)',
+    backgroundColor: 'rgba(30, 70, 115, 0.035)',
   },
+  serviceOptionContent: { flexDirection: 'row', alignItems: 'center', gap: 11, width: '100%' },
   check: {
     width: 22,
     height: 22,
@@ -598,14 +654,14 @@ const styles = StyleSheet.create({
     width: 1,
     flex: 1,
     minHeight: 18,
-    backgroundColor: 'rgba(88, 116, 94, 0.12)',
+    backgroundColor: 'rgba(20, 86, 148, 0.12)',
     marginVertical: 3,
   },
   stepTag: {
     borderRadius: 999,
     paddingHorizontal: 7,
     paddingVertical: 3,
-    backgroundColor: 'rgba(47, 62, 52, 0.045)',
+    backgroundColor: 'rgba(30, 70, 115, 0.045)',
   },
   serviceStatusRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   approvalPill: { flexDirection: 'row', alignItems: 'center', gap: 4 },
@@ -615,8 +671,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
     borderWidth: 1,
-    borderColor: 'rgba(88, 116, 94, 0.22)',
-    backgroundColor: 'rgba(55, 225, 165, 0.10)',
+    borderColor: 'rgba(20, 86, 148, 0.22)',
+    backgroundColor: 'rgba(58, 137, 222, 0.10)',
     borderRadius: 999,
     paddingHorizontal: 9,
     paddingVertical: 5,

@@ -5,17 +5,16 @@ import {
   Linking,
   Modal,
   Platform,
-  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppleMaps, GoogleMaps } from 'expo-maps';
 import * as Location from 'expo-location';
-import { Location as PreciseLocation, LocationAccuracy, LocationProfile } from 'expo-location/next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { palette } from '../theme';
 import { AppText } from './base';
+import { MotionPressable } from './motion';
 
 export type PickedLocation = { address: string; latitude: number; longitude: number };
 type Coordinates = { latitude: number; longitude: number };
@@ -161,36 +160,8 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
   async function locate() {
     setLoading(true);
     try {
-      if (!PreciseLocation.hasLocationServicesEnabled()) {
-        if (Platform.OS === 'android') {
-          const enabled = await PreciseLocation.enableLocationServices();
-          if (!enabled) {
-            Alert.alert(copy.title, copy.servicesOff);
-            return;
-          }
-        } else {
-          Alert.alert(copy.title, copy.servicesOff, [
-            { text: copy.cancel, style: 'cancel' },
-            { text: copy.settings, onPress: () => void Linking.openSettings() },
-          ]);
-          return;
-        }
-      }
-
-      const permission = await PreciseLocation.requestForegroundPermissions();
+      const permission = await Location.requestForegroundPermissionsAsync();
       if (!permission.granted) {
-        if (!permission.canAskAgain) {
-          Alert.alert(copy.permissionTitle, copy.permission, [
-            { text: copy.cancel, style: 'cancel' },
-            { text: copy.settings, onPress: () => void Linking.openSettings() },
-          ]);
-        } else {
-          Alert.alert(copy.permissionTitle, copy.permission);
-        }
-        return;
-      }
-
-      if (permission.accuracy === LocationAccuracy.REDUCED) {
         Alert.alert(copy.permissionTitle, copy.permission, [
           { text: copy.cancel, style: 'cancel' },
           { text: copy.settings, onPress: () => void Linking.openSettings() },
@@ -198,25 +169,27 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
         return;
       }
 
-      const fix = await PreciseLocation.getPosition({
-        maxCachedAge: 0,
-        timeout: 25,
-        profile: LocationProfile.OTHER_NAVIGATION,
+      // Use a recent cached fix immediately when available. A fresh balanced
+      // fix avoids the long high-accuracy navigation wait on the booking flow.
+      const cached = await Location.getLastKnownPositionAsync({
+        maxAge: 60_000,
+        requiredAccuracy: 1_500,
       });
-      if (!fix) {
-        Alert.alert(copy.title, copy.locationFailed);
-        return;
-      }
+      const fix =
+        cached ??
+        (await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        }));
 
       const point = {
-        latitude: fix.coordinates.latitude,
-        longitude: fix.coordinates.longitude,
+        latitude: fix.coords.latitude,
+        longitude: fix.coords.longitude,
       };
       centerRef.current = point;
       setCenter(point);
       setMapStart(point);
       setUserLocation(point);
-      setLocationAccuracy(fix.horizontalAccuracy);
+      setLocationAccuracy(fix.coords.accuracy ?? null);
       setMapKey((current) => current + 1);
       await resolveAddress(point);
     } catch {
@@ -294,9 +267,9 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
     >
       <View style={styles.root}>
         <View style={[styles.header, rtl && styles.rowReverse]}>
-          <Pressable onPress={onClose} style={styles.close}>
+          <MotionPressable onPress={onClose} style={styles.close} contentStyle={styles.actionContent}>
             <Ionicons name="close" size={21} color={palette.ink} />
-          </Pressable>
+          </MotionPressable>
           <View style={{ flex: 1, gap: 2 }}>
             <AppText variant="h2">{copy.title}</AppText>
             <AppText variant="caption" tone="muted">
@@ -309,18 +282,18 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
           {Platform.OS === 'ios' ? (
             <AppleMaps.View
               key={`apple-${mapKey}`}
-              style={StyleSheet.absoluteFill}
+              style={styles.nativeMap}
               cameraPosition={cameraPosition}
               markers={userMarker}
               properties={{ isMyLocationEnabled: Boolean(userLocation), selectionEnabled: true }}
-              uiSettings={{ myLocationButtonEnabled: true, compassEnabled: true }}
+              uiSettings={{ myLocationButtonEnabled: false, compassEnabled: true }}
               onCameraMove={(event) => handleCameraMove(event.coordinates)}
               onMapClick={(event) => handleMapTap(event.coordinates)}
             />
           ) : Platform.OS === 'android' ? (
             <GoogleMaps.View
               key={`google-${mapKey}`}
-              style={StyleSheet.absoluteFill}
+              style={styles.nativeMap}
               cameraPosition={cameraPosition}
               userLocation={
                 userLocation ? { coordinates: userLocation, followUserLocation: false } : undefined
@@ -343,7 +316,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
             <Ionicons name="location" size={35} color={palette.jadeDeep} />
           </View>
           <LinearGradient
-            colors={['rgba(243,243,239,0.9)', 'rgba(243,243,239,0)']}
+            colors={['rgba(244,247,251,0.92)', 'rgba(243,243,239,0)']}
             style={styles.mapTopFade}
             pointerEvents="none"
           />
@@ -355,12 +328,12 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
         </View>
 
         <View style={styles.bottom}>
-          <Pressable onPress={() => void locate()} disabled={loading} style={styles.locateButton}>
+          <MotionPressable onPress={() => void locate()} disabled={loading} style={styles.locateButton} contentStyle={styles.locateContent}>
             <Ionicons name="locate" size={18} color={palette.jadeDeep} />
             <AppText variant="label" style={{ color: palette.jadeDeep }}>
               {copy.current}
             </AppText>
-          </Pressable>
+          </MotionPressable>
           <View style={styles.addressCard}>
             <View style={[styles.addressTop, rtl && styles.rowReverse]}>
               <Ionicons name="location-outline" size={18} color={palette.jadeDeep} />
@@ -381,16 +354,17 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
               {copy.coords}: {center.latitude.toFixed(6)}, {center.longitude.toFixed(6)}
             </AppText>
           </View>
-          <Pressable
+          <MotionPressable
             disabled={loading}
             onPress={() => void confirm()}
             style={[styles.confirm, loading && { opacity: 0.55 }]}
+            contentStyle={styles.confirmContent}
           >
             <AppText variant="bodyStrong" style={{ color: '#FFFFFF' }}>
               {copy.confirm}
             </AppText>
             <Ionicons name={rtl ? 'arrow-back' : 'arrow-forward'} size={18} color="#FFFFFF" />
-          </Pressable>
+          </MotionPressable>
         </View>
       </View>
     </Modal>
@@ -407,6 +381,7 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
   },
   rowReverse: { flexDirection: 'row-reverse' },
+  actionContent: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   close: {
     width: 42,
     height: 42,
@@ -417,7 +392,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.lineSoft,
   },
-  mapWrap: { flex: 1, overflow: 'hidden', backgroundColor: '#E7E9E4' },
+  mapWrap: { flex: 1, flexShrink: 1, minHeight: 180, overflow: 'hidden', backgroundColor: '#E8F0F9' },
+  nativeMap: { flex: 1, width: '100%', minHeight: 180 },
   mapFallback: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   pin: {
     position: 'absolute',
@@ -445,22 +421,22 @@ const styles = StyleSheet.create({
   bottom: {
     paddingHorizontal: 18,
     paddingTop: 13,
-    paddingBottom: 28,
+    paddingBottom: 20,
     gap: 11,
     backgroundColor: palette.canvas,
   },
   locateButton: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 9,
     alignSelf: 'flex-start',
     paddingHorizontal: 13,
     paddingVertical: 10,
     borderRadius: 14,
-    backgroundColor: 'rgba(88,116,94,0.08)',
+    backgroundColor: 'rgba(23,111,194,0.08)',
     borderWidth: 1,
     borderColor: 'rgba(88,116,94,0.2)',
   },
+  locateContent: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   addressCard: {
     padding: 14,
     borderRadius: 18,
@@ -470,6 +446,7 @@ const styles = StyleSheet.create({
     gap: 7,
   },
   addressTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  confirmContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
   confirm: {
     minHeight: 52,
     borderRadius: 17,

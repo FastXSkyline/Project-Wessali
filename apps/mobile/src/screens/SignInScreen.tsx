@@ -1,102 +1,69 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { palette, serviceTheme } from '../theme';
-import type { Copy } from '../copy';
+import { palette } from '../theme';
 import type { WessaliApp } from '../useWessali';
 import type { Role } from '../types';
-import {
-  AppText,
-  Aurora,
-  BrandMark,
-  GlassCard,
-  Page,
-  RouteDoodle,
-  useLocaleValue,
-} from '../ui/base';
+import { AppText, BrandMark, GlassCard, Page, useLocaleValue } from '../ui/base';
 import { Field, PrimaryButton, Segmented } from '../ui/controls';
-import { IconTile } from '../ui/IconTile';
 import { LanguageSwitch } from '../ui/LanguageSwitch';
+import { animateLayout, MotionPressable } from '../ui/motion';
 
 export function SignInScreen({ app }: { app: WessaliApp }) {
   const { locale, ui, isRtl } = app;
-  const { isRtl: rtlStyle } = useLocaleValue();
+  const { isRtl: rtl } = useLocaleValue();
   const [showConnection, setShowConnection] = useState(false);
 
   return (
-    <Page variant="auth" bottomSpace={18} topSpace={6}>
-      <View style={[styles.header, isRtl && styles.rowReverse]}>
-        <View style={[styles.brandRow, isRtl && styles.rowReverse]}>
-          <BrandMark size={40} />
-          <View style={{ gap: 1 }}>
-            <AppText variant="h3" style={{ letterSpacing: 0.2 }}>
-              Wessali
-            </AppText>
-            <AppText variant="caption" tone="muted" style={{ fontSize: 10, letterSpacing: 0.6 }}>
-              وصلي
-            </AppText>
-          </View>
-        </View>
+    <Page variant="auth" bottomSpace={18} topSpace={12} contentStyle={styles.pageContent}>
+      <View style={[styles.languageRow, rtl && styles.rowReverse]}>
         <LanguageSwitch value={locale} onChange={app.setLocale} compact />
       </View>
-
-      <View style={styles.hero}>
-        <View style={[styles.kicker, isRtl && styles.rowReverse]}>
-          <View style={styles.kickerDot} />
-          <AppText variant="caption" tone="jade">
-            {ui.welcomeKicker}
-          </AppText>
-        </View>
-        <AppText variant="display" style={styles.headline}>
-          {ui.welcomeTitle}
-        </AppText>
-        <AppText variant="body" tone="soft" style={styles.heroBody}>
-          {ui.welcomeBody}
-        </AppText>
+      <View style={styles.brandBlock}>
+        <BrandMark size={66} />
+        <AppText variant="h2" align="center">Wessali</AppText>
+        <AppText variant="caption" tone="muted" align="center" style={{ maxWidth: 260 }}>{ui.tagline}</AppText>
       </View>
 
-      <ServiceConstellation isRtl={isRtl} ui={ui} />
-
-      <View style={[styles.trustRow, isRtl && styles.rowReverse]}>
-        <TrustItem icon="shield-checkmark-outline" label={ui.trustVerified} />
-        <TrustItem icon="git-commit-outline" label={ui.trustMilestones} />
-        <TrustItem icon="location-outline" label={ui.trustLocal} />
-      </View>
-
-      <GlassCard padding={20} intensity={34} radius={30}>
+      <GlassCard padding={21} radius={24}>
         <View style={{ gap: 5 }}>
           <AppText variant="h2">{ui.signInTitle}</AppText>
-          <AppText variant="caption" tone="muted">
-            {ui.signInBody}
-          </AppText>
+          <AppText variant="caption" tone="muted">{ui.signInBody}</AppText>
         </View>
-
-        <View style={{ height: 18 }} />
-        <View style={{ gap: 9 }}>
-          <AppText variant="label" tone="soft">
-            {ui.roleLabel}
-          </AppText>
-          <Segmented
-            value={app.role}
-            onChange={(value) => app.setRole(value as Role)}
-            options={[
-              { value: 'customer', label: ui.roleCustomer },
-              { value: 'provider', label: ui.roleProvider },
-            ]}
-          />
-        </View>
-
-        <View style={{ height: 16 }} />
-        <View style={{ gap: 14 }}>
-          <Field
-            label={ui.nameLabel}
-            value={app.name}
-            onChangeText={app.setName}
-            placeholder={ui.namePlaceholder}
-            icon="person-outline"
-            autoComplete="name"
-          />
+        <View style={{ height: 17 }} />
+        <Segmented
+          value={app.authMode}
+          onChange={(value) => app.setAuthMode(value as 'login' | 'register')}
+          accent={palette.jadeBright}
+          options={[
+            { value: 'register', label: ui.authRegister },
+            { value: 'login', label: ui.authLogin },
+          ]}
+        />
+        <View style={{ height: 12 }} />
+        <AppText variant="label" tone="soft">{ui.roleLabel}</AppText>
+        <View style={{ height: 8 }} />
+        <Segmented
+          value={app.role}
+          onChange={(value) => app.setRole(value as Role)}
+          accent={palette.jadeBright}
+          options={[
+            { value: 'customer', label: ui.roleCustomer },
+            { value: 'provider', label: ui.roleProvider },
+          ]}
+        />
+        <View style={{ height: 15 }} />
+        <View style={{ gap: 13 }}>
+          {app.authMode === 'register' ? (
+            <Field
+              label={ui.nameLabel}
+              value={app.name}
+              onChangeText={app.setName}
+              placeholder={ui.namePlaceholder}
+              icon="person-outline"
+              autoComplete="name"
+            />
+          ) : null}
           <Field
             label={ui.phoneLabel}
             value={app.phone}
@@ -106,253 +73,70 @@ export function SignInScreen({ app }: { app: WessaliApp }) {
             keyboardType="phone-pad"
             autoComplete="tel"
           />
+          <Field
+            label={ui.passwordLabel}
+            value={app.password}
+            onChangeText={app.setPassword}
+            placeholder={ui.passwordPlaceholder}
+            icon="lock-closed-outline"
+            secureTextEntry
+            autoComplete={app.authMode === 'register' ? 'new-password' : 'current-password'}
+            autoCapitalize="none"
+          />
         </View>
-
-        <Pressable
+        <MotionPressable
           accessibilityRole="button"
           accessibilityLabel={ui.connection}
           accessibilityState={{ expanded: showConnection }}
-          onPress={() => setShowConnection((current) => !current)}
-          style={[styles.connectionRow, rtlStyle && styles.rowReverse]}
+          onPress={() => {
+            animateLayout();
+            setShowConnection((value) => !value);
+          }}
+          style={styles.connectionPress}
+          contentStyle={[styles.connectionRow, rtl && styles.rowReverse]}
         >
-          <View style={[styles.connectionLabel, rtlStyle && styles.rowReverse]}>
-            <Ionicons name="link-outline" size={15} color={palette.muted} />
-            <AppText variant="caption" tone="muted">
-              {ui.connection}
-            </AppText>
+          <View style={[styles.connectionLabel, rtl && styles.rowReverse]}>
+            <Ionicons name="server-outline" size={15} color={palette.muted} />
+            <AppText variant="caption" tone="muted">{ui.connection}</AppText>
           </View>
-          <Ionicons
-            name={showConnection ? 'chevron-up' : isRtl ? 'chevron-back' : 'chevron-forward'}
-            size={16}
-            color={palette.faint}
-          />
-        </Pressable>
-
+          <Ionicons name={showConnection ? 'chevron-up' : isRtl ? 'chevron-back' : 'chevron-forward'} size={16} color={palette.faint} />
+        </MotionPressable>
         {showConnection ? (
           <View style={{ gap: 8, paddingTop: 4 }}>
-            <Field
-              label={ui.apiLabel}
-              value={app.apiInput}
-              onChangeText={app.setApiInput}
-              placeholder={ui.apiPlaceholder}
-              icon="server-outline"
-              keyboardType="url"
-              autoCapitalize="none"
-            />
-            <AppText variant="caption" tone="faint" style={{ lineHeight: 16 }}>
-              {ui.connectionHint}
-            </AppText>
+            <Field label={ui.apiLabel} value={app.apiInput} onChangeText={app.setApiInput} placeholder={ui.apiPlaceholder} icon="link-outline" keyboardType="url" autoCapitalize="none" />
+            <AppText variant="caption" tone="muted" style={{ lineHeight: 17 }}>{ui.connectionHint}</AppText>
           </View>
         ) : null}
-
-        <View style={{ height: 18 }} />
+        <View style={{ height: 17 }} />
         <PrimaryButton
-          label={ui.enter}
-          icon="arrow-forward"
+          label={app.authMode === 'register' ? ui.authRegister : ui.authLogin}
+          icon={app.authMode === 'register' ? 'person-add-outline' : 'log-in-outline'}
           onPress={() => void app.signIn()}
           loading={app.busy}
         />
-        <AppText variant="caption" tone="faint" align="center" style={styles.demoNotice}>
-          {ui.demoNotice}
+        <MotionPressable
+          onPress={() => app.setAuthMode(app.authMode === 'register' ? 'login' : 'register')}
+          style={{ alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 6 }}
+        >
+          <AppText variant="label" style={{ color: palette.jadeDeep }}>
+            {app.authMode === 'register' ? ui.switchToLogin : ui.switchToRegister}
+          </AppText>
+        </MotionPressable>
+        <AppText variant="caption" tone="muted" align="center" style={{ marginTop: 5, lineHeight: 17 }}>
+          {ui.phoneVerificationNotice}
         </AppText>
       </GlassCard>
-
-      <View style={{ alignItems: 'center', gap: 3, paddingTop: 2 }}>
-        <AppText variant="caption" tone="faint" align="center">
-          {ui.version} · {ui.madeFor}
-        </AppText>
-      </View>
+      <AppText variant="caption" tone="faint" align="center">{ui.version} · {ui.madeFor}</AppText>
     </Page>
   );
 }
 
-function TrustItem({
-  icon,
-  label,
-}: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  label: string;
-}) {
-  return (
-    <View style={styles.trustItem}>
-      <Ionicons name={icon} size={13} color={palette.jade} />
-      <AppText variant="caption" tone="muted" style={{ fontSize: 10.5 }}>
-        {label}
-      </AppText>
-    </View>
-  );
-}
-
-function ServiceConstellation({ isRtl, ui }: { isRtl: boolean; ui: Copy }) {
-  // Mirror the composition so the largest tile always leads on the reading side.
-  const anchor = (side: 'left' | 'right', value: number) => {
-    const resolved = isRtl ? (side === 'left' ? 'right' : 'left') : side;
-    return resolved === 'left' ? { left: value } : { right: value };
-  };
-
-  return (
-    <View style={styles.constellation}>
-      <LinearGradient
-        colors={['rgba(232, 239, 230, 0.96)', 'rgba(247, 248, 244, 0.92)']}
-        start={{ x: 0.15, y: 0 }}
-        end={{ x: 0.85, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-      <Aurora width={360} height={230} opacity={0.26} secondary={palette.aqua} />
-      <RouteDoodle height={210} opacity={0.9} />
-      <View
-        style={[
-          styles.orbit,
-          { borderColor: 'rgba(82, 105, 87, 0.12)' },
-          isRtl ? { right: -40 } : { left: -40 },
-        ]}
-      />
-      <View
-        style={[
-          styles.orbitLarge,
-          { borderColor: 'rgba(82, 105, 87, 0.07)' },
-          isRtl ? { right: -85 } : { left: -85 },
-        ]}
-      />
-
-      <View style={[styles.node, { top: 8 }, anchor('right', 14)]}>
-        <IconTile tone="freight" size="xl" />
-        <View style={[styles.nodeLabel, isRtl ? { left: 104 } : { right: 104 }]}>
-          <ServiceLabel
-            label={ui.legendFreight}
-            color={serviceTheme.freight.accent}
-            isRtl={isRtl}
-          />
-        </View>
-      </View>
-
-      <View style={[styles.node, { top: 62 }, anchor('left', 16)]}>
-        <IconTile tone="roadside" size="lg" />
-        <View style={[styles.nodeLabel, isRtl ? { right: 84 } : { left: 84 }]}>
-          <ServiceLabel
-            label={ui.legendRoadside}
-            color={serviceTheme.roadside.accent}
-            isRtl={isRtl}
-          />
-        </View>
-      </View>
-
-      <View style={[styles.node, { top: 126 }, anchor('right', 30)]}>
-        <IconTile tone="water" size="lg" />
-        <View style={[styles.nodeLabel, isRtl ? { left: 84 } : { right: 84 }]}>
-          <ServiceLabel label={ui.legendWater} color={serviceTheme.water.accent} isRtl={isRtl} />
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function ServiceLabel({ label, color, isRtl }: { label: string; color: string; isRtl: boolean }) {
-  return (
-    <View style={[styles.serviceLabel, isRtl && styles.rowReverse]}>
-      <View style={[styles.serviceDot, { backgroundColor: color, shadowColor: color }]} />
-      <AppText variant="caption" tone="soft" numberOfLines={1} style={{ fontSize: 10.5 }}>
-        {label}
-      </AppText>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
+  pageContent: { gap: 15 },
   rowReverse: { flexDirection: 'row-reverse' },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  hero: { gap: 12, paddingTop: 10 },
-  kicker: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 7,
-    paddingHorizontal: 11,
-    paddingVertical: 7,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(88, 116, 94, 0.18)',
-    backgroundColor: 'rgba(88, 116, 94, 0.07)',
-  },
-  kickerDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: palette.jade,
-    shadowColor: palette.jade,
-    shadowOpacity: 0.8,
-    shadowRadius: 6,
-  },
-  headline: { marginTop: 2 },
-  heroBody: { maxWidth: 330, lineHeight: 23 },
-  constellation: {
-    height: 212,
-    borderRadius: 30,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(82, 105, 87, 0.14)',
-    backgroundColor: palette.glassDeep,
-  },
-  node: { position: 'absolute', flexDirection: 'row', alignItems: 'center' },
-  nodeLabel: { position: 'absolute', top: 26 },
-  serviceLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(82, 105, 87, 0.13)',
-    backgroundColor: 'rgba(255, 255, 255, 0.78)',
-  },
-  serviceDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 999,
-    shadowOpacity: 0.8,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 0 },
-  },
-  orbit: {
-    position: 'absolute',
-    width: 230,
-    height: 230,
-    borderRadius: 999,
-    borderWidth: 1,
-    top: -50,
-  },
-  orbitLarge: {
-    position: 'absolute',
-    width: 320,
-    height: 320,
-    borderRadius: 999,
-    borderWidth: 1,
-    top: -95,
-  },
-
-  trustRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-    paddingHorizontal: 2,
-  },
-  trustItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  connectionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 16,
-    paddingVertical: 4,
-  },
+  languageRow: { flexDirection: 'row', justifyContent: 'flex-end' },
+  brandBlock: { alignItems: 'center', gap: 7, paddingTop: 2, paddingBottom: 4 },
+  connectionPress: { marginTop: 14, paddingVertical: 5 },
+  connectionRow: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   connectionLabel: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  demoNotice: { marginTop: 10, lineHeight: 16 },
 });
