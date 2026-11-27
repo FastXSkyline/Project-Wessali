@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { palette, serviceTheme } from '../theme';
 import type { WessaliApp } from '../useWessali';
@@ -143,32 +144,48 @@ function PartnerIntro({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: () =
   ];
   return (
     <>
-      <GlassCard padding={20} tone="deep" radius={30} style={{ overflow: 'hidden' }}>
-        <RouteDoodle height={180} opacity={0.6} color={palette.jadeBright} />
-        <RadialGlow
-          size={260}
-          color={palette.jadeBright}
-          opacity={0.16}
-          style={{ position: 'absolute', top: -140, right: -90 }}
-        />
-        <View style={{ gap: 13 }}>
-          <View style={[styles.introTop, isRtl && styles.rowReverse]}>
-            <View style={[styles.kicker, isRtl && styles.rowReverse]}>
-              <View style={[styles.kickerDot, { backgroundColor: palette.jadeBright }]} />
-              <AppText variant="caption" style={{ color: palette.jadeBright }}>
-                {ui.brand} · {ui.partnerTitle}
-              </AppText>
+      <View style={styles.heroShell}>
+        <LinearGradient
+          colors={['#092844', '#104B78', '#1769A3']}
+          start={{ x: 0.04, y: 0 }}
+          end={{ x: 0.96, y: 1 }}
+          style={styles.partnerHero}
+        >
+          <RouteDoodle height={190} opacity={0.22} color="#83C6F5" />
+          <RadialGlow
+            size={290}
+            color="#56B8FF"
+            opacity={0.24}
+            style={{ position: 'absolute', top: -142, right: -102 }}
+          />
+          <RadialGlow
+            size={210}
+            color="#39B9D5"
+            opacity={0.12}
+            style={{ position: 'absolute', bottom: -118, left: -92 }}
+          />
+          <View style={{ gap: 15 }}>
+            <View style={[styles.introTop, isRtl && styles.rowReverse]}>
+              <View style={[styles.kicker, styles.kickerDark, isRtl && styles.rowReverse]}>
+                <View style={[styles.kickerDot, { backgroundColor: '#82D2FF' }]} />
+                <AppText variant="caption" style={{ color: '#D1ECFF' }}>
+                  {ui.brand} · {ui.partnerTitle}
+                </AppText>
+              </View>
+              <IconTile tone="jade" icon="account-hard-hat" size="lg" glow={false} />
             </View>
-            <IconTile tone="jade" icon="account-hard-hat" size="lg" />
+            <AppText variant="h1" tone="white" style={{ maxWidth: '92%' }}>
+              {ui.partnerIntroTitle}
+            </AppText>
+            <AppText
+              variant="body"
+              style={{ color: 'rgba(232,244,255,0.82)', maxWidth: '94%', lineHeight: 23 }}
+            >
+              {ui.partnerIntroBody}
+            </AppText>
           </View>
-          <AppText variant="h1" style={{ maxWidth: '90%' }}>
-            {ui.partnerIntroTitle}
-          </AppText>
-          <AppText variant="body" tone="soft" style={{ maxWidth: '92%' }}>
-            {ui.partnerIntroBody}
-          </AppText>
-        </View>
-      </GlassCard>
+        </LinearGradient>
+      </View>
 
       <GlassCard padding={16} radius={24}>
         <View style={{ gap: 13 }}>
@@ -448,41 +465,53 @@ function ApprovedBusiness({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: 
   ];
   return (
     <>
-      <GlassCard padding={20} tone="deep" radius={30} style={{ overflow: 'hidden' }}>
-        <RouteDoodle height={170} opacity={0.5} color={palette.jade} />
-        <RadialGlow
-          size={260}
-          color={palette.jade}
-          opacity={0.2}
-          style={{ position: 'absolute', top: -130, right: -90 }}
-        />
-        <View style={{ gap: 13 }}>
-          <View style={[styles.introTop, rtlStyle && styles.rowReverse]}>
-            <View style={[styles.kicker, rtlStyle && styles.rowReverse]}>
-              <View style={styles.kickerDot} />
-              <AppText variant="caption" tone="jade">
-                {ui.approvedTitle}
-              </AppText>
+      <View style={styles.heroShell}>
+        <LinearGradient
+          colors={['#092844', '#104B78', '#1769A3']}
+          start={{ x: 0.04, y: 0 }}
+          end={{ x: 0.96, y: 1 }}
+          style={styles.partnerHero}
+        >
+          <RouteDoodle height={180} opacity={0.20} color="#83C6F5" />
+          <RadialGlow
+            size={290}
+            color="#56B8FF"
+            opacity={0.22}
+            style={{ position: 'absolute', top: -142, right: -102 }}
+          />
+          <View style={{ gap: 15 }}>
+            <View style={[styles.introTop, rtlStyle && styles.rowReverse]}>
+              <View style={[styles.kicker, styles.kickerDark, rtlStyle && styles.rowReverse]}>
+                <View style={[styles.kickerDot, { backgroundColor: '#82D2FF' }]} />
+                <AppText variant="caption" style={{ color: '#D1ECFF' }}>
+                  {ui.approvedTitle}
+                </AppText>
+              </View>
+              <IconTile tone="jade" icon="shield-check-outline" size="lg" glow={false} />
             </View>
-            <IconTile tone="jade" icon="shield-check-outline" size="lg" />
-          </View>
-          <AppText variant="h1">{providerProfile?.business_name ?? ui.partnerTitle}</AppText>
-          <View style={[styles.approvedMeta, rtlStyle && styles.rowReverse]}>
-            <View style={styles.approvedPill}>
-              <Ionicons name="checkmark-circle" size={14} color={palette.jade} />
-              <AppText variant="caption" tone="jade" style={{ fontSize: 10 }}>
-                {ui.approved}
-              </AppText>
+            <AppText variant="h1" tone="white">
+              {providerProfile?.business_name ?? ui.partnerTitle}
+            </AppText>
+            <View style={[styles.approvedMeta, rtlStyle && styles.rowReverse]}>
+              <View style={[styles.approvedPill, styles.approvedPillDark]}>
+                <Ionicons name="checkmark-circle" size={14} color="#8BD3FF" />
+                <AppText variant="caption" style={{ color: '#E2F3FF', fontSize: 10 }}>
+                  {ui.approved}
+                </AppText>
+              </View>
+              {providerProfile?.approved_at || providerProfile?.created_at ? (
+                <AppText
+                  variant="caption"
+                  style={{ color: 'rgba(225,241,255,0.72)', fontSize: 10 }}
+                >
+                  {ui.businessSince}{' '}
+                  {formatShortDate(providerProfile.approved_at ?? providerProfile.created_at, locale)}
+                </AppText>
+              ) : null}
             </View>
-            {providerProfile?.approved_at || providerProfile?.created_at ? (
-              <AppText variant="caption" tone="muted" style={{ fontSize: 10 }}>
-                {ui.businessSince}{' '}
-                {formatShortDate(providerProfile.approved_at ?? providerProfile.created_at, locale)}
-              </AppText>
-            ) : null}
           </View>
-        </View>
-      </GlassCard>
+        </LinearGradient>
+      </View>
 
       <View style={[styles.statRow, rtlStyle && styles.rowReverse]}>
         {stats.map((stat) => (
@@ -513,6 +542,30 @@ function ApprovedBusiness({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: 
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  heroShell: {
+    borderRadius: 30,
+    shadowColor: '#0A3C68',
+    shadowOpacity: 0.14,
+    shadowRadius: 21,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
+  },
+  partnerHero: {
+    minHeight: 208,
+    padding: 20,
+    borderRadius: 30,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(124,190,239,0.30)',
+  },
+  kickerDark: {
+    borderColor: 'rgba(165,215,252,0.24)',
+    backgroundColor: 'rgba(220,241,255,0.10)',
+  },
+  approvedPillDark: {
+    borderColor: 'rgba(139,211,255,0.30)',
+    backgroundColor: 'rgba(139,211,255,0.12)',
+  },
   rowReverse: { flexDirection: 'row-reverse' },
   introTop: {
     flexDirection: 'row',
