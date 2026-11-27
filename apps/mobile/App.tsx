@@ -125,6 +125,7 @@ function AppRoot() {
           app={app}
           onStartRequest={() => openService('freight')}
           onOpenPartner={() => navigate('partner')}
+          onOpenTracking={(booking) => setTrackingBooking(booking)}
         />
       );
     }
