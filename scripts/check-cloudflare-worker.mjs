@@ -36,13 +36,11 @@ for (const [index, script] of inlineScripts.entries()) {
   }
 }
 
-const marker = 'const ADMIN_HTML = ';
-const markerIndex = workerSource.indexOf(marker);
-const valueStart = markerIndex < 0 ? -1 : workerSource.indexOf('"', markerIndex + marker.length);
-if (markerIndex < 0 || valueStart < 0) {
-  throw new Error('The Worker does not contain the embedded dashboard HTML.');
+const assignment = /const\s+ADMIN_HTML\s*=\s*(")/.exec(workerSource);
+if (!assignment) {
+  throw new Error('The Worker does not contain the embedded dashboard HTML assignment.');
 }
-
+const valueStart = assignment.index + assignment[0].length - 1;
 let valueEnd = valueStart + 1;
 let escaped = false;
 for (; valueEnd < workerSource.length; valueEnd += 1) {
