@@ -6,7 +6,7 @@
     "scheme": "wessali",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#F3F3EF",
+    "backgroundColor": "#F4F7FB",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -21,16 +21,16 @@
       "package": "dz.wessali.app",
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
-        "backgroundColor": "#F3F3EF"
+        "backgroundColor": "#F4F7FB"
       }
     },
     "androidStatusBar": {
-      "backgroundColor": "#F3F3EF",
+      "backgroundColor": "#F4F7FB",
       "barStyle": "dark-content",
       "translucent": true
     },
     "androidNavigationBar": {
-      "backgroundColor": "#F3F3EF",
+      "backgroundColor": "#F4F7FB",
       "barStyle": "dark-content"
     },
     "extra": {
@@ -44,7 +44,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F3F3EF",
+          "backgroundColor": "#F4F7FB",
           "resizeMode": "contain"
         }
       ],
