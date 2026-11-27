@@ -27,6 +27,8 @@ import { BookingScreen } from './src/screens/BookingScreen';
 import { RequestsScreen } from './src/screens/RequestsScreen';
 import { PartnerScreen } from './src/screens/PartnerScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
+import { TrackingScreen } from './src/screens/TrackingScreen';
+import type { Booking } from './src/types';
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -56,16 +58,19 @@ function AppRoot() {
   const app = useWessali();
   const [tab, setTab] = useState<Tab>('home');
   const [bookingOpen, setBookingOpen] = useState(false);
+  const [trackingBooking, setTrackingBooking] = useState<Booking | null>(null);
 
   useEffect(() => {
     if (!app.session) {
       setTab('home');
       setBookingOpen(false);
+      setTrackingBooking(null);
     }
   }, [app.session]);
 
   function navigate(next: Tab) {
     app.setError('');
+    setTrackingBooking(null);
     if (next === 'create') {
       app.beginBooking('freight');
       setBookingOpen(true);
@@ -103,6 +108,9 @@ function AppRoot() {
         />
       );
     }
+    if (trackingBooking) {
+      return <TrackingScreen app={app} booking={trackingBooking} onBack={() => setTrackingBooking(null)} />;
+    }
     if (tab === 'requests') {
       return (
         <RequestsScreen
@@ -130,6 +138,9 @@ function AppRoot() {
         onOpenRequests={() => navigate('requests')}
         onOpenPartner={() => navigate('partner')}
         onOpenProfile={() => navigate('profile')}
+        onOpenTracking={() => {
+          if (app.activeBooking) setTrackingBooking(app.activeBooking);
+        }}
       />
     );
   })();
@@ -141,7 +152,7 @@ function AppRoot() {
       <View style={styles.root}>
         <StatusBar style="dark" />
         {content}
-        {app.session && !bookingOpen ? (
+        {app.session && !bookingOpen && !trackingBooking ? (
           <BottomDock
             active={tab}
             onSelect={navigate}
