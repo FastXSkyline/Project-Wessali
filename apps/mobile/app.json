@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "dz.wessali.app",
-      "buildNumber": "50",
+      "buildNumber": "51",
       "infoPlist": {
         "UIUserInterfaceStyle": "Light",
         "UIViewControllerBasedStatusBarAppearance": false
