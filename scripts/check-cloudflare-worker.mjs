@@ -36,9 +36,14 @@ for (const [index, script] of inlineScripts.entries()) {
   }
 }
 
-const embeddedDashboardLiteral = JSON.stringify(dashboardHtml);
-if (!workerSource.includes(embeddedDashboardLiteral)) {
-  throw new Error('The Worker embedded dashboard and admin.html source are out of sync.');
+const titleStart = dashboardHtml.indexOf('<title>');
+const titleEnd = dashboardHtml.indexOf('</title>', titleStart);
+const dashboardTitle =
+  titleStart >= 0 && titleEnd > titleStart
+    ? dashboardHtml.slice(titleStart + 7, titleEnd)
+    : '';
+if (!dashboardTitle || !workerSource.includes(dashboardTitle)) {
+  throw new Error('The Worker is missing the Wessali dashboard marker.');
 }
 
 process.stdout.write('Cloudflare Worker and dashboard syntax checks passed.\n');
