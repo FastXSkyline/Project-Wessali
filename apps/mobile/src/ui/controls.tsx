@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   fieldShellFocused: {
-    borderColor: 'rgba(88, 116, 94, 0.42)',
+    borderColor: 'rgba(23, 111, 194, 0.42)',
     backgroundColor: 'rgba(255, 255, 255, 0.96)',
   },
   fieldShellMultiline: { alignItems: 'flex-start', paddingTop: 14, minHeight: 92 },
@@ -588,11 +588,11 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 999,
     padding: 3,
-    backgroundColor: 'rgba(67, 82, 70, 0.12)',
+    backgroundColor: 'rgba(30, 70, 115, 0.12)',
     borderWidth: 1,
     borderColor: palette.lineSoft,
   },
-  trackOn: { backgroundColor: palette.jade, borderColor: 'rgba(88,116,94,0.32)' },
+  trackOn: { backgroundColor: palette.jade, borderColor: 'rgba(23,111,194,0.32)' },
   knob: {
     width: 22,
     height: 22,
