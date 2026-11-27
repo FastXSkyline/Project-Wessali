@@ -311,8 +311,8 @@ export function BrandMark({ size = 44 }: { size?: number }) {
     <View style={{ width: size, height: size }}>
       <RadialGlow
         size={size * 2.1}
-        color={palette.jade}
-        opacity={0.28}
+        color={palette.jadeBright}
+        opacity={0.14}
         style={{ position: 'absolute', top: -size * 0.55, left: -size * 0.55 }}
       />
       <LinearGradient
@@ -323,16 +323,22 @@ export function BrandMark({ size = 44 }: { size?: number }) {
       >
         <Svg width={size} height={size} viewBox="0 0 40 40">
           <Path
-            d="M10.4 27.5 L16 13.5 L21 24.8 L27 11.8"
+            d="M5 17.5 H22.5 V28 H5 Z M22.5 21 H29 L34 25.5 V28 H22.5"
             stroke={palette.onAccent}
-            strokeWidth={3.1}
+            strokeWidth={2.25}
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"
-            opacity={0.94}
           />
-          <Circle cx={10.4} cy={27.5} r={2.05} fill={palette.onAccent} opacity={0.7} />
-          <Circle cx={27} cy={11.8} r={2.3} fill={palette.onAccent} />
+          <Circle cx={11} cy={28.5} r={2.7} fill={palette.onAccent} />
+          <Circle cx={28} cy={28.5} r={2.7} fill={palette.onAccent} />
+          <Path
+            d="M29 3.5 C25.6 3.5 23 6.1 23 9.4 C23 13.2 29 19.5 29 19.5 C29 19.5 35 13.2 35 9.4 C35 6.1 32.4 3.5 29 3.5 Z"
+            fill={palette.onAccent}
+          />
+          <Circle cx={29} cy={9.4} r={2.05} fill={palette.jadeDeep} />
+          <Path d="M2 21 H5" stroke={palette.onAccent} strokeWidth={1.8} strokeLinecap="round" opacity={0.9} />
+          <Path d="M1.5 25 H5" stroke={palette.onAccent} strokeWidth={1.8} strokeLinecap="round" opacity={0.58} />
         </Svg>
         <View style={[styles.brandSheen, { borderRadius: size * 0.32 }]} />
       </LinearGradient>
