@@ -588,8 +588,8 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     borderRadius: 13,
     borderWidth: 1,
-    borderColor: 'rgba(88,116,94,0.22)',
-    backgroundColor: 'rgba(88,116,94,0.07)',
+    borderColor: 'rgba(20,86,148,0.22)',
+    backgroundColor: 'rgba(20,86,148,0.07)',
   },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 },
   metaChip: {
