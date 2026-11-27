@@ -145,7 +145,6 @@ export function ScreenTransition({
 
     return () => animation.stop();
   }, [
-    children,
     direction,
     height,
     incomingOpacity,
