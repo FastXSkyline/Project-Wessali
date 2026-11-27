@@ -15,6 +15,7 @@ import { Location as PreciseLocation, LocationAccuracy, LocationProfile } from '
 import { LinearGradient } from 'expo-linear-gradient';
 import { palette } from '../theme';
 import { AppText } from './base';
+import { MotionPressable } from './motion';
 
 export type PickedLocation = { address: string; latitude: number; longitude: number };
 type Coordinates = { latitude: number; longitude: number };

@@ -246,7 +246,8 @@ export function ContentTransition({
   );
 }
 
-type MotionPressableProps = Omit<PressableProps, 'style'> & {
+type MotionPressableProps = Omit<PressableProps, 'style' | 'children'> & {
+  children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
 };

@@ -17,6 +17,7 @@ import {
 import { Field, IconButton, InfoNote, PrimaryButton } from '../ui/controls';
 import { IconTile } from '../ui/IconTile';
 import { formatShortDate } from '../utils';
+import { ContentTransition, MotionPressable, StaggeredItem } from '../ui/motion';
 
 export function PartnerScreen({
   app,

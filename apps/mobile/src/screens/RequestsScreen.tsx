@@ -617,7 +617,8 @@ const styles = StyleSheet.create({
   rowReverse: { flexDirection: 'row-reverse' },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 11 },
   routeWrap: { marginTop: 14 },
-  trackAction: { minHeight: 38, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 11, borderRadius: 12, backgroundColor: '#EAF3FC' },
+  trackAction: { minHeight: 38, paddingHorizontal: 11, borderRadius: 12, backgroundColor: '#EAF3FC' },
+  trackActionContent: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   mapLink: {
     paddingHorizontal: 11,
     paddingVertical: 9,
