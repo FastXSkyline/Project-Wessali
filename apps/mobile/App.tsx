@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -18,7 +19,7 @@ import {
 } from '@expo-google-fonts/ibm-plex-sans-arabic';
 import { palette } from './src/theme';
 import { useWessali } from './src/useWessali';
-import { LocaleProvider } from './src/ui/base';
+import { BrandMark, LocaleProvider } from './src/ui/base';
 import { BottomDock, type Tab } from './src/ui/BottomDock';
 import { FeedbackToast } from './src/ui/feedback';
 import { SignInScreen } from './src/screens/SignInScreen';
@@ -44,7 +45,13 @@ export default function App() {
   });
 
   if (!fontsLoaded && !fontError) {
-    return <View style={styles.splash} />;
+    return (
+      <LinearGradient colors={['#061F3A', '#0A3763', '#0E4A7D']} style={styles.splash}>
+        <BrandMark size={82} />
+        <Text style={styles.splashTitle}>Wessali</Text>
+        <Text style={styles.splashSubtitle}>Freight · Roadside · Water</Text>
+      </LinearGradient>
+    );
   }
 
   return (
@@ -182,5 +189,7 @@ function AppRoot() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: palette.canvas, overflow: 'hidden' },
-  splash: { flex: 1, backgroundColor: palette.canvas },
+  splash: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 13 },
+  splashTitle: { color: '#FFFFFF', fontSize: 31, fontWeight: '800', letterSpacing: -0.5 },
+  splashSubtitle: { color: 'rgba(255,255,255,0.78)', fontSize: 11, fontWeight: '500', letterSpacing: 0.2 },
 });
