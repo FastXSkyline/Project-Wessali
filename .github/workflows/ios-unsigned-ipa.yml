@@ -1,4 +1,4 @@
-run-name: Build Wessali iOS IPA (${{ github.ref_name }})
+run-name: Build Wessali iOS IPA (${{ github.ref_name }} @ ${{ github.sha }})
 name: Build iOS unsigned IPA
 
 on:
