@@ -343,7 +343,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
             <Ionicons name="location" size={35} color={palette.jadeDeep} />
           </View>
           <LinearGradient
-            colors={['rgba(243,243,239,0.9)', 'rgba(243,243,239,0)']}
+            colors={['rgba(244,247,251,0.92)', 'rgba(243,243,239,0)']}
             style={styles.mapTopFade}
             pointerEvents="none"
           />
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.lineSoft,
   },
-  mapWrap: { flex: 1, overflow: 'hidden', backgroundColor: '#E7E9E4' },
+  mapWrap: { flex: 1, overflow: 'hidden', backgroundColor: '#E8F0F9' },
   mapFallback: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   pin: {
     position: 'absolute',
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     paddingVertical: 10,
     borderRadius: 14,
-    backgroundColor: 'rgba(88,116,94,0.08)',
+    backgroundColor: 'rgba(23,111,194,0.08)',
     borderWidth: 1,
     borderColor: 'rgba(88,116,94,0.2)',
   },
