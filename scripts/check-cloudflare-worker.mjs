@@ -38,11 +38,27 @@ for (const [index, script] of inlineScripts.entries()) {
 
 const marker = 'const ADMIN_HTML = ';
 const markerIndex = workerSource.indexOf(marker);
-const semicolonIndex = workerSource.indexOf(';\n', markerIndex);
-if (markerIndex < 0 || semicolonIndex < 0) {
+const valueStart = markerIndex < 0 ? -1 : workerSource.indexOf('"', markerIndex + marker.length);
+if (markerIndex < 0 || valueStart < 0) {
   throw new Error('The Worker does not contain the embedded dashboard HTML.');
 }
-const embeddedHtml = JSON.parse(workerSource.slice(markerIndex + marker.length, semicolonIndex));
+
+let valueEnd = valueStart + 1;
+let escaped = false;
+for (; valueEnd < workerSource.length; valueEnd += 1) {
+  const character = workerSource[valueEnd];
+  if (escaped) {
+    escaped = false;
+  } else if (character === '\\') {
+    escaped = true;
+  } else if (character === '"') {
+    break;
+  }
+}
+if (valueEnd >= workerSource.length || workerSource[valueEnd + 1] !== ';') {
+  throw new Error('The embedded dashboard string is not a valid JavaScript literal.');
+}
+const embeddedHtml = JSON.parse(workerSource.slice(valueStart, valueEnd + 1));
 if (embeddedHtml !== dashboardHtml) {
   throw new Error('The Worker embedded dashboard and admin.html source are out of sync.');
 }
