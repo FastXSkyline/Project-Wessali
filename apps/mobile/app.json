@@ -6,7 +6,7 @@
     "scheme": "wessali",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#F4F7FB",
+    "backgroundColor": "#082B50",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -21,7 +21,7 @@
       "package": "dz.wessali.app",
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
-        "backgroundColor": "#F4F7FB"
+        "backgroundColor": "#082B50"
       }
     },
     "androidStatusBar": {
