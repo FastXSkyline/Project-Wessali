@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { AppleMaps, GoogleMaps } from 'expo-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,10 +6,12 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { WessaliApp } from '../useWessali';
 import type { Booking } from '../types';
+import { isActive } from '../utils';
 import { palette } from '../theme';
 import { AppText, GlassCard, Page, RadialGlow, useLocaleValue } from '../ui/base';
 import { IconButton, StatusPill } from '../ui/controls';
 import { RouteProgress, TripRoute } from '../ui/trip';
+import { apiRequest } from '../api';
 
 const DEFAULT_CENTER = { latitude: 36.7538, longitude: 3.0588 };
 
@@ -45,6 +47,40 @@ export function TrackingScreen({
 }) {
   const { ui, locale, isRtl } = app;
   const { isRtl: rtl } = useLocaleValue();
+  const [providerLocation, setProviderLocation] = useState<{
+    latitude: number;
+    longitude: number;
+    recordedAt: string;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const refreshProviderLocation = async () => {
+      if (!app.session?.accessToken || !isActive(booking.status)) {
+        setProviderLocation(null);
+        return;
+      }
+      try {
+        const result = await apiRequest<{
+          providerLocation: { latitude: number; longitude: number; recordedAt: string } | null;
+        }>(
+          app.apiBaseUrl,
+          `/bookings/${booking.id}/tracking`,
+          app.session.accessToken,
+        );
+        if (!cancelled) setProviderLocation(result.providerLocation);
+      } catch {
+        if (!cancelled) setProviderLocation(null);
+      }
+    };
+
+    void refreshProviderLocation();
+    const timer = setInterval(() => void refreshProviderLocation(), 12000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [app.apiBaseUrl, app.session?.accessToken, booking.id, booking.status]);
 
   const pickup = useMemo(
     () =>
@@ -100,6 +136,15 @@ export function TrackingScreen({
           },
         ]
       : []),
+    ...(providerLocation
+      ? [{
+          id: 'provider-live',
+          coordinates: { latitude: providerLocation.latitude, longitude: providerLocation.longitude },
+          title: ui.assignedProvider,
+          systemImage: 'car.fill',
+          tintColor: '#4BC7A2',
+        }]
+      : []),
   ];
 
   const googleMarkers = [
@@ -115,6 +160,14 @@ export function TrackingScreen({
             snippet: booking.public_reference,
           },
         ]
+      : []),
+    ...(providerLocation
+      ? [{
+          id: 'provider-live',
+          coordinates: { latitude: providerLocation.latitude, longitude: providerLocation.longitude },
+          title: ui.assignedProvider,
+          snippet: providerLocation.recordedAt,
+        }]
       : []),
   ];
 
@@ -262,6 +315,14 @@ export function TrackingScreen({
                   <View style={[styles.legendDot, { backgroundColor: '#FF8494' }]} />
                   <AppText variant="caption" style={styles.legendText}>
                     {ui.destinationLabel}
+                  </AppText>
+                </View>
+              ) : null}
+              {providerLocation ? (
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: '#4BC7A2' }]} />
+                  <AppText variant="caption" style={styles.legendText}>
+                    {ui.assignedProvider}
                   </AppText>
                 </View>
               ) : null}

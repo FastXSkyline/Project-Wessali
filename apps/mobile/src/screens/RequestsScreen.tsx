@@ -532,6 +532,21 @@ function JobCard({ app, booking }: { app: WessaliApp; booking: Booking }) {
           loading={app.busy}
           onPress={() => void app.advanceJob(booking.id)}
         />
+        <SecondaryButton
+          label={app.trackingBookingId === booking.id ? ui.stopSharing : ui.shareLocation}
+          icon={app.trackingBookingId === booking.id ? 'location-outline' : 'navigate-outline'}
+          disabled={app.busy}
+          onPress={() => void (
+            app.trackingBookingId === booking.id
+              ? app.stopLocationSharing()
+              : app.startLocationSharing(booking.id)
+          )}
+        />
+        {app.trackingBookingId === booking.id ? (
+          <AppText variant="caption" tone="muted">
+            {ui.locationShareHint}
+          </AppText>
+        ) : null}
       </View>
     </GlassCard>
   );

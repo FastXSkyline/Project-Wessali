@@ -31,14 +31,58 @@ export function SignInScreen({ app }: { app: WessaliApp }) {
           <AppText variant="caption" tone="muted">{ui.signInBody}</AppText>
         </View>
         <View style={{ height: 17 }} />
+        <Segmented
+          value={app.authMode}
+          onChange={(value) => app.setAuthMode(value as 'login' | 'register')}
+          accent={palette.jadeBright}
+          options={[
+            { value: 'register', label: ui.authRegister },
+            { value: 'login', label: ui.authLogin },
+          ]}
+        />
+        <View style={{ height: 12 }} />
         <AppText variant="label" tone="soft">{ui.roleLabel}</AppText>
         <View style={{ height: 8 }} />
-        <Segmented value={app.role} onChange={(value) => app.setRole(value as Role)} accent={palette.jadeBright}
-          options={[{ value: 'customer', label: ui.roleCustomer }, { value: 'provider', label: ui.roleProvider }]} />
+        <Segmented
+          value={app.role}
+          onChange={(value) => app.setRole(value as Role)}
+          accent={palette.jadeBright}
+          options={[
+            { value: 'customer', label: ui.roleCustomer },
+            { value: 'provider', label: ui.roleProvider },
+          ]}
+        />
         <View style={{ height: 15 }} />
         <View style={{ gap: 13 }}>
-          <Field label={ui.nameLabel} value={app.name} onChangeText={app.setName} placeholder={ui.namePlaceholder} icon="person-outline" autoComplete="name" />
-          <Field label={ui.phoneLabel} value={app.phone} onChangeText={app.setPhone} placeholder={ui.phonePlaceholder} icon="call-outline" keyboardType="phone-pad" autoComplete="tel" />
+          {app.authMode === 'register' ? (
+            <Field
+              label={ui.nameLabel}
+              value={app.name}
+              onChangeText={app.setName}
+              placeholder={ui.namePlaceholder}
+              icon="person-outline"
+              autoComplete="name"
+            />
+          ) : null}
+          <Field
+            label={ui.phoneLabel}
+            value={app.phone}
+            onChangeText={app.setPhone}
+            placeholder={ui.phonePlaceholder}
+            icon="call-outline"
+            keyboardType="phone-pad"
+            autoComplete="tel"
+          />
+          <Field
+            label={ui.passwordLabel}
+            value={app.password}
+            onChangeText={app.setPassword}
+            placeholder={ui.passwordPlaceholder}
+            icon="lock-closed-outline"
+            secureTextEntry
+            autoComplete={app.authMode === 'register' ? 'new-password' : 'current-password'}
+            autoCapitalize="none"
+          />
         </View>
         <MotionPressable
           accessibilityRole="button"
@@ -64,8 +108,23 @@ export function SignInScreen({ app }: { app: WessaliApp }) {
           </View>
         ) : null}
         <View style={{ height: 17 }} />
-        <PrimaryButton label={ui.enter} icon="log-in-outline" onPress={() => void app.signIn()} loading={app.busy} />
-        <AppText variant="caption" tone="muted" align="center" style={{ marginTop: 11, lineHeight: 17 }}>{ui.demoNotice}</AppText>
+        <PrimaryButton
+          label={app.authMode === 'register' ? ui.authRegister : ui.authLogin}
+          icon={app.authMode === 'register' ? 'person-add-outline' : 'log-in-outline'}
+          onPress={() => void app.signIn()}
+          loading={app.busy}
+        />
+        <MotionPressable
+          onPress={() => app.setAuthMode(app.authMode === 'register' ? 'login' : 'register')}
+          style={{ alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 6 }}
+        >
+          <AppText variant="label" style={{ color: palette.jadeDeep }}>
+            {app.authMode === 'register' ? ui.switchToLogin : ui.switchToRegister}
+          </AppText>
+        </MotionPressable>
+        <AppText variant="caption" tone="muted" align="center" style={{ marginTop: 5, lineHeight: 17 }}>
+          {ui.phoneVerificationNotice}
+        </AppText>
       </GlassCard>
       <AppText variant="caption" tone="faint" align="center">{ui.version} · {ui.madeFor}</AppText>
     </Page>
