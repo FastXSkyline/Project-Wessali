@@ -286,7 +286,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
               cameraPosition={cameraPosition}
               markers={userMarker}
               properties={{ isMyLocationEnabled: Boolean(userLocation), selectionEnabled: true }}
-              uiSettings={{ myLocationButtonEnabled: true, compassEnabled: true }}
+              uiSettings={{ myLocationButtonEnabled: false, compassEnabled: true }}
               onCameraMove={(event) => handleCameraMove(event.coordinates)}
               onMapClick={(event) => handleMapTap(event.coordinates)}
             />
@@ -392,8 +392,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.lineSoft,
   },
-  mapWrap: { flex: 1, minHeight: 280, overflow: 'hidden', backgroundColor: '#E8F0F9' },
-  nativeMap: { flex: 1, width: '100%', minHeight: 280 },
+  mapWrap: { flex: 1, flexShrink: 1, minHeight: 180, overflow: 'hidden', backgroundColor: '#E8F0F9' },
+  nativeMap: { flex: 1, width: '100%', minHeight: 180 },
   mapFallback: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   pin: {
     position: 'absolute',
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   bottom: {
     paddingHorizontal: 18,
     paddingTop: 13,
-    paddingBottom: 28,
+    paddingBottom: 20,
     gap: 11,
     backgroundColor: palette.canvas,
   },
