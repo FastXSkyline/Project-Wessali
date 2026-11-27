@@ -47,6 +47,7 @@ export default function App() {
   if (!fontsLoaded && !fontError) {
     return (
       <LinearGradient colors={['#061F3A', '#0A3763', '#0E4A7D']} style={styles.splash}>
+        <StatusBar style="light" />
         <BrandMark size={82} />
         <Text style={styles.splashTitle}>Wessali</Text>
         <Text style={styles.splashSubtitle}>Freight · Roadside · Water</Text>
