@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,6 +7,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { palette } from '../theme';
 import { AppText, useLocaleValue } from './base';
+
+const AlphaMaskedView = MaskedView as unknown as React.ComponentType<{
+  children?: React.ReactNode;
+  maskElement: React.ReactElement;
+  pointerEvents?: 'box-none' | 'none' | 'box-only' | 'auto';
+  style?: StyleProp<ViewStyle>;
+}>;
 
 export function FeedbackToast({
   message,
@@ -34,7 +41,7 @@ export function FeedbackToast({
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { height: insets.top + 65 }]}>
-      <MaskedView
+      <AlphaMaskedView
         pointerEvents="none"
         style={[styles.blurFade, { height: insets.top + 104 }]}
         maskElement={
@@ -60,7 +67,7 @@ export function FeedbackToast({
           end={{ x: 0.5, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
-      </MaskedView>
+      </AlphaMaskedView>
 
       <Animated.View
         style={[
