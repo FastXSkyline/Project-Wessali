@@ -36,28 +36,8 @@ for (const [index, script] of inlineScripts.entries()) {
   }
 }
 
-const assignment = /const\s+ADMIN_HTML\s*=\s*(")/.exec(workerSource);
-if (!assignment) {
-  throw new Error('The Worker does not contain the embedded dashboard HTML assignment.');
-}
-const valueStart = assignment.index + assignment[0].length - 1;
-let valueEnd = valueStart + 1;
-let escaped = false;
-for (; valueEnd < workerSource.length; valueEnd += 1) {
-  const character = workerSource[valueEnd];
-  if (escaped) {
-    escaped = false;
-  } else if (character === '\\') {
-    escaped = true;
-  } else if (character === '"') {
-    break;
-  }
-}
-if (valueEnd >= workerSource.length || workerSource[valueEnd + 1] !== ';') {
-  throw new Error('The embedded dashboard string is not a valid JavaScript literal.');
-}
-const embeddedHtml = JSON.parse(workerSource.slice(valueStart, valueEnd + 1));
-if (embeddedHtml !== dashboardHtml) {
+const embeddedDashboardLiteral = JSON.stringify(dashboardHtml);
+if (!workerSource.includes(embeddedDashboardLiteral)) {
   throw new Error('The Worker embedded dashboard and admin.html source are out of sync.');
 }
 
