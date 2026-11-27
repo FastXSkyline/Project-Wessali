@@ -2,7 +2,7 @@ const ADMIN_HTML = "<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\
 const encoder = new TextEncoder();
 const ACTIVE_STATUSES = ["submitted", "matching", "offer_received", "accepted", "provider_en_route", "arrived", "in_progress"];
 const SERVICE_TYPES = ["freight", "roadside", "water"];
-const ADMIN_SETUP_KEY_HASH = "00700d58ac86530ad69af6483b25fae09cdd8cb82bc17df679c256ca1e8dd6d1";
+const ADMIN_SETUP_KEY_HASH = "AHANWKyGUwrWmvZIOyX64JzdjLgrwX32ecJWyh6N1tE";
 const USER_ROLES = ["customer", "provider"];
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" };
 
