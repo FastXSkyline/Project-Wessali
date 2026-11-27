@@ -87,7 +87,7 @@ export function BookingScreen({ app, onBack, onSent }: { app: WessaliApp; onBack
         </GlassCard>
 
         <GlassCard padding={16} radius={21}>
-          <SectionTitle title={ui.detailsSection} icon="clipboard-list-outline" />
+          <SectionTitle title={ui.detailsSection} icon="clipboard-outline" />
           <View style={{ height: 14 }} />
           {selectedService === 'freight' ? (
             <View style={{ gap: 13 }}>
