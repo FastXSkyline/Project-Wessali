@@ -15,28 +15,34 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { accentForTone, gradients, palette, statusTone } from '../theme';
 import { AppText, RadialGlow, useLocaleValue } from './base';
+import { animateLayout, MotionPressable } from './motion';
 
 function tap() {
   Haptics.selectionAsync().catch(() => undefined);
 }
 
 export function usePressScale() {
-  const scale = useRef(new Animated.Value(1)).current;
+  const progress = useRef(new Animated.Value(0)).current;
+  const scale = progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0.992] });
+  const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [0, 1.5] });
   return {
     scale,
+    translateY,
     pressIn: () =>
-      Animated.spring(scale, {
-        toValue: 0.965,
-        useNativeDriver: true,
-        speed: 35,
-        bounciness: 0,
-      }).start(),
-    pressOut: () =>
-      Animated.spring(scale, {
+      Animated.spring(progress, {
         toValue: 1,
         useNativeDriver: true,
-        speed: 28,
-        bounciness: 7,
+        damping: 24,
+        stiffness: 340,
+        mass: 0.65,
+      }).start(),
+    pressOut: () =>
+      Animated.spring(progress, {
+        toValue: 0,
+        useNativeDriver: true,
+        damping: 22,
+        stiffness: 280,
+        mass: 0.7,
       }).start(),
   };
 }
@@ -60,7 +66,7 @@ export function PrimaryButton({
   style,
   compact = false,
 }: PrimaryButtonProps) {
-  const { scale, pressIn, pressOut } = usePressScale();
+  const { scale, translateY, pressIn, pressOut } = usePressScale();
   const inactive = disabled || loading;
   const { isRtl } = useLocaleValue();
 
@@ -79,7 +85,7 @@ export function PrimaryButton({
       }}
       style={[{ opacity: disabled ? 0.5 : 1 }, style]}
     >
-      <Animated.View style={{ transform: [{ scale }] }}>
+      <Animated.View style={{ transform: [{ translateY }, { scale }] }}>
         <RadialGlow
           size={180}
           color={palette.jadeBright}
@@ -129,31 +135,30 @@ export function SecondaryButton({
 }) {
   const { isRtl } = useLocaleValue();
   return (
-    <Pressable
+    <MotionPressable
       accessibilityRole="button"
       accessibilityLabel={label}
       disabled={disabled}
       onPress={() => {
+        if (disabled) return;
         tap();
         onPress();
       }}
-      style={({ pressed }) => [
+      style={[
         styles.secondaryButton,
         danger && { borderColor: 'rgba(255,123,123,0.32)', backgroundColor: palette.dangerSoft },
         disabled && { opacity: 0.5 },
-        pressed && !disabled && styles.secondaryPressed,
         style,
       ]}
+      contentStyle={[styles.buttonRow, isRtl && styles.rowReverse]}
     >
-      <View style={[styles.buttonRow, isRtl && styles.rowReverse]}>
-        {icon ? (
-          <Ionicons name={icon} size={16} color={danger ? palette.danger : palette.ink} />
-        ) : null}
-        <AppText variant="button" tone={danger ? 'danger' : 'ink'} align="center">
-          {label}
-        </AppText>
-      </View>
-    </Pressable>
+      {icon ? (
+        <Ionicons name={icon} size={16} color={danger ? palette.danger : palette.ink} />
+      ) : null}
+      <AppText variant="button" tone={danger ? 'danger' : 'ink'} align="center">
+        {label}
+      </AppText>
+    </MotionPressable>
   );
 }
 
@@ -171,21 +176,21 @@ export function IconButton({
   tint?: string;
 }) {
   return (
-    <Pressable
+    <MotionPressable
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={() => {
         tap();
         onPress();
       }}
-      style={({ pressed }) => [
+      style={[
         styles.iconButton,
         { width: size, height: size, borderRadius: Math.min(15, size * 0.36) },
-        pressed && styles.iconButtonPressed,
       ]}
+      contentStyle={styles.iconButtonContent}
     >
       <Ionicons name={icon} size={size * 0.43} color={tint} />
-    </Pressable>
+    </MotionPressable>
   );
 }
 
@@ -273,6 +278,62 @@ export function Field({
 
 type Choice = { label: string; value: string };
 
+function ChoiceChip({
+  option,
+  active,
+  accent,
+  onSelect,
+}: {
+  option: Choice;
+  active: boolean;
+  accent: string;
+  onSelect: () => void;
+}) {
+  const progress = useRef(new Animated.Value(active ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(progress, {
+      toValue: active ? 1 : 0,
+      duration: 190,
+          useNativeDriver: true,
+    }).start();
+  }, [active, progress]);
+
+  return (
+    <MotionPressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+      onPress={onSelect}
+      style={[
+        styles.chip,
+        active && { borderColor: `${accent}80` },
+      ]}
+      contentStyle={styles.choiceChipContent}
+    >
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          { borderRadius: 999, backgroundColor: `${accent}1F`, opacity: progress },
+        ]}
+      />
+      <Animated.View
+        style={{
+          opacity: progress,
+          transform: [
+            { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] }) },
+          ],
+        }}
+      >
+        <View style={[styles.chipDot, { backgroundColor: accent }]} />
+      </Animated.View>
+      <AppText variant="label" tone={active ? 'ink' : 'muted'}>
+        {option.label}
+      </AppText>
+    </MotionPressable>
+  );
+}
+
 export function ChoiceChips({
   options,
   value,
@@ -287,32 +348,18 @@ export function ChoiceChips({
   const { isRtl } = useLocaleValue();
   return (
     <View style={[styles.chipWrap, isRtl && styles.rowReverse]}>
-      {options.map((option) => {
-        const active = option.value === value;
-        return (
-          <Pressable
-            key={option.value}
-            accessibilityRole="button"
-            accessibilityState={{ selected: active }}
-            onPress={() => {
-              tap();
-              onChange(option.value);
-            }}
-            style={[
-              styles.chip,
-              active && {
-                backgroundColor: `${accent}1F`,
-                borderColor: `${accent}80`,
-              },
-            ]}
-          >
-            {active ? <View style={[styles.chipDot, { backgroundColor: accent }]} /> : null}
-            <AppText variant="label" tone={active ? 'ink' : 'muted'}>
-              {option.label}
-            </AppText>
-          </Pressable>
-        );
-      })}
+      {options.map((option) => (
+        <ChoiceChip
+          key={option.value}
+          option={option}
+          active={option.value === value}
+          accent={accent}
+          onSelect={() => {
+            tap();
+            onChange(option.value);
+          }}
+        />
+      ))}
     </View>
   );
 }
@@ -329,29 +376,65 @@ export function Segmented({
   accent?: string;
 }) {
   const { isRtl } = useLocaleValue();
+  const [containerWidth, setContainerWidth] = useState(0);
+  const indicatorX = useRef(new Animated.Value(0)).current;
+  const activeIndex = Math.max(0, options.findIndex((option) => option.value === value));
+  const physicalIndex = isRtl ? options.length - 1 - activeIndex : activeIndex;
+  const segmentWidth = options.length
+    ? Math.max(0, (containerWidth - 8 - (options.length - 1) * 3) / options.length)
+    : 0;
+
+  useEffect(() => {
+    if (!segmentWidth) return;
+    Animated.spring(indicatorX, {
+      toValue: physicalIndex * (segmentWidth + 3),
+      damping: 25,
+      stiffness: 220,
+      mass: 0.82,
+      useNativeDriver: true,
+    }).start();
+  }, [indicatorX, physicalIndex, segmentWidth]);
+
   return (
-    <View style={[styles.segmented, isRtl && styles.rowReverse]}>
+    <View
+      onLayout={(event) => setContainerWidth(event.nativeEvent.layout.width)}
+      style={[styles.segmented, isRtl && styles.rowReverse]}
+    >
+      {segmentWidth > 0 ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.segmentIndicator,
+            {
+              width: segmentWidth,
+              transform: [{ translateX: indicatorX }],
+            },
+          ]}
+        >
+          <LinearGradient
+            colors={[`${accent}F2`, `${accent}B8`]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        </Animated.View>
+      ) : null}
       {options.map((option) => {
         const active = option.value === value;
         return (
-          <Pressable
+          <MotionPressable
             key={option.value}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
             onPress={() => {
+              if (active) return;
+              animateLayout();
               tap();
               onChange(option.value);
             }}
             style={styles.segment}
+            contentStyle={styles.segmentContent}
           >
-            {active ? (
-              <LinearGradient
-                colors={[`${accent}F2`, `${accent}B8`]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-            ) : null}
             <AppText
               variant="label"
               align="center"
@@ -360,7 +443,7 @@ export function Segmented({
             >
               {option.label}
             </AppText>
-          </Pressable>
+          </MotionPressable>
         );
       })}
     </View>
@@ -391,15 +474,16 @@ export function ToggleRow({
   const translateX = slide.interpolate({ inputRange: [0, 1], outputRange: [0, 18] });
 
   return (
-    <Pressable
+    <MotionPressable
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}
       accessibilityLabel={label}
       onPress={() => {
+        animateLayout();
         tap();
         onChange(!value);
       }}
-      style={[styles.toggleRow, isRtl && styles.rowReverse]}
+      contentStyle={[styles.toggleRow, isRtl && styles.rowReverse]}
     >
       <View style={{ flex: 1, gap: 2 }}>
         <AppText variant="bodyStrong">{label}</AppText>
@@ -412,7 +496,7 @@ export function ToggleRow({
       <View style={[styles.track, value && styles.trackOn]}>
         <Animated.View style={[styles.knob, { transform: [{ translateX }] }]} />
       </View>
-    </Pressable>
+    </MotionPressable>
   );
 }
 
@@ -501,7 +585,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 1,
   },
-  secondaryPressed: { backgroundColor: '#EAF3FD', transform: [{ scale: 0.985 }] },
+  iconButtonContent: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  choiceChipContent: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  segmentIndicator: {
+    position: 'absolute',
+    top: 4,
+    bottom: 4,
+    left: 4,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  segmentContent: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' },
   iconButton: {
     alignItems: 'center',
     justifyContent: 'center',

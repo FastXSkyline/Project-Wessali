@@ -5,7 +5,6 @@ import {
   Linking,
   Modal,
   Platform,
-  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
@@ -294,9 +293,9 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
     >
       <View style={styles.root}>
         <View style={[styles.header, rtl && styles.rowReverse]}>
-          <Pressable onPress={onClose} style={styles.close}>
+          <MotionPressable onPress={onClose} style={styles.close} contentStyle={styles.actionContent}>
             <Ionicons name="close" size={21} color={palette.ink} />
-          </Pressable>
+          </MotionPressable>
           <View style={{ flex: 1, gap: 2 }}>
             <AppText variant="h2">{copy.title}</AppText>
             <AppText variant="caption" tone="muted">
@@ -355,12 +354,12 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
         </View>
 
         <View style={styles.bottom}>
-          <Pressable onPress={() => void locate()} disabled={loading} style={styles.locateButton}>
+          <MotionPressable onPress={() => void locate()} disabled={loading} style={styles.locateButton} contentStyle={styles.locateContent}>
             <Ionicons name="locate" size={18} color={palette.jadeDeep} />
             <AppText variant="label" style={{ color: palette.jadeDeep }}>
               {copy.current}
             </AppText>
-          </Pressable>
+          </MotionPressable>
           <View style={styles.addressCard}>
             <View style={[styles.addressTop, rtl && styles.rowReverse]}>
               <Ionicons name="location-outline" size={18} color={palette.jadeDeep} />
@@ -381,16 +380,17 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
               {copy.coords}: {center.latitude.toFixed(6)}, {center.longitude.toFixed(6)}
             </AppText>
           </View>
-          <Pressable
+          <MotionPressable
             disabled={loading}
             onPress={() => void confirm()}
             style={[styles.confirm, loading && { opacity: 0.55 }]}
+            contentStyle={styles.confirmContent}
           >
             <AppText variant="bodyStrong" style={{ color: '#FFFFFF' }}>
               {copy.confirm}
             </AppText>
             <Ionicons name={rtl ? 'arrow-back' : 'arrow-forward'} size={18} color="#FFFFFF" />
-          </Pressable>
+          </MotionPressable>
         </View>
       </View>
     </Modal>
@@ -407,6 +407,7 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
   },
   rowReverse: { flexDirection: 'row-reverse' },
+  actionContent: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   close: {
     width: 42,
     height: 42,
@@ -450,7 +451,6 @@ const styles = StyleSheet.create({
     backgroundColor: palette.canvas,
   },
   locateButton: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 9,
     alignSelf: 'flex-start',
@@ -461,6 +461,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(88,116,94,0.2)',
   },
+  locateContent: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   addressCard: {
     padding: 14,
     borderRadius: 18,
@@ -470,6 +471,7 @@ const styles = StyleSheet.create({
     gap: 7,
   },
   addressTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  confirmContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
   confirm: {
     minHeight: 52,
     borderRadius: 17,

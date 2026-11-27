@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
@@ -101,20 +101,22 @@ export function PartnerScreen({
         />
       </View>
 
-      {approved ? (
-        <ApprovedBusiness app={app} onOpenQueue={onOpenQueue} />
-      ) : status === 'not_applied' ? (
-        <>
-          <PartnerIntro app={app} onOpenQueue={onOpenQueue} />
-          <ApplicationForm app={app} />
-        </>
-      ) : (
-        <>
-          <StatusTimeline app={app} rejected={rejected} />
-          <ServiceApprovalList app={app} />
-          {rejected ? <ApplicationForm app={app} /> : null}
-        </>
-      )}
+      <ContentTransition transitionKey={status} direction="forward" style={{ width: '100%' }}>
+        {approved ? (
+          <ApprovedBusiness app={app} onOpenQueue={onOpenQueue} />
+        ) : status === 'not_applied' ? (
+          <>
+            <PartnerIntro app={app} onOpenQueue={onOpenQueue} />
+            <ApplicationForm app={app} />
+          </>
+        ) : (
+          <>
+            <StatusTimeline app={app} rejected={rejected} />
+            <ServiceApprovalList app={app} />
+            {rejected ? <ApplicationForm app={app} /> : null}
+          </>
+        )}
+      </ContentTransition>
     </Page>
   );
 }
@@ -190,7 +192,8 @@ function PartnerIntro({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: () =
       <GlassCard padding={16} radius={24}>
         <View style={{ gap: 13 }}>
           {benefits.map((benefit, index) => (
-            <React.Fragment key={benefit.title}>
+            <StaggeredItem key={benefit.title} index={index}>
+              <>
               <View style={[styles.benefitRow, isRtl && styles.rowReverse]}>
                 <View
                   style={[
@@ -208,7 +211,8 @@ function PartnerIntro({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: () =
                 </View>
               </View>
               {index < benefits.length - 1 ? <Divider /> : null}
-            </React.Fragment>
+              </>
+            </StaggeredItem>
           ))}
         </View>
       </GlassCard>
@@ -252,7 +256,7 @@ function ApplicationForm({ app }: { app: WessaliApp }) {
           const selected = app.providerServices.includes(service.id);
           const tone = serviceTheme[service.id];
           return (
-            <Pressable
+            <MotionPressable
               key={service.id}
               accessibilityRole="button"
               accessibilityState={{ selected }}
@@ -260,12 +264,12 @@ function ApplicationForm({ app }: { app: WessaliApp }) {
               onPress={() => app.toggleProviderService(service.id as ServiceKind)}
               style={[
                 styles.serviceOption,
-                rtlStyle && styles.rowReverse,
                 selected && {
                   borderColor: `${tone.accent}66`,
                   backgroundColor: `${tone.accent}0F`,
                 },
               ]}
+              contentStyle={[styles.serviceOptionContent, rtlStyle && styles.rowReverse]}
             >
               <IconTile tone={service.id} size="sm" glow={selected} />
               <View style={{ flex: 1, gap: 1 }}>
@@ -288,7 +292,7 @@ function ApplicationForm({ app }: { app: WessaliApp }) {
               >
                 {selected ? <Ionicons name="checkmark" size={13} color={palette.onAccent} /> : null}
               </View>
-            </Pressable>
+            </MotionPressable>
           );
         })}
       </View>
@@ -606,15 +610,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(54, 136, 217, 0.18)',
   },
   serviceOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 11,
     borderWidth: 1,
     borderColor: palette.lineSoft,
     borderRadius: 18,
     padding: 10,
     backgroundColor: 'rgba(30, 70, 115, 0.035)',
   },
+  serviceOptionContent: { flexDirection: 'row', alignItems: 'center', gap: 11, width: '100%' },
   check: {
     width: 22,
     height: 22,

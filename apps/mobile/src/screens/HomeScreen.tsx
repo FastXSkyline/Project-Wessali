@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { RefreshControl, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,6 +10,7 @@ import { AppText, Avatar, BrandMark, Divider, GlassCard, Page, SectionHeading, u
 import { PrimaryButton, StatusPill } from '../ui/controls';
 import { IconTile } from '../ui/IconTile';
 import { RouteProgress, TripRoute } from '../ui/trip';
+import { MotionPressable, StaggeredItem } from '../ui/motion';
 import { firstName, formatShortDate } from '../utils';
 
 const photos: Record<ServiceKind, string> = {
@@ -55,9 +56,9 @@ export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests,
             <AppText variant="caption" tone="muted" numberOfLines={1}>{ui.tagline}</AppText>
           </View>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel={ui.profileTitle} onPress={onOpenProfile}>
+        <MotionPressable accessibilityRole="button" accessibilityLabel={ui.profileTitle} onPress={onOpenProfile}>
           <Avatar name={session?.user.displayName ?? 'Wessali'} provider={app.isProvider} size={40} />
-        </Pressable>
+        </MotionPressable>
       </View>
 
       <View style={[styles.greeting, rtl && styles.rowReverse]}>
@@ -87,10 +88,10 @@ export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests,
           <TripRoute booking={activeBooking} locale={locale} />
           <View style={{ height: 12 }} />
           <RouteProgress status={activeBooking.status} />
-          <Pressable onPress={onOpenTracking} style={[styles.trackRow, rtl && styles.rowReverse]}>
+          <MotionPressable onPress={onOpenTracking} style={styles.trackRow} contentStyle={[styles.trackRowContent, rtl && styles.rowReverse]}>
             <AppText variant="label" style={{ color: palette.jadeBright }}>{ui.track}</AppText>
             <Ionicons name={isRtl ? 'arrow-back' : 'arrow-forward'} size={15} color={palette.jadeBright} />
-          </Pressable>
+          </MotionPressable>
         </GlassCard>
       ) : (
         <View style={styles.hero}>
@@ -119,20 +120,20 @@ export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests,
         <ServiceCard kind="roadside" title={service('roadside')} description={ui.serviceRoadsideShort} actionLabel={ui.navNew} onPress={() => onOpenService('roadside')} />
         <ServiceCard kind="freight" title={service('freight')} description={ui.serviceFreightShort} actionLabel={ui.navNew} onPress={() => onOpenService('freight')} />
       </View>
-      <Pressable accessibilityRole="button" onPress={() => onOpenService('water')} style={({ pressed }) => [styles.waterAction, rtl && styles.rowReverse, pressed && { opacity: 0.78 }]}>
+      <MotionPressable accessibilityRole="button" onPress={() => onOpenService('water')} style={styles.waterAction} contentStyle={[styles.waterActionContent, rtl && styles.rowReverse]}>
         <IconTile tone="water" size="sm" />
         <View style={{ flex: 1, gap: 2 }}>
           <AppText variant="bodyStrong">{service('water')}</AppText>
           <AppText variant="caption" tone="muted">{ui.serviceWaterShort}</AppText>
         </View>
         <Ionicons name={isRtl ? 'chevron-back' : 'chevron-forward'} size={17} color={palette.aqua} />
-      </Pressable>
+      </MotionPressable>
 
       <SectionHeading title={ui.recentTitle} action={ui.seeAll} onAction={onOpenRequests} />
       {bookings.length > 0 ? (
         <View style={{ gap: 9 }}>
-          {bookings.slice(0, 3).map((booking) => (
-            <Pressable key={booking.id} accessibilityRole="button" onPress={onOpenRequests}>
+          {bookings.slice(0, 3).map((booking, index) => (
+            <StaggeredItem key={booking.id} index={index}><MotionPressable accessibilityRole="button" onPress={onOpenRequests}>
               <GlassCard padding={12} radius={18}>
                 <View style={[styles.recentRow, rtl && styles.rowReverse]}>
                   <IconTile tone={booking.service_type} size="sm" />
@@ -146,7 +147,7 @@ export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests,
                   </View>
                 </View>
               </GlassCard>
-            </Pressable>
+            </MotionPressable></StaggeredItem>
           ))}
         </View>
       ) : (
@@ -154,7 +155,7 @@ export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests,
           <View style={[styles.emptyRow, rtl && styles.rowReverse]}>
             <Ionicons name="receipt-outline" size={20} color={palette.jadeBright} />
             <AppText variant="caption" tone="muted" style={{ flex: 1 }}>{ui.noData}</AppText>
-            <Pressable onPress={onStartRequest}><AppText variant="label" style={{ color: palette.jadeBright }}>{ui.homeCta}</AppText></Pressable>
+            <MotionPressable onPress={onStartRequest}><AppText variant="label" style={{ color: palette.jadeBright }}>{ui.homeCta}</AppText></MotionPressable>
           </View>
         </GlassCard>
       )}
@@ -186,7 +187,7 @@ function ServiceCard({ kind, title, description, actionLabel, onPress }: { kind:
   const tone = serviceTheme[kind];
   const { isRtl } = useLocaleValue();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={({ pressed }) => [styles.serviceCard, pressed && { opacity: 0.82, transform: [{ scale: 0.985 }] }]}>
+    <MotionPressable accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={styles.serviceCard} contentStyle={styles.serviceCardContentWrap}>
       <ExpoImage source={{ uri: photos[kind] }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} cachePolicy="memory-disk" />
       <LinearGradient colors={['rgba(7,28,52,0.10)', 'rgba(7,28,52,0.88)']} locations={[0,1]} style={StyleSheet.absoluteFill} />
       <View style={[styles.serviceCardContent, isRtl && styles.rowReverse]}>
@@ -200,16 +201,16 @@ function ServiceCard({ kind, title, description, actionLabel, onPress }: { kind:
         <Ionicons name={isRtl ? 'arrow-back' : 'arrow-forward'} size={16} color="#FFFFFF" />
       </View>
       <AppText variant="caption" tone="white" style={styles.serviceActionLabel}>{actionLabel}</AppText>
-    </Pressable>
+    </MotionPressable>
   );
 }
 
 function Shortcut({ icon, label, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={styles.shortcut}>
+    <MotionPressable accessibilityRole="button" onPress={onPress} style={styles.shortcut} contentStyle={styles.shortcutContent}>
       <View style={styles.shortcutIcon}><Ionicons name={icon} size={18} color={palette.jade} /></View>
       <AppText variant="caption" align="center" numberOfLines={1}>{label}</AppText>
-    </Pressable>
+    </MotionPressable>
   );
 }
 
@@ -230,7 +231,11 @@ const styles = StyleSheet.create({
   serviceCardContent: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, paddingBottom: 8 },
   serviceBadge: { width: 29, height: 29, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   serviceActionLabel: { marginHorizontal: 12, marginBottom: 10, opacity: 0.8 },
-  waterAction: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFFFFF', borderRadius: 17, borderWidth: 1, borderColor: palette.lineSoft, padding: 11 },
+  waterAction: { backgroundColor: '#FFFFFF', borderRadius: 17, borderWidth: 1, borderColor: palette.lineSoft, padding: 11 },
+  waterActionContent: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  trackRowContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  serviceCardContentWrap: { flex: 1, justifyContent: 'flex-end' },
+  shortcutContent: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 6 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 9, flex: 1 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   trackRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 12 },

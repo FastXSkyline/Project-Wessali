@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Linking, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { Alert, Linking, RefreshControl, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { palette, serviceTheme } from '../theme';
@@ -9,6 +9,7 @@ import { AppText, EmptyArt, GlassCard, Page, useLocaleValue } from '../ui/base';
 import { IconButton, PrimaryButton, SecondaryButton, Segmented, StatusPill } from '../ui/controls';
 import { IconTile } from '../ui/IconTile';
 import { RouteProgress, TripRoute } from '../ui/trip';
+import { ContentTransition, directionBetween, MotionPressable, StaggeredItem, type MotionDirection } from '../ui/motion';
 import { formatShortDate, isActive, isClosed } from '../utils';
 
 type Props = {
@@ -25,6 +26,7 @@ function statusText(app: WessaliApp, status: string) {
 export function RequestsScreen({ app, onStartRequest, onOpenPartner, onOpenTracking }: Props) {
   const { ui, isRtl } = app;
   const [filter, setFilter] = useState<'active' | 'closed' | 'all'>('active');
+  const [filterDirection, setFilterDirection] = useState<MotionDirection>('forward');
   const [queueTab, setQueueTab] = useState<'available' | 'jobs'>('available');
 
   if (app.isProvider) {
@@ -36,6 +38,12 @@ export function RequestsScreen({ app, onStartRequest, onOpenPartner, onOpenTrack
         setQueueTab={setQueueTab}
       />
     );
+  }
+
+  function changeFilter(value: string) {
+    const order = ['active', 'closed', 'all'];
+    setFilterDirection(directionBetween(order.indexOf(filter), order.indexOf(value), isRtl));
+    setFilter(value as typeof filter);
   }
 
   const items =
@@ -97,7 +105,7 @@ export function RequestsScreen({ app, onStartRequest, onOpenPartner, onOpenTrack
 
       <Segmented
         value={filter}
-        onChange={(value) => setFilter(value as typeof filter)}
+        onChange={changeFilter}
         options={[
           { value: 'active', label: ui.filterActive },
           { value: 'closed', label: ui.filterClosed },
@@ -105,6 +113,7 @@ export function RequestsScreen({ app, onStartRequest, onOpenPartner, onOpenTrack
         ]}
       />
 
+      <ContentTransition transitionKey={filter} direction={filterDirection} style={{ width: '100%' }}>
       {items.length === 0 ? (
         <GlassCard padding={24} radius={26}>
           <View style={{ gap: 12, alignItems: 'center' }}>
@@ -126,17 +135,19 @@ export function RequestsScreen({ app, onStartRequest, onOpenPartner, onOpenTrack
         </GlassCard>
       ) : (
         <View style={{ gap: 12 }}>
-          {items.map((booking) => (
-            <CustomerBookingCard
-              key={booking.id}
-              app={app}
-              booking={booking}
-              onCancel={() => requestCancel(booking)}
-              onOpenTracking={() => onOpenTracking(booking)}
-            />
+          {items.map((booking, index) => (
+            <StaggeredItem key={booking.id} index={index}>
+              <CustomerBookingCard
+                app={app}
+                booking={booking}
+                onCancel={() => requestCancel(booking)}
+                onOpenTracking={() => onOpenTracking(booking)}
+              />
+            </StaggeredItem>
           ))}
         </View>
       )}
+      </ContentTransition>
     </Page>
   );
 }
@@ -183,12 +194,12 @@ function CustomerBookingCard({
         <View style={{ gap: 10, marginTop: 14 }}>
           <RouteProgress status={booking.status} />
           {(typeof booking.pickup_latitude === 'number' && typeof booking.pickup_longitude === 'number') || (typeof booking.destination_latitude === 'number' && typeof booking.destination_longitude === 'number') ? (
-            <Pressable accessibilityRole="button" onPress={onOpenTracking} style={[styles.trackAction, rtlStyle && styles.rowReverse]}>
+            <MotionPressable accessibilityRole="button" onPress={onOpenTracking} style={styles.trackAction} contentStyle={[styles.trackActionContent, rtlStyle && styles.rowReverse]}>
               <Ionicons name="map-outline" size={15} color={palette.jadeBright} />
               <AppText variant="label" style={{ color: palette.jadeBright }}>{ui.track}</AppText>
               <View style={{ flex: 1 }} />
               <Ionicons name={isRtl ? 'arrow-back' : 'arrow-forward'} size={14} color={palette.jadeBright} />
-            </Pressable>
+            </MotionPressable>
           ) : null}
         </View>
       ) : null}
@@ -332,6 +343,12 @@ function ProviderQueue({
 }) {
   const { ui, isRtl, providerApproved, providerRequests, providerJobs } = app;
   const { isRtl: rtlStyle } = useLocaleValue();
+  const [queueDirection, setQueueDirection] = useState<MotionDirection>('forward');
+
+  function changeQueueTab(value: string) {
+    setQueueDirection(directionBetween(queueTab === 'available' ? 0 : 1, value === 'available' ? 0 : 1, isRtl));
+    setQueueTab(value as typeof queueTab);
+  }
 
   return (
     <Page
@@ -387,7 +404,7 @@ function ProviderQueue({
         <>
           <Segmented
             value={queueTab}
-            onChange={(value) => setQueueTab(value as typeof queueTab)}
+            onChange={changeQueueTab}
             options={[
               {
                 value: 'available',
@@ -396,11 +413,14 @@ function ProviderQueue({
               { value: 'jobs', label: `${ui.activeJobs} · ${providerJobs.length}` },
             ]}
           />
+          <ContentTransition transitionKey={queueTab} direction={queueDirection} style={{ width: '100%' }}>
           {queueTab === 'available' ? (
             providerRequests.length ? (
               <View style={{ gap: 12 }}>
-                {providerRequests.map((booking) => (
-                  <AvailableCard key={booking.id} app={app} booking={booking} />
+                {providerRequests.map((booking, index) => (
+                  <StaggeredItem key={booking.id} index={index}>
+                    <AvailableCard app={app} booking={booking} />
+                  </StaggeredItem>
                 ))}
               </View>
             ) : (
@@ -412,13 +432,16 @@ function ProviderQueue({
             )
           ) : providerJobs.length ? (
             <View style={{ gap: 12 }}>
-              {providerJobs.map((booking) => (
-                <JobCard key={booking.id} app={app} booking={booking} />
+              {providerJobs.map((booking, index) => (
+                <StaggeredItem key={booking.id} index={index}>
+                  <JobCard app={app} booking={booking} />
+                </StaggeredItem>
               ))}
             </View>
           ) : (
             <QueueEmpty icon="checkmark-done-outline" title={ui.noJobsTitle} body={ui.noJobsBody} />
           )}
+          </ContentTransition>
           <AppText variant="caption" tone="faint" align="center" style={{ paddingTop: 4 }}>
             {ui.providerBannerBody}
           </AppText>
@@ -538,26 +561,28 @@ function CoordinateNavigation({ booking, locale }: { booking: Booking; locale: s
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 11 }}>
       {pickupReady ? (
-        <Pressable
+        <MotionPressable
           onPress={() => void open(booking.pickup_latitude!, booking.pickup_longitude!)}
           style={styles.mapLink}
+          contentStyle={styles.mapLinkContent}
         >
           <Ionicons name="navigate-outline" size={14} color={palette.jadeDeep} />
           <AppText variant="caption" style={{ color: palette.jadeDeep }}>
             {pickup}
           </AppText>
-        </Pressable>
+        </MotionPressable>
       ) : null}
       {destinationReady ? (
-        <Pressable
+        <MotionPressable
           onPress={() => void open(booking.destination_latitude!, booking.destination_longitude!)}
           style={styles.mapLink}
+          contentStyle={styles.mapLinkContent}
         >
           <Ionicons name="flag-outline" size={14} color={palette.jadeDeep} />
           <AppText variant="caption" style={{ color: palette.jadeDeep }}>
             {destination}
           </AppText>
-        </Pressable>
+        </MotionPressable>
       ) : null}
     </View>
   );
@@ -594,9 +619,6 @@ const styles = StyleSheet.create({
   routeWrap: { marginTop: 14 },
   trackAction: { minHeight: 38, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 11, borderRadius: 12, backgroundColor: '#EAF3FC' },
   mapLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
     paddingHorizontal: 11,
     paddingVertical: 9,
     borderRadius: 13,
@@ -604,6 +626,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(20,86,148,0.22)',
     backgroundColor: 'rgba(20,86,148,0.07)',
   },
+  mapLinkContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   metaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 },
   metaChip: {
     flexDirection: 'row',

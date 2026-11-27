@@ -30,6 +30,7 @@ import { PartnerScreen } from './src/screens/PartnerScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { TrackingScreen } from './src/screens/TrackingScreen';
 import type { Booking } from './src/types';
+import { ScreenTransition, type MotionDirection } from './src/ui/motion';
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -67,12 +68,16 @@ function AppRoot() {
   const [tab, setTab] = useState<Tab>('home');
   const [bookingOpen, setBookingOpen] = useState(false);
   const [trackingBooking, setTrackingBooking] = useState<Booking | null>(null);
+  const [motionDirection, setMotionDirection] = useState<MotionDirection>('fade');
 
   useEffect(() => {
     if (!app.session) {
       setTab('home');
       setBookingOpen(false);
       setTrackingBooking(null);
+      setMotionDirection('down');
+    } else {
+      setMotionDirection('up');
     }
   }, [app.session]);
 
@@ -80,9 +85,17 @@ function AppRoot() {
     app.setError('');
     setTrackingBooking(null);
     if (next === 'create') {
+      setMotionDirection('up');
       app.beginBooking('freight');
       setBookingOpen(true);
       return;
+    }
+    if (next !== tab) {
+      const order: Tab[] = ['home', 'requests', 'partner', 'profile'];
+      const fromIndex = order.indexOf(tab);
+      const toIndex = order.indexOf(next);
+      const movesRight = (toIndex > fromIndex) !== app.isRtl;
+      setMotionDirection(movesRight ? 'forward' : 'back');
     }
     setTab(next);
     if (app.session && (next === 'requests' || next === 'partner' || next === 'home')) {
@@ -92,6 +105,7 @@ function AppRoot() {
 
   function openService(kind: Parameters<typeof app.beginBooking>[0]) {
     app.setError('');
+    setMotionDirection('up');
     app.beginBooking(kind);
     setBookingOpen(true);
   }
@@ -117,8 +131,12 @@ function AppRoot() {
       return (
         <BookingScreen
           app={app}
-          onBack={() => setBookingOpen(false)}
+          onBack={() => {
+            setMotionDirection('down');
+            setBookingOpen(false);
+          }}
           onSent={() => {
+            setMotionDirection('forward');
             setBookingOpen(false);
             setTab('requests');
           }}
@@ -126,7 +144,10 @@ function AppRoot() {
       );
     }
     if (trackingBooking) {
-      return <TrackingScreen app={app} booking={trackingBooking} onBack={() => setTrackingBooking(null)} />;
+      return <TrackingScreen app={app} booking={trackingBooking} onBack={() => {
+        setMotionDirection('back');
+        setTrackingBooking(null);
+      }} />;
     }
     if (tab === 'requests') {
       return (
@@ -134,7 +155,10 @@ function AppRoot() {
           app={app}
           onStartRequest={() => openService('freight')}
           onOpenPartner={() => navigate('partner')}
-          onOpenTracking={(booking) => setTrackingBooking(booking)}
+          onOpenTracking={(booking) => {
+            setMotionDirection('forward');
+            setTrackingBooking(booking);
+          }}
         />
       );
     }
@@ -157,11 +181,24 @@ function AppRoot() {
         onOpenPartner={() => navigate('partner')}
         onOpenProfile={() => navigate('profile')}
         onOpenTracking={() => {
-          if (app.activeBooking) setTrackingBooking(app.activeBooking);
+          if (app.activeBooking) {
+            setMotionDirection('forward');
+            setTrackingBooking(app.activeBooking);
+          }
         }}
       />
     );
   })();
+
+  const screenKey = !app.ready
+    ? 'loading'
+    : !app.session
+      ? 'signin'
+      : trackingBooking
+        ? `tracking:${trackingBooking.id}`
+        : bookingOpen
+          ? 'booking'
+          : `tab:${tab}:${app.isProvider ? 'provider' : 'customer'}`;
 
   const message = app.error || app.notice;
 
@@ -169,7 +206,9 @@ function AppRoot() {
     <LocaleProvider locale={app.locale}>
       <View style={styles.root}>
         <StatusBar style="dark" />
-        {content}
+        <ScreenTransition transitionKey={screenKey} direction={motionDirection}>
+          {content}
+        </ScreenTransition>
         {app.session && !bookingOpen && !trackingBooking ? (
           <BottomDock
             active={tab}

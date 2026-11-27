@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { palette, serviceTheme } from '../theme';
@@ -8,6 +8,7 @@ import { AppText, GlassCard, Page, useLocaleValue } from '../ui/base';
 import { ChoiceChips, Field, IconButton, InfoNote, PrimaryButton, Segmented, ToggleRow } from '../ui/controls';
 import { IconTile } from '../ui/IconTile';
 import { LocationPicker, type PickedLocation } from '../ui/LocationPicker';
+import { ContentTransition, directionBetween, MotionPressable, type MotionDirection } from '../ui/motion';
 
 export function BookingScreen({ app, onBack, onSent }: { app: WessaliApp; onBack: () => void; onSent: () => void }) {
   const { ui, locale, selectedService, isRtl } = app;
@@ -15,6 +16,7 @@ export function BookingScreen({ app, onBack, onSent }: { app: WessaliApp; onBack
   const tone = serviceTheme[selectedService];
   const [pickerTarget, setPickerTarget] = useState<'pickup' | 'destination' | null>(null);
   const [formError, setFormError] = useState('');
+  const [serviceDirection, setServiceDirection] = useState<MotionDirection>('forward');
 
   function applyPickedLocation(location: PickedLocation) {
     if (pickerTarget === 'pickup') {
@@ -52,7 +54,13 @@ export function BookingScreen({ app, onBack, onSent }: { app: WessaliApp; onBack
   }
 
   const chooseOnMap = locale === 'ar' ? 'اختيار من الخريطة' : locale === 'fr' ? 'Choisir sur la carte' : 'Choose on map';
-  const setService = (value: string) => { app.selectService(value as ServiceKind); setFormError(''); };
+  const setService = (value: string) => {
+    const next = value as ServiceKind;
+    const options = SERVICE_CATEGORIES.map((service) => service.id);
+    setServiceDirection(directionBetween(options.indexOf(selectedService), options.indexOf(next), isRtl));
+    app.selectService(next);
+    setFormError('');
+  };
   return (
     <>
       <Page topSpace={8} bottomSpace={26}>
@@ -89,59 +97,64 @@ export function BookingScreen({ app, onBack, onSent }: { app: WessaliApp; onBack
         <GlassCard padding={16} radius={21}>
           <SectionTitle title={ui.detailsSection} icon="clipboard-outline" />
           <View style={{ height: 14 }} />
-          {selectedService === 'freight' ? (
-            <View style={{ gap: 13 }}>
-              <Field label={ui.cargoLabel} value={app.cargoDescription} onChangeText={app.setCargoDescription} placeholder={ui.cargoPlaceholder} icon="cube-outline" multiline />
-              <Field label={ui.weightLabel} value={app.weightKg} onChangeText={app.setWeightKg} placeholder="1000" icon="scale-outline" keyboardType="numeric" />
-              <View style={{ gap: 8 }}>
-                <AppText variant="label" tone="soft">{ui.truckLabel}</AppText>
-                <ChoiceChips accent={tone.accent} value={app.truckType} onChange={app.setTruckType} options={[
-                  { value: 'pickup', label: ui.truckPickup }, { value: 'van', label: ui.truckVan }, { value: 'flatbed', label: ui.truckFlatbed }, { value: 'box_truck', label: ui.truckBox }, { value: 'semi_trailer', label: ui.truckSemi },
-                ]} />
+          <ContentTransition transitionKey={selectedService} direction={serviceDirection} style={{ width: '100%' }}>
+            <>
+            {selectedService === 'freight' ? (
+              <View style={{ gap: 13 }}>
+                <Field label={ui.cargoLabel} value={app.cargoDescription} onChangeText={app.setCargoDescription} placeholder={ui.cargoPlaceholder} icon="cube-outline" multiline />
+                <Field label={ui.weightLabel} value={app.weightKg} onChangeText={app.setWeightKg} placeholder="1000" icon="scale-outline" keyboardType="numeric" />
+                <View style={{ gap: 8 }}>
+                  <AppText variant="label" tone="soft">{ui.truckLabel}</AppText>
+                  <ChoiceChips accent={tone.accent} value={app.truckType} onChange={app.setTruckType} options={[
+                    { value: 'pickup', label: ui.truckPickup }, { value: 'van', label: ui.truckVan }, { value: 'flatbed', label: ui.truckFlatbed }, { value: 'box_truck', label: ui.truckBox }, { value: 'semi_trailer', label: ui.truckSemi },
+                  ]} />
+                </View>
+                <Field label={ui.loadingLabel} value={app.loadingRequirements} onChangeText={app.setLoadingRequirements} placeholder={ui.loadingPlaceholder} icon="layers-outline" multiline />
               </View>
-              <Field label={ui.loadingLabel} value={app.loadingRequirements} onChangeText={app.setLoadingRequirements} placeholder={ui.loadingPlaceholder} icon="layers-outline" multiline />
-            </View>
-          ) : null}
-
-          {selectedService === 'roadside' ? (
-            <View style={{ gap: 14 }}>
-              <View style={{ gap: 8 }}>
-                <AppText variant="label" tone="soft">{ui.vehicleLabel}</AppText>
-                <ChoiceChips accent={tone.accent} value={app.vehicleType} onChange={app.setVehicleType} options={[
-                  { value: 'car', label: ui.vehicleCar }, { value: 'motorcycle', label: ui.vehicleMotorcycle }, { value: 'van', label: ui.vehicleVan }, { value: 'truck', label: ui.vehicleTruck },
-                ]} />
+            ) : null}
+  
+            {selectedService === 'roadside' ? (
+              <View style={{ gap: 14 }}>
+                <View style={{ gap: 8 }}>
+                  <AppText variant="label" tone="soft">{ui.vehicleLabel}</AppText>
+                  <ChoiceChips accent={tone.accent} value={app.vehicleType} onChange={app.setVehicleType} options={[
+                    { value: 'car', label: ui.vehicleCar }, { value: 'motorcycle', label: ui.vehicleMotorcycle }, { value: 'van', label: ui.vehicleVan }, { value: 'truck', label: ui.vehicleTruck },
+                  ]} />
+                </View>
+                <View style={{ gap: 8 }}>
+                  <AppText variant="label" tone="soft">{ui.issueLabel}</AppText>
+                  <ChoiceChips accent={tone.accent} value={app.issueCategory} onChange={app.setIssueCategory} options={[
+                    { value: 'mechanical', label: ui.issueMechanical }, { value: 'tyre', label: ui.issueTyre }, { value: 'battery', label: ui.issueBattery }, { value: 'fuel', label: ui.issueFuel }, { value: 'towing', label: ui.issueTowing },
+                  ]} />
+                </View>
+                <View style={styles.divider} />
+                <ToggleRow label={ui.towingLabel} value={app.needsTowing} onChange={(value) => { app.setNeedsTowing(value); setFormError(''); }} />
+                {app.needsTowing ? <Field label={ui.towingDestinationLabel} value={app.towingDestination} onChangeText={app.setTowingDestination} placeholder={ui.towingPlaceholder} icon="navigate-outline" /> : null}
+                <InfoNote icon="shield-checkmark-outline" tone="amber">{ui.safetyNote}</InfoNote>
               </View>
-              <View style={{ gap: 8 }}>
-                <AppText variant="label" tone="soft">{ui.issueLabel}</AppText>
-                <ChoiceChips accent={tone.accent} value={app.issueCategory} onChange={app.setIssueCategory} options={[
-                  { value: 'mechanical', label: ui.issueMechanical }, { value: 'tyre', label: ui.issueTyre }, { value: 'battery', label: ui.issueBattery }, { value: 'fuel', label: ui.issueFuel }, { value: 'towing', label: ui.issueTowing },
-                ]} />
+            ) : null}
+  
+            {selectedService === 'water' ? (
+              <View style={{ gap: 14 }}>
+                <Field label={ui.quantityLabel} value={app.quantityLitres} onChangeText={app.setQuantityLitres} placeholder="3000" icon="water-outline" keyboardType="numeric" />
+                <View style={{ gap: 8 }}>
+                  <AppText variant="label" tone="soft">{ui.useLabel}</AppText>
+                  <ChoiceChips accent={tone.accent} value={app.intendedUse} onChange={app.setIntendedUse} options={[
+                    { value: 'residential', label: ui.residential }, { value: 'agricultural', label: ui.agricultural }, { value: 'other', label: ui.otherUse },
+                  ]} />
+                </View>
+                <View style={{ gap: 8 }}>
+                  <AppText variant="label" tone="soft">{ui.waterCategoryLabel}</AppText>
+                  <ChoiceChips accent={tone.accent} value={app.waterCategory} onChange={app.setWaterCategory} options={[
+                    { value: 'potable', label: ui.potable }, { value: 'non_potable', label: ui.nonPotable }, { value: 'irrigation', label: ui.irrigation },
+                  ]} />
+                </View>
+                <InfoNote icon="information-circle-outline" tone="aqua">{ui.waterNote}</InfoNote>
               </View>
-              <View style={styles.divider} />
-              <ToggleRow label={ui.towingLabel} value={app.needsTowing} onChange={(value) => { app.setNeedsTowing(value); setFormError(''); }} />
-              {app.needsTowing ? <Field label={ui.towingDestinationLabel} value={app.towingDestination} onChangeText={app.setTowingDestination} placeholder={ui.towingPlaceholder} icon="navigate-outline" /> : null}
-              <InfoNote icon="shield-checkmark-outline" tone="amber">{ui.safetyNote}</InfoNote>
-            </View>
-          ) : null}
-
-          {selectedService === 'water' ? (
-            <View style={{ gap: 14 }}>
-              <Field label={ui.quantityLabel} value={app.quantityLitres} onChangeText={app.setQuantityLitres} placeholder="3000" icon="water-outline" keyboardType="numeric" />
-              <View style={{ gap: 8 }}>
-                <AppText variant="label" tone="soft">{ui.useLabel}</AppText>
-                <ChoiceChips accent={tone.accent} value={app.intendedUse} onChange={app.setIntendedUse} options={[
-                  { value: 'residential', label: ui.residential }, { value: 'agricultural', label: ui.agricultural }, { value: 'other', label: ui.otherUse },
-                ]} />
-              </View>
-              <View style={{ gap: 8 }}>
-                <AppText variant="label" tone="soft">{ui.waterCategoryLabel}</AppText>
-                <ChoiceChips accent={tone.accent} value={app.waterCategory} onChange={app.setWaterCategory} options={[
-                  { value: 'potable', label: ui.potable }, { value: 'non_potable', label: ui.nonPotable }, { value: 'irrigation', label: ui.irrigation },
-                ]} />
-              </View>
-              <InfoNote icon="information-circle-outline" tone="aqua">{ui.waterNote}</InfoNote>
-            </View>
-          ) : null}
+            ) : null}
+  
+            </>
+          </ContentTransition>
           <View style={{ height: 14 }} />
           <Field label={ui.notesLabel} value={app.customerNotes} onChangeText={app.setCustomerNotes} placeholder={ui.notesPlaceholder} multiline />
         </GlassCard>
@@ -167,12 +180,17 @@ function SectionTitle({ title, icon }: { title: string; icon: React.ComponentPro
 function MapAction({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
   const { isRtl } = useLocaleValue();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={[styles.mapAction, isRtl && styles.rowReverse]}>
+    <MotionPressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={styles.mapAction}
+      contentStyle={[styles.mapActionContent, isRtl && styles.rowReverse]}
+    >
       <Ionicons name="map-outline" size={15} color={palette.jadeBright} />
       <AppText variant="label" style={{ color: palette.jadeBright }}>{label}</AppText>
       <View style={{ flex: 1 }} />
       {selected ? <Ionicons name="checkmark-circle" size={16} color={palette.success} /> : null}
-    </Pressable>
+    </MotionPressable>
   );
 }
 
@@ -181,6 +199,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   sectionTitle: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   sectionIcon: { width: 32, height: 32, borderRadius: 11, backgroundColor: '#EAF2FC', alignItems: 'center', justifyContent: 'center' },
-  mapAction: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 9, minHeight: 38, paddingHorizontal: 11, borderRadius: 12, backgroundColor: '#EFF5FC' },
+  mapAction: { marginTop: 9, minHeight: 38, paddingHorizontal: 11, borderRadius: 12, backgroundColor: '#EFF5FC' },
+  mapActionContent: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
   divider: { height: 1, backgroundColor: palette.lineSoft },
 });

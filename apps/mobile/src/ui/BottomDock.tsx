@@ -1,10 +1,11 @@
-import React from 'react';
-import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { gradients, palette } from '../theme';
 import { AppText, useLocaleValue } from './base';
+import { MotionPressable } from './motion';
 
 export type Tab = 'home' | 'requests' | 'create' | 'partner' | 'profile';
 
@@ -14,6 +15,74 @@ type Item = {
   icon: React.ComponentProps<typeof Ionicons>['name'];
   activeIcon: React.ComponentProps<typeof Ionicons>['name'];
 };
+
+function DockTab({
+  item,
+  selected,
+  compact,
+  onSelect,
+}: {
+  item: Item;
+  selected: boolean;
+  compact: boolean;
+  onSelect: () => void;
+}) {
+  const progress = useRef(new Animated.Value(selected ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(progress, {
+      toValue: selected ? 1 : 0,
+      damping: 22,
+      stiffness: 230,
+      mass: 0.72,
+      useNativeDriver: true,
+    }).start();
+  }, [progress, selected]);
+
+  const iconY = progress.interpolate({ inputRange: [0, 1], outputRange: [2, 0] });
+  const iconScale = progress.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] });
+  const iconOpacity = progress.interpolate({ inputRange: [0, 1], outputRange: [0.78, 1] });
+
+  return (
+    <MotionPressable
+      accessibilityRole="tab"
+      accessibilityLabel={item.label}
+      accessibilityState={{ selected }}
+      onPress={onSelect}
+      style={styles.item}
+      contentStyle={styles.dockItemContent}
+    >
+      <Animated.View
+        style={[
+          styles.iconSlot,
+          selected && styles.iconSlotActive,
+          {
+            opacity: iconOpacity,
+            transform: [{ translateY: iconY }, { scale: iconScale }],
+          },
+        ]}
+      >
+        <Ionicons
+          name={selected ? item.activeIcon : item.icon}
+          size={compact ? 19 : 21}
+          color={selected ? palette.jadeBright : palette.muted}
+        />
+      </Animated.View>
+      <AppText
+        variant="caption"
+        align="center"
+        numberOfLines={1}
+        style={{
+          color: selected ? palette.jadeDeep : palette.muted,
+          fontSize: compact ? 8 : 9,
+          opacity: selected ? 1 : 0.82,
+        }}
+      >
+        {item.label}
+      </AppText>
+    </MotionPressable>
+  );
+}
 
 export function BottomDock({
   active,
@@ -42,12 +111,13 @@ export function BottomDock({
         {items.map((item) => {
           if (item.tab === 'create') {
             return (
-              <Pressable
+              <MotionPressable
                 key={item.tab}
                 accessibilityRole="button"
                 accessibilityLabel={item.label}
                 onPress={() => onSelect(item.tab)}
                 style={styles.createSlot}
+                contentStyle={styles.createContent}
               >
                 <LinearGradient
                   colors={gradients.primary}
@@ -60,38 +130,18 @@ export function BottomDock({
                 <AppText variant="caption" align="center" style={styles.createLabel}>
                   {item.label}
                 </AppText>
-              </Pressable>
+              </MotionPressable>
             );
           }
-          const selected = item.tab === active;
+
           return (
-            <Pressable
+            <DockTab
               key={item.tab}
-              accessibilityRole="tab"
-              accessibilityLabel={item.label}
-              accessibilityState={{ selected }}
-              onPress={() => onSelect(item.tab)}
-              style={styles.item}
-            >
-              <View style={[styles.iconSlot, selected && styles.iconSlotActive]}>
-                <Ionicons
-                  name={selected ? item.activeIcon : item.icon}
-                  size={compact ? 19 : 21}
-                  color={selected ? palette.jadeBright : palette.muted}
-                />
-              </View>
-              <AppText
-                variant="caption"
-                align="center"
-                numberOfLines={1}
-                style={{
-                  color: selected ? palette.jadeDeep : palette.muted,
-                  fontSize: compact ? 8 : 9,
-                }}
-              >
-                {item.label}
-              </AppText>
-            </Pressable>
+              item={item}
+              selected={item.tab === active}
+              compact={compact}
+              onSelect={() => onSelect(item.tab)}
+            />
           );
         })}
       </View>
@@ -126,10 +176,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   rowReverse: { flexDirection: 'row-reverse' },
-  item: { flex: 1, minWidth: 0, alignItems: 'center', justifyContent: 'center', gap: 3 },
+  item: { flex: 1, minWidth: 0 },
+  dockItemContent: { alignItems: 'center', justifyContent: 'center', gap: 3 },
   iconSlot: { width: 40, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   iconSlotActive: { backgroundColor: '#E9F2FC' },
-  createSlot: { flex: 1, minWidth: 0, alignItems: 'center', justifyContent: 'center', gap: 2 },
+  createSlot: { flex: 1, minWidth: 0, alignItems: 'center', justifyContent: 'center' },
+  createContent: { alignItems: 'center', justifyContent: 'center', gap: 2 },
   createOrb: {
     width: 47,
     height: 47,

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { palette } from '../theme';
 import { AppText, useLocaleValue } from './base';
+import { MotionPressable } from './motion';
 
 const AlphaMaskedView = MaskedView as unknown as React.ComponentType<{
   children?: React.ReactNode;
@@ -87,15 +88,16 @@ export function FeedbackToast({
         <AppText variant="caption" tone="ink" numberOfLines={2} style={styles.message}>
           {message}
         </AppText>
-        <Pressable
+        <MotionPressable
           accessibilityRole="button"
           accessibilityLabel="Dismiss"
           onPress={onClose}
           hitSlop={9}
-          style={({ pressed }) => [styles.close, pressed && { opacity: 0.52 }]}
+          style={styles.close}
+          contentStyle={styles.closeContent}
         >
           <Ionicons name="close" size={16} color={palette.inkSoft} />
-        </Pressable>
+        </MotionPressable>
       </Animated.View>
     </View>
   );
@@ -141,6 +143,7 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: palette.ink,
   },
+  closeContent: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   close: {
     width: 25,
     height: 25,

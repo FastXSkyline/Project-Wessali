@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useId } from 'react';
+import React, { createContext, useContext, useEffect, useId, useRef } from 'react';
 import {
+  Animated,
+  Easing,
   ScrollView,
   StyleSheet,
   Text as RNText,
@@ -15,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { MotionPressable } from './motion';
 import type { Locale } from '@wessali/i18n';
 import {
   fontFamily,
@@ -432,6 +435,37 @@ export function Page({
   const maxContentWidth = width >= 720 ? 680 : layout.maxWidth;
   const paddingTop = insets.top + topSpace;
   const paddingBottom = insets.bottom + bottomSpace + 18;
+  const entranceOpacity = useRef(new Animated.Value(0)).current;
+  const entranceY = useRef(new Animated.Value(12)).current;
+
+  useEffect(() => {
+    const animation = Animated.sequence([
+      Animated.delay(35),
+      Animated.parallel([
+        Animated.timing(entranceOpacity, {
+          toValue: 1,
+          duration: 320,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.spring(entranceY, {
+          toValue: 0,
+          damping: 24,
+          stiffness: 190,
+          mass: 0.85,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]);
+    animation.start();
+    return () => animation.stop();
+  }, [entranceOpacity, entranceY]);
+
+  const pageInnerStyle = [
+    styles.pageInner,
+    { maxWidth: maxContentWidth },
+    { opacity: entranceOpacity, transform: [{ translateY: entranceY }] },
+  ];
 
   return (
     <View style={styles.page}>
@@ -448,24 +482,23 @@ export function Page({
           refreshControl={refreshControl}
           automaticallyAdjustKeyboardInsets
         >
-          <View style={[styles.pageInner, { maxWidth: maxContentWidth }]}>{children}</View>
+          <Animated.View style={pageInnerStyle}>{children}</Animated.View>
         </ScrollView>
       ) : (
-        <View
+        <Animated.View
           style={[
-            styles.pageInner,
+            pageInnerStyle,
             {
               paddingTop,
               paddingBottom,
               flex: 1,
-              maxWidth: maxContentWidth,
               paddingHorizontal: horizontalPadding,
             },
             contentStyle,
           ]}
         >
           {children}
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -494,9 +527,11 @@ export function SectionHeading({
         ) : null}
       </View>
       {action && onAction ? (
-        <AppText variant="label" tone="jade" onPress={onAction} suppressHighlighting>
-          {action}
-        </AppText>
+        <MotionPressable onPress={onAction} style={styles.sectionAction}>
+          <AppText variant="label" tone="jade" suppressHighlighting>
+            {action}
+          </AppText>
+        </MotionPressable>
       ) : null}
     </View>
   );
@@ -592,6 +627,7 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     gap: 18,
   },
+  sectionAction: { alignSelf: 'center', paddingVertical: 4, paddingHorizontal: 5 },
   sectionHeading: {
     flexDirection: 'row',
     alignItems: 'flex-end',

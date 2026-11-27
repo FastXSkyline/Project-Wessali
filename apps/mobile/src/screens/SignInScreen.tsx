@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { palette } from '../theme';
 import type { WessaliApp } from '../useWessali';
@@ -7,6 +7,7 @@ import type { Role } from '../types';
 import { AppText, BrandMark, GlassCard, Page, useLocaleValue } from '../ui/base';
 import { Field, PrimaryButton, Segmented } from '../ui/controls';
 import { LanguageSwitch } from '../ui/LanguageSwitch';
+import { animateLayout, MotionPressable } from '../ui/motion';
 
 export function SignInScreen({ app }: { app: WessaliApp }) {
   const { locale, ui, isRtl } = app;
@@ -39,14 +40,23 @@ export function SignInScreen({ app }: { app: WessaliApp }) {
           <Field label={ui.nameLabel} value={app.name} onChangeText={app.setName} placeholder={ui.namePlaceholder} icon="person-outline" autoComplete="name" />
           <Field label={ui.phoneLabel} value={app.phone} onChangeText={app.setPhone} placeholder={ui.phonePlaceholder} icon="call-outline" keyboardType="phone-pad" autoComplete="tel" />
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel={ui.connection} accessibilityState={{ expanded: showConnection }}
-          onPress={() => setShowConnection((value) => !value)} style={[styles.connectionRow, rtl && styles.rowReverse]}>
+        <MotionPressable
+          accessibilityRole="button"
+          accessibilityLabel={ui.connection}
+          accessibilityState={{ expanded: showConnection }}
+          onPress={() => {
+            animateLayout();
+            setShowConnection((value) => !value);
+          }}
+          style={styles.connectionPress}
+          contentStyle={[styles.connectionRow, rtl && styles.rowReverse]}
+        >
           <View style={[styles.connectionLabel, rtl && styles.rowReverse]}>
             <Ionicons name="server-outline" size={15} color={palette.muted} />
             <AppText variant="caption" tone="muted">{ui.connection}</AppText>
           </View>
           <Ionicons name={showConnection ? 'chevron-up' : isRtl ? 'chevron-back' : 'chevron-forward'} size={16} color={palette.faint} />
-        </Pressable>
+        </MotionPressable>
         {showConnection ? (
           <View style={{ gap: 8, paddingTop: 4 }}>
             <Field label={ui.apiLabel} value={app.apiInput} onChangeText={app.setApiInput} placeholder={ui.apiPlaceholder} icon="link-outline" keyboardType="url" autoCapitalize="none" />
@@ -67,6 +77,7 @@ const styles = StyleSheet.create({
   rowReverse: { flexDirection: 'row-reverse' },
   languageRow: { flexDirection: 'row', justifyContent: 'flex-end' },
   brandBlock: { alignItems: 'center', gap: 7, paddingTop: 2, paddingBottom: 4 },
-  connectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14, paddingVertical: 5 },
+  connectionPress: { marginTop: 14, paddingVertical: 5 },
+  connectionRow: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   connectionLabel: { flexDirection: 'row', alignItems: 'center', gap: 7 },
 });
