@@ -293,7 +293,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
           ) : Platform.OS === 'android' ? (
             <GoogleMaps.View
               key={`google-${mapKey}`}
-              style={StyleSheet.absoluteFill}
+              style={styles.nativeMap}
               cameraPosition={cameraPosition}
               userLocation={
                 userLocation ? { coordinates: userLocation, followUserLocation: false } : undefined
