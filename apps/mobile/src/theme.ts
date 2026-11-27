@@ -4,44 +4,44 @@ import type { ServiceKind } from '@wessali/contracts';
 
 export { brandColors, radii, spacing };
 
-/** Warm, neutral surfaces with a restrained sage identity. */
+/** Navy and blue logistics identity based on the customer's reference. */
 export const palette = {
-  canvas: '#F3F3EF',
-  canvasDeep: '#E8EAE4',
+  canvas: '#F4F7FB',
+  canvasDeep: '#EAF0F8',
   canvasLift: '#FFFFFF',
-  ink: '#202A24',
-  inkSoft: '#536159',
-  muted: '#748078',
-  faint: '#98A198',
-  jade: '#58745E',
-  jadeBright: '#66866C',
-  jadeDeep: '#3F5E47',
-  mint: '#E3ECE2',
-  sand: '#A98255',
-  amber: '#B7834D',
-  aqua: '#668795',
-  danger: '#B85F58',
-  success: '#63836A',
-  white08: 'rgba(36, 50, 40, 0.055)',
-  white12: 'rgba(36, 50, 40, 0.08)',
-  white18: 'rgba(36, 50, 40, 0.12)',
-  line: 'rgba(55, 73, 60, 0.15)',
-  lineSoft: 'rgba(55, 73, 60, 0.085)',
-  glass: 'rgba(255, 255, 255, 0.82)',
-  glassDeep: 'rgba(249, 250, 247, 0.94)',
-  glassLight: 'rgba(255, 255, 255, 0.94)',
+  ink: '#132B49',
+  inkSoft: '#52677F',
+  muted: '#74869B',
+  faint: '#9AAABD',
+  jade: '#0E3C68',
+  jadeBright: '#176FC2',
+  jadeDeep: '#082B50',
+  mint: '#E5F1FF',
+  sand: '#54799F',
+  amber: '#D99A37',
+  aqua: '#3688D9',
+  danger: '#E34F59',
+  success: '#2475BE',
+  white08: 'rgba(18, 54, 92, 0.035)',
+  white12: 'rgba(18, 54, 92, 0.055)',
+  white18: 'rgba(18, 54, 92, 0.085)',
+  line: 'rgba(26, 66, 110, 0.13)',
+  lineSoft: 'rgba(26, 66, 110, 0.075)',
+  glass: 'rgba(255, 255, 255, 0.96)',
+  glassDeep: 'rgba(248, 251, 255, 0.98)',
+  glassLight: 'rgba(255, 255, 255, 0.98)',
   onAccent: '#FFFFFF',
-  scrim: 'rgba(24, 34, 28, 0.54)',
-  dangerSoft: 'rgba(184, 95, 88, 0.10)',
+  scrim: 'rgba(7, 27, 51, 0.58)',
+  dangerSoft: 'rgba(227, 79, 89, 0.09)',
 } as const;
 
 export const glassTokens = {
-  topEdge: 'rgba(255, 255, 255, 0.94)',
-  rim: 'rgba(72, 91, 76, 0.14)',
-  rimInner: 'rgba(255, 255, 255, 0.76)',
-  fillTop: 'rgba(255, 255, 255, 0.92)',
-  fillBottom: 'rgba(246, 247, 243, 0.88)',
-  shadow: 'rgba(38, 48, 40, 0.13)',
+  topEdge: 'rgba(255, 255, 255, 0.98)',
+  rim: 'rgba(28, 72, 120, 0.11)',
+  rimInner: 'rgba(255, 255, 255, 0.88)',
+  fillTop: 'rgba(255, 255, 255, 0.98)',
+  fillBottom: 'rgba(247, 250, 255, 0.96)',
+  shadow: 'rgba(24, 55, 92, 0.08)',
 } as const;
 
 export const serviceTheme: Record<
@@ -49,22 +49,22 @@ export const serviceTheme: Record<
   { accent: string; accentSoft: string; icon: string; gradient: [string, string, string] }
 > = {
   freight: {
-    accent: palette.jade,
-    accentSoft: 'rgba(88, 116, 94, 0.13)',
+    accent: '#0E3C68',
+    accentSoft: 'rgba(14, 60, 104, 0.10)',
     icon: 'truck-fast-outline',
-    gradient: ['#D2E0D1', '#91AA92', '#58745E'],
+    gradient: ['#DCEBFA', '#83B3E5', '#0E3C68'],
   },
   roadside: {
-    accent: palette.amber,
-    accentSoft: 'rgba(183, 131, 77, 0.14)',
+    accent: '#E34F59',
+    accentSoft: 'rgba(227, 79, 89, 0.11)',
     icon: 'car-wrench',
-    gradient: ['#F0E0CC', '#C8A37B', '#8D6944'],
+    gradient: ['#FCE7E9', '#F09AA0', '#D83D49'],
   },
   water: {
-    accent: palette.aqua,
-    accentSoft: 'rgba(102, 135, 149, 0.14)',
+    accent: '#3688D9',
+    accentSoft: 'rgba(54, 136, 217, 0.11)',
     icon: 'water-outline',
-    gradient: ['#DCE7E9', '#A3BCC3', '#668795'],
+    gradient: ['#DDF0FF', '#8CC2F1', '#3688D9'],
   },
 };
 
@@ -130,36 +130,36 @@ export const typeScale: Record<
   TypeVariant,
   { fontSize: number; lineHeight: number; weight: FontWeightName; letterSpacing: number }
 > = {
-  display: { fontSize: 40, lineHeight: 47, weight: 'black', letterSpacing: -1.5 },
-  h1: { fontSize: 30, lineHeight: 37, weight: 'bold', letterSpacing: -0.9 },
-  h2: { fontSize: 23, lineHeight: 29, weight: 'bold', letterSpacing: -0.45 },
-  h3: { fontSize: 18, lineHeight: 24, weight: 'semibold', letterSpacing: -0.15 },
-  body: { fontSize: 14.5, lineHeight: 22, weight: 'regular', letterSpacing: 0 },
-  bodyStrong: { fontSize: 14.5, lineHeight: 22, weight: 'semibold', letterSpacing: 0 },
-  label: { fontSize: 12, lineHeight: 16, weight: 'semibold', letterSpacing: 0.2 },
-  caption: { fontSize: 11, lineHeight: 15, weight: 'medium', letterSpacing: 0.1 },
-  button: { fontSize: 14.5, lineHeight: 19, weight: 'semibold', letterSpacing: 0 },
-  number: { fontSize: 32, lineHeight: 38, weight: 'bold', letterSpacing: -1.1 },
+  display: { fontSize: 38, lineHeight: 46, weight: 'black', letterSpacing: -1.3 },
+  h1: { fontSize: 28, lineHeight: 35, weight: 'bold', letterSpacing: -0.65 },
+  h2: { fontSize: 22, lineHeight: 29, weight: 'bold', letterSpacing: -0.35 },
+  h3: { fontSize: 17, lineHeight: 24, weight: 'semibold', letterSpacing: -0.1 },
+  body: { fontSize: 14, lineHeight: 21, weight: 'regular', letterSpacing: 0 },
+  bodyStrong: { fontSize: 14, lineHeight: 21, weight: 'semibold', letterSpacing: 0 },
+  label: { fontSize: 12, lineHeight: 16, weight: 'semibold', letterSpacing: 0.1 },
+  caption: { fontSize: 10.5, lineHeight: 15, weight: 'medium', letterSpacing: 0 },
+  button: { fontSize: 14, lineHeight: 19, weight: 'semibold', letterSpacing: 0 },
+  number: { fontSize: 30, lineHeight: 37, weight: 'bold', letterSpacing: -0.8 },
 };
 
 export const layout = {
-  screenPadding: 20,
+  screenPadding: 18,
   maxWidth: 560,
-  dockSpace: 132,
+  dockSpace: 108,
   cardRadius: radii.xl,
 };
 
 export const glow = {
-  jade: { color: palette.jade, opacity: 0.13 },
-  aqua: { color: palette.aqua, opacity: 0.09 },
-  amber: { color: palette.amber, opacity: 0.09 },
-  sand: { color: palette.sand, opacity: 0.11 },
-  danger: { color: palette.danger, opacity: 0.12 },
+  jade: { color: palette.jadeBright, opacity: 0.08 },
+  aqua: { color: palette.aqua, opacity: 0.07 },
+  amber: { color: palette.amber, opacity: 0.07 },
+  sand: { color: palette.sand, opacity: 0.07 },
+  danger: { color: palette.danger, opacity: 0.08 },
 };
 
 export const gradients = {
-  primary: ['#829C83', '#66836A', '#4E6A53'] as const,
-  glass: ['rgba(255,255,255,0.94)', 'rgba(255,255,255,0.70)', 'rgba(237,240,234,0.35)'] as const,
-  deepGlass: ['rgba(248,250,246,0.96)', 'rgba(235,239,232,0.90)'] as const,
+  primary: ['#14558F', '#0C3C69', '#082B50'] as const,
+  glass: ['rgba(255,255,255,0.98)', 'rgba(255,255,255,0.86)', 'rgba(242,247,253,0.72)'] as const,
+  deepGlass: ['rgba(248,251,255,0.99)', 'rgba(239,246,254,0.96)'] as const,
   canvas: [palette.canvas, palette.canvasDeep] as const,
 };
