@@ -1,36 +1,21 @@
 import React from 'react';
-import { Pressable, RefreshControl, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Image as ExpoImage } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { palette, serviceTheme } from '../theme';
 import type { WessaliApp } from '../useWessali';
-import {
-  AppText,
-  Aurora,
-  Avatar,
-  BrandMark,
-  Divider,
-  GlassCard,
-  Page,
-  RouteDoodle,
-  SectionHeading,
-  useLocaleValue,
-} from '../ui/base';
-import { LinearGradient } from 'expo-linear-gradient';
+import { AppText, Avatar, BrandMark, Divider, GlassCard, Page, SectionHeading, useLocaleValue } from '../ui/base';
 import { PrimaryButton, StatusPill } from '../ui/controls';
 import { IconTile } from '../ui/IconTile';
-import { ActivityArea, ServiceMix } from '../ui/charts';
 import { RouteProgress, TripRoute } from '../ui/trip';
-import { firstName, formatShortDate, lastSevenDays, weeklyRequestCounts } from '../utils';
+import { firstName, formatShortDate } from '../utils';
 
-const servicePhotos: Record<ServiceKind, string> = {
-  freight:
-    'https://images.pexels.com/photos/5410923/pexels-photo-5410923.jpeg?auto=compress&cs=tinysrgb&w=1400',
-  roadside:
-    'https://images.pexels.com/photos/6140995/pexels-photo-6140995.jpeg?auto=compress&cs=tinysrgb&w=1400',
-  water:
-    'https://images.pexels.com/photos/37899833/pexels-photo-37899833/free-photo-of-yellow-water-tanker-truck-by-seaside-in-foca.jpeg?auto=compress&cs=tinysrgb&w=1400',
+const photos: Record<ServiceKind, string> = {
+  freight: 'https://images.pexels.com/photos/5410923/pexels-photo-5410923.jpeg?auto=compress&cs=tinysrgb&w=1400',
+  roadside: 'https://images.pexels.com/photos/6140995/pexels-photo-6140995.jpeg?auto=compress&cs=tinysrgb&w=1400',
+  water: 'https://images.pexels.com/photos/37899833/pexels-photo-37899833/free-photo-of-yellow-water-tanker-truck-by-seaside-in-foca.jpeg?auto=compress&cs=tinysrgb&w=1400',
 };
 
 type Props = {
@@ -39,6 +24,7 @@ type Props = {
   onOpenService: (kind: ServiceKind) => void;
   onOpenRequests: () => void;
   onOpenPartner: () => void;
+  onOpenProfile: () => void;
 };
 
 function greetingFor(app: WessaliApp) {
@@ -52,551 +38,204 @@ function statusText(app: WessaliApp, status: string) {
   return (app.ui.status as Record<string, string>)[status] ?? status.replaceAll('_', ' ');
 }
 
-export function HomeScreen({
-  app,
-  onStartRequest,
-  onOpenService,
-  onOpenRequests,
-  onOpenPartner,
-}: Props) {
-  const { isRtl, locale, ui, session, activeBooking, bookings, activeBookings } = app;
-  const { width } = useWindowDimensions();
-  const compactStats = width < 350;
-  const { isRtl: rtlStyle } = useLocaleValue();
-  const week = weeklyRequestCounts(bookings, locale);
-  const dayLabels = lastSevenDays(locale).map((day) => day.label);
-  const weekTotal = week.reduce((sum, value) => sum + value, 0);
+export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests, onOpenPartner, onOpenProfile }: Props) {
+  const { isRtl, locale, ui, session, bookings, activeBookings, activeBooking } = app;
+  const { isRtl: rtl } = useLocaleValue();
   const completed = bookings.filter((booking) => booking.status === 'completed').length;
-  const serviceCounts = SERVICE_CATEGORIES.map((service) => ({
-    label: service.labels[locale],
-    value: bookings.filter((booking) => booking.service_type === service.id).length,
-    tone: serviceTheme[service.id].accent,
-  }));
-  const maxServiceCount = Math.max(1, ...serviceCounts.map((row) => row.value));
-
+  const service = (kind: ServiceKind) => SERVICE_CATEGORIES.find((item) => item.id === kind)?.labels[locale] ?? '';
   return (
-    <Page
-      refreshControl={
-        <RefreshControl
-          refreshing={app.busy}
-          onRefresh={() => void app.refreshData()}
-          tintColor={palette.jade}
-          colors={[palette.jade]}
-          progressBackgroundColor={palette.canvasLift}
-        />
-      }
-    >
-      <View style={[styles.header, isRtl && styles.rowReverse]}>
-        <View style={[styles.brandRow, isRtl && styles.rowReverse]}>
+    <Page topSpace={8} bottomSpace={108}
+      refreshControl={<RefreshControl refreshing={app.busy} onRefresh={() => void app.refreshData()} tintColor={palette.jadeBright} colors={[palette.jadeBright]} progressBackgroundColor={palette.canvasLift} />}>
+      <View style={[styles.header, rtl && styles.rowReverse]}>
+        <View style={[styles.brandRow, rtl && styles.rowReverse]}>
           <BrandMark size={38} />
-          <View style={{ gap: 1, maxWidth: 210 }}>
-            <AppText variant="h3" style={{ fontSize: 16 }}>
-              Wessali
-            </AppText>
-            <AppText variant="caption" tone="faint" numberOfLines={1} style={{ fontSize: 9.5 }}>
-              {ui.tagline}
-            </AppText>
+          <View style={{ gap: 1 }}>
+            <AppText variant="h3" style={{ fontSize: 16 }}>{ui.brand || 'Wessali'}</AppText>
+            <AppText variant="caption" tone="muted" numberOfLines={1}>{ui.tagline}</AppText>
           </View>
         </View>
-        <Avatar name={session?.user.displayName ?? 'Wessali'} provider={app.isProvider} />
+        <Pressable accessibilityRole="button" accessibilityLabel={ui.profileTitle} onPress={onOpenProfile}>
+          <Avatar name={session?.user.displayName ?? 'Wessali'} provider={app.isProvider} size={40} />
+        </Pressable>
       </View>
 
-      <View style={styles.greeting}>
-        <AppText variant="caption" tone="muted">
-          {greetingFor(app)},
-        </AppText>
-        <AppText variant="h2" numberOfLines={1}>
-          {firstName(session?.user.displayName ?? '')}
-        </AppText>
+      <View style={[styles.greeting, rtl && styles.rowReverse]}>
+        <View style={{ flex: 1, gap: 1 }}>
+          <AppText variant="caption" tone="muted">{greetingFor(app)}</AppText>
+          <AppText variant="h2" numberOfLines={1}>{firstName(session?.user.displayName ?? '')}</AppText>
+        </View>
+        <View style={styles.locationBadge}>
+          <Ionicons name="location" size={13} color={palette.jadeBright} />
+          <AppText variant="caption" style={{ color: palette.jade }}>{locale === 'ar' ? 'الجزائر' : locale === 'fr' ? 'Algérie' : 'Algeria'}</AppText>
+        </View>
       </View>
 
       {activeBooking ? (
-        <ActiveRunCard app={app} onOpenRequests={onOpenRequests} />
-      ) : (
-        <GlassCard padding={20} tone="deep" radius={30} style={{ overflow: 'hidden' }}>
-          <RouteDoodle height={190} opacity={0.72} />
-          <Aurora width={380} height={300} opacity={0.3} secondary={palette.aqua} />
-          <View style={{ gap: 14 }}>
-            <View style={[styles.heroTop, rtlStyle && styles.rowReverse]}>
-              <View style={[styles.kicker, rtlStyle && styles.rowReverse]}>
-                <View style={styles.kickerDot} />
-                <AppText variant="caption" tone="jade">
-                  {ui.welcomeKicker}
-                </AppText>
+        <GlassCard padding={16} radius={22}>
+          <View style={[styles.rowBetween, rtl && styles.rowReverse]}>
+            <View style={[styles.row, rtl && styles.rowReverse]}>
+              <IconTile tone={activeBooking.service_type} size="sm" />
+              <View style={{ flex: 1, gap: 2 }}>
+                <AppText variant="caption" tone="muted">{ui.activeRunTitle}</AppText>
+                <AppText variant="bodyStrong">{activeBooking.public_reference}</AppText>
               </View>
-              <IconTile tone="freight" size="lg" />
             </View>
-            <AppText variant="h1" style={{ maxWidth: '88%' }}>
-              {ui.homeTitle}
-            </AppText>
-            <AppText variant="body" tone="soft" style={{ maxWidth: '86%' }}>
-              {ui.homeBody}
-            </AppText>
-            <PrimaryButton
-              label={ui.homeCta}
-              icon={isRtl ? 'arrow-back' : 'arrow-forward'}
-              compact
-              onPress={onStartRequest}
-              style={{ alignSelf: isRtl ? 'flex-end' : 'flex-start', minWidth: 180 }}
-            />
+            <StatusPill status={activeBooking.status} label={statusText(app, activeBooking.status)} />
+          </View>
+          <View style={{ height: 12 }} />
+          <TripRoute booking={activeBooking} locale={locale} />
+          <View style={{ height: 12 }} />
+          <RouteProgress status={activeBooking.status} />
+          <Pressable onPress={onOpenRequests} style={[styles.trackRow, rtl && styles.rowReverse]}>
+            <AppText variant="label" style={{ color: palette.jadeBright }}>{ui.track}</AppText>
+            <Ionicons name={isRtl ? 'arrow-back' : 'arrow-forward'} size={15} color={palette.jadeBright} />
+          </Pressable>
+        </GlassCard>
+      ) : (
+        <View style={styles.hero}>
+          <ExpoImage source={{ uri: photos.freight }} style={StyleSheet.absoluteFill} contentFit="cover" transition={350} cachePolicy="memory-disk" />
+          <LinearGradient colors={['rgba(5,28,55,0.18)', 'rgba(5,29,57,0.94)']} locations={[0,1]} style={StyleSheet.absoluteFill} />
+          <View style={styles.heroContent}>
+            <View style={styles.heroBadge}>
+              <View style={styles.onlineDot} />
+              <AppText variant="caption" tone="white">{ui.welcomeKicker}</AppText>
+            </View>
+            <AppText variant="h2" tone="white" style={{ maxWidth: '92%' }}>{ui.homeTitle}</AppText>
+            <AppText variant="caption" tone="white" style={styles.heroBody}>{ui.homeBody}</AppText>
+            <PrimaryButton label={ui.homeCta} icon={isRtl ? 'arrow-back' : 'arrow-forward'} compact onPress={onStartRequest} style={{ alignSelf: isRtl ? 'flex-end' : 'flex-start', minWidth: 164 }} />
+          </View>
+        </View>
+      )}
+
+      <View style={[styles.statRow, rtl && styles.rowReverse]}>
+        <Metric value={activeBookings.length} label={ui.statActive} icon="navigate-outline" />
+        <Metric value={completed} label={ui.statCompleted} icon="checkmark-circle-outline" />
+        <Metric value={bookings.length} label={ui.statTotal} icon="layers-outline" />
+      </View>
+
+      <SectionHeading title={ui.servicesTitle} caption={ui.servicesBody} />
+      <View style={[styles.serviceGrid, rtl && styles.rowReverse]}>
+        <ServiceCard kind="roadside" title={service('roadside')} description={ui.serviceRoadsideShort} actionLabel={ui.navNew} onPress={() => onOpenService('roadside')} />
+        <ServiceCard kind="freight" title={service('freight')} description={ui.serviceFreightShort} actionLabel={ui.navNew} onPress={() => onOpenService('freight')} />
+      </View>
+      <Pressable accessibilityRole="button" onPress={() => onOpenService('water')} style={({ pressed }) => [styles.waterAction, rtl && styles.rowReverse, pressed && { opacity: 0.78 }]}>
+        <IconTile tone="water" size="sm" />
+        <View style={{ flex: 1, gap: 2 }}>
+          <AppText variant="bodyStrong">{service('water')}</AppText>
+          <AppText variant="caption" tone="muted">{ui.serviceWaterShort}</AppText>
+        </View>
+        <Ionicons name={isRtl ? 'chevron-back' : 'chevron-forward'} size={17} color={palette.aqua} />
+      </Pressable>
+
+      <SectionHeading title={ui.recentTitle} action={ui.seeAll} onAction={onOpenRequests} />
+      {bookings.length > 0 ? (
+        <View style={{ gap: 9 }}>
+          {bookings.slice(0, 3).map((booking) => (
+            <Pressable key={booking.id} accessibilityRole="button" onPress={onOpenRequests}>
+              <GlassCard padding={12} radius={18}>
+                <View style={[styles.recentRow, rtl && styles.rowReverse]}>
+                  <IconTile tone={booking.service_type} size="sm" />
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <AppText variant="bodyStrong" numberOfLines={1}>{service(booking.service_type)}</AppText>
+                    <AppText variant="caption" tone="muted" numberOfLines={1}>{booking.pickup_address}</AppText>
+                  </View>
+                  <View style={{ alignItems: isRtl ? 'flex-start' : 'flex-end', gap: 4 }}>
+                    <StatusPill status={booking.status} label={statusText(app, booking.status)} />
+                    <AppText variant="caption" tone="faint">{formatShortDate(booking.requested_at ?? booking.created_at, locale)}</AppText>
+                  </View>
+                </View>
+              </GlassCard>
+            </Pressable>
+          ))}
+        </View>
+      ) : (
+        <GlassCard padding={15} radius={18}>
+          <View style={[styles.emptyRow, rtl && styles.rowReverse]}>
+            <Ionicons name="receipt-outline" size={20} color={palette.jadeBright} />
+            <AppText variant="caption" tone="muted" style={{ flex: 1 }}>{ui.noData}</AppText>
+            <Pressable onPress={onStartRequest}><AppText variant="label" style={{ color: palette.jadeBright }}>{ui.homeCta}</AppText></Pressable>
           </View>
         </GlassCard>
       )}
 
-      <View
-        style={[
-          styles.statsRow,
-          rtlStyle && styles.rowReverse,
-          compactStats && styles.statsRowCompact,
-        ]}
-      >
-        <StatTile
-          label={ui.statActive}
-          value={activeBookings.length}
-          color={palette.jade}
-          icon="navigate-outline"
-          isRtl={isRtl}
-          compact={compactStats}
-        />
-        <StatTile
-          label={ui.statCompleted}
-          value={completed}
-          color={palette.aqua}
-          icon="checkmark-circle-outline"
-          isRtl={isRtl}
-          compact={compactStats}
-        />
-        <StatTile
-          label={ui.statTotal}
-          value={bookings.length}
-          color={palette.sand}
-          icon="layers-outline"
-          isRtl={isRtl}
-          compact={compactStats}
-        />
+      <View style={[styles.shortcuts, rtl && styles.rowReverse]}>
+        <Shortcut icon="receipt-outline" label={ui.navRequests} onPress={onOpenRequests} />
+        <Shortcut icon="briefcase-outline" label={ui.navPartner} onPress={onOpenPartner} />
+        <Shortcut icon="person-outline" label={ui.navProfile} onPress={onOpenProfile} />
       </View>
-
-      <SectionHeading title={ui.servicesTitle} caption={ui.servicesBody} />
-      <View style={{ gap: 12 }}>
-        {SERVICE_CATEGORIES.map((service, index) => {
-          const tone = serviceTheme[service.id];
-          const description =
-            service.id === 'freight'
-              ? ui.serviceFreightShort
-              : service.id === 'roadside'
-                ? ui.serviceRoadsideShort
-                : ui.serviceWaterShort;
-
-          return (
-            <Pressable
-              key={service.id}
-              accessibilityRole="button"
-              accessibilityLabel={service.labels[locale]}
-              onPress={() => onOpenService(service.id)}
-              style={({ pressed }) => [pressed && { transform: [{ scale: 0.985 }], opacity: 0.94 }]}
-            >
-              <View style={[styles.serviceCard, { borderColor: `${tone.accent}48` }]}>
-                <ExpoImage
-                  source={{ uri: servicePhotos[service.id] }}
-                  style={StyleSheet.absoluteFill}
-                  contentFit="cover"
-                  transition={420}
-                  cachePolicy="memory-disk"
-                />
-                <LinearGradient
-                  colors={['rgba(10,18,14,0.02)', 'rgba(10,18,14,0.18)', 'rgba(10,18,14,0.92)']}
-                  locations={[0, 0.42, 1]}
-                  start={{ x: 0.5, y: 0 }}
-                  end={{ x: 0.5, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
-                <LinearGradient
-                  colors={[`${tone.accent}42`, 'rgba(255,255,255,0)', 'rgba(255,255,255,0)']}
-                  locations={[0, 0.48, 1]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={styles.serviceImageCounter}>
-                  <AppText variant="caption" tone="white" style={{ fontSize: 9, lineHeight: 12 }}>
-                    {String(index + 1).padStart(2, '0')} / 03
-                  </AppText>
-                </View>
-                <View style={[styles.serviceCardBottom, rtlStyle && styles.rowReverse]}>
-                  <View style={styles.serviceCardIcon}>
-                    <IconTile tone={service.id} size="md" glow />
-                  </View>
-                  <View style={{ flex: 1, gap: 4 }}>
-                    <AppText variant="h3" tone="white" numberOfLines={1} style={{ fontSize: 18 }}>
-                      {service.labels[locale]}
-                    </AppText>
-                    <AppText
-                      variant="caption"
-                      tone="white"
-                      numberOfLines={2}
-                      style={{ lineHeight: 16, opacity: 0.86 }}
-                    >
-                      {description}
-                    </AppText>
-                  </View>
-                  <View
-                    style={[
-                      styles.serviceArrow,
-                      { backgroundColor: `${tone.accent}30`, borderColor: `${tone.accent}80` },
-                    ]}
-                  >
-                    <Ionicons
-                      name={isRtl ? 'arrow-back' : 'arrow-forward'}
-                      size={16}
-                      color="#FFFFFF"
-                    />
-                  </View>
-                </View>
-                <View style={[styles.serviceGlow, { backgroundColor: tone.accent }]} />
-              </View>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      <GlassCard padding={18} radius={26}>
-        <View style={[styles.cardTop, rtlStyle && styles.rowReverse]}>
-          <View style={{ flex: 1, gap: 3 }}>
-            <AppText variant="h3">{ui.weekTitle}</AppText>
-            <AppText variant="caption" tone="muted">
-              {ui.weekCaption}
-            </AppText>
-          </View>
-          <View style={styles.weekTotal}>
-            <AppText variant="h2" tone="jade" align="center" style={{ fontSize: 22 }}>
-              {weekTotal}
-            </AppText>
-            <AppText variant="caption" tone="muted" align="center" style={{ fontSize: 9 }}>
-              {ui.navRequests}
-            </AppText>
-          </View>
-        </View>
-        <View style={{ height: 14 }} />
-        <ActivityArea data={week} labels={dayLabels} />
-        {weekTotal === 0 ? (
-          <AppText variant="caption" tone="faint" align="center" style={{ marginTop: 6 }}>
-            {ui.weekEmpty}
-          </AppText>
-        ) : null}
-        <Divider style={{ marginVertical: 16 }} />
-        <View style={{ gap: 12 }}>
-          <AppText variant="label" tone="soft">
-            {ui.serviceMix}
-          </AppText>
-          <ServiceMix rows={serviceCounts.map((row) => ({ ...row, max: maxServiceCount }))} />
-        </View>
-      </GlassCard>
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={app.isProvider ? ui.providerBannerCta : ui.partnerBannerCta}
-        onPress={onOpenPartner}
-        style={({ pressed }) => [pressed && { opacity: 0.8 }]}
-      >
-        <GlassCard padding={16} radius={24} tone="deep">
-          <Aurora
-            width={300}
-            height={200}
-            opacity={0.16}
-            color={palette.sand}
-            secondary={palette.amber}
-          />
-          <View style={[styles.partnerRow, rtlStyle && styles.rowReverse]}>
-            <IconTile
-              tone="sand"
-              icon={app.isProvider ? 'account-hard-hat' : 'handshake-outline'}
-              size="md"
-            />
-            <View style={{ flex: 1, gap: 3 }}>
-              <AppText variant="bodyStrong">
-                {app.isProvider ? ui.providerBannerTitle : ui.partnerBannerTitle}
-              </AppText>
-              <AppText variant="caption" tone="muted" style={{ lineHeight: 17 }}>
-                {app.isProvider ? ui.providerBannerBody : ui.partnerBannerBody}
-              </AppText>
-            </View>
-            <Ionicons
-              name={isRtl ? 'chevron-back' : 'chevron-forward'}
-              size={17}
-              color={palette.sand}
-            />
-          </View>
-        </GlassCard>
-      </Pressable>
-
-      {bookings.length > 0 ? (
-        <>
-          <SectionHeading title={ui.recentTitle} action={ui.seeAll} onAction={onOpenRequests} />
-          <View style={{ gap: 9 }}>
-            {bookings.slice(0, 2).map((booking) => {
-              const service = SERVICE_CATEGORIES.find((item) => item.id === booking.service_type);
-              return (
-                <Pressable
-                  key={booking.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={booking.public_reference}
-                  onPress={onOpenRequests}
-                >
-                  <GlassCard padding={13} radius={20}>
-                    <View style={[styles.recentRow, rtlStyle && styles.rowReverse]}>
-                      <IconTile tone={booking.service_type} size="sm" />
-                      <View style={{ flex: 1, gap: 2 }}>
-                        <AppText variant="bodyStrong" numberOfLines={1} style={{ fontSize: 13.5 }}>
-                          {service?.labels[locale]}
-                        </AppText>
-                        <AppText variant="caption" tone="muted" numberOfLines={1}>
-                          {booking.pickup_address}
-                        </AppText>
-                      </View>
-                      <View style={{ alignItems: isRtl ? 'flex-start' : 'flex-end', gap: 4 }}>
-                        <StatusPill
-                          status={booking.status}
-                          label={statusText(app, booking.status)}
-                        />
-                        <AppText variant="caption" tone="faint" style={{ fontSize: 9.5 }}>
-                          {formatShortDate(booking.requested_at ?? booking.created_at, locale)}
-                        </AppText>
-                      </View>
-                    </View>
-                  </GlassCard>
-                </Pressable>
-              );
-            })}
-          </View>
-        </>
-      ) : null}
+      <Divider />
+      <AppText variant="caption" tone="faint" align="center">{ui.madeFor} · {ui.version}</AppText>
     </Page>
   );
 }
 
-function StatTile({
-  label,
-  value,
-  color,
-  icon,
-  isRtl,
-  compact = false,
-}: {
-  label: string;
-  value: number;
-  color: string;
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  isRtl: boolean;
-  compact?: boolean;
-}) {
+function Metric({ value, label, icon }: { value: number; label: string; icon: React.ComponentProps<typeof Ionicons>['name'] }) {
   return (
-    <GlassCard
-      padding={compact ? 10 : 13}
-      radius={20}
-      style={compact ? { width: '48%', flex: 0 } : { flex: 1 }}
-    >
-      <View style={{ gap: 6, alignItems: isRtl ? 'flex-end' : 'flex-start' }}>
-        <View style={[styles.statTop, { justifyContent: 'space-between' }]}>
-          <LinearGradient
-            colors={[`${color}3D`, `${color}0F`]}
-            start={{ x: 0.15, y: 0 }}
-            end={{ x: 0.9, y: 1 }}
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 10,
-              borderWidth: 1,
-              borderColor: `${color}2E`,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Ionicons name={icon} size={14} color={color} />
-          </LinearGradient>
-        </View>
-        <AppText
-          variant="number"
-          style={{
-            color,
-            fontSize: compact ? 24 : 27,
-            lineHeight: compact ? 28 : 31,
-            letterSpacing: -1,
-          }}
-        >
-          {value}
-        </AppText>
-        <AppText variant="caption" tone="muted" numberOfLines={1} style={{ fontSize: 10 }}>
-          {label}
-        </AppText>
+    <GlassCard padding={11} radius={17} style={{ flex: 1 }}>
+      <View style={{ gap: 5 }}>
+        <Ionicons name={icon} size={16} color={palette.jadeBright} />
+        <AppText variant="number" style={{ color: palette.ink, fontSize: 22, lineHeight: 27 }}>{value}</AppText>
+        <AppText variant="caption" tone="muted" numberOfLines={1}>{label}</AppText>
       </View>
     </GlassCard>
   );
 }
 
-function ActiveRunCard({ app, onOpenRequests }: { app: WessaliApp; onOpenRequests: () => void }) {
-  const { ui, locale, activeBooking, isRtl } = app;
-  const { isRtl: rtlStyle } = useLocaleValue();
-  if (!activeBooking) return null;
+function ServiceCard({ kind, title, description, actionLabel, onPress }: { kind: ServiceKind; title: string; description: string; actionLabel: string; onPress: () => void }) {
+  const tone = serviceTheme[kind];
+  const { isRtl } = useLocaleValue();
   return (
-    <GlassCard padding={18} tone="deep" radius={28} style={{ overflow: 'hidden' }}>
-      <RouteDoodle
-        height={150}
-        opacity={0.5}
-        color={serviceTheme[activeBooking.service_type].accent}
-      />
-      <View style={{ gap: 14 }}>
-        <View style={[styles.cardTop, rtlStyle && styles.rowReverse]}>
-          <View style={[styles.activeTitle, rtlStyle && styles.rowReverse]}>
-            <IconTile tone={activeBooking.service_type} size="sm" />
-            <View style={{ gap: 2 }}>
-              <AppText variant="caption" tone="jade">
-                {ui.activeRunTitle}
-              </AppText>
-              <AppText variant="h3" numberOfLines={1} style={{ fontSize: 15, maxWidth: 170 }}>
-                {activeBooking.public_reference}
-              </AppText>
-            </View>
-          </View>
-          <StatusPill status={activeBooking.status} label={statusText(app, activeBooking.status)} />
+    <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={({ pressed }) => [styles.serviceCard, pressed && { opacity: 0.82, transform: [{ scale: 0.985 }] }]}>
+      <ExpoImage source={{ uri: photos[kind] }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} cachePolicy="memory-disk" />
+      <LinearGradient colors={['rgba(7,28,52,0.10)', 'rgba(7,28,52,0.88)']} locations={[0,1]} style={StyleSheet.absoluteFill} />
+      <View style={[styles.serviceCardContent, isRtl && styles.rowReverse]}>
+        <View style={[styles.serviceBadge, { backgroundColor: kind === 'roadside' ? '#E34F59' : '#176FC2' }]}>
+          <Ionicons name={kind === 'roadside' ? 'flash' : 'cube'} size={14} color="#FFFFFF" />
         </View>
-        <TripRoute booking={activeBooking} locale={locale} />
-        <View style={{ gap: 9 }}>
-          <RouteProgress status={activeBooking.status} />
-          <View style={[styles.activeFooter, rtlStyle && styles.rowReverse]}>
-            <AppText variant="caption" tone="muted" style={{ flex: 1 }} numberOfLines={1}>
-              {activeBooking.provider_name ?? ui.findingProvider}
-            </AppText>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={ui.track}
-              onPress={onOpenRequests}
-              style={[styles.trackCta, rtlStyle && styles.rowReverse]}
-            >
-              <AppText variant="label" tone="jade">
-                {ui.track}
-              </AppText>
-              <Ionicons
-                name={isRtl ? 'arrow-back' : 'arrow-forward'}
-                size={13}
-                color={palette.jade}
-              />
-            </Pressable>
-          </View>
+        <View style={{ flex: 1, gap: 3 }}>
+          <AppText variant="bodyStrong" tone="white" numberOfLines={1}>{title}</AppText>
+          <AppText variant="caption" tone="white" numberOfLines={2} style={{ opacity: 0.86 }}>{description}</AppText>
         </View>
+        <Ionicons name={isRtl ? 'arrow-back' : 'arrow-forward'} size={16} color="#FFFFFF" />
       </View>
-    </GlassCard>
+      <AppText variant="caption" tone="white" style={styles.serviceActionLabel}>{actionLabel}</AppText>
+    </Pressable>
+  );
+}
+
+function Shortcut({ icon, label, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; onPress: () => void }) {
+  return (
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.shortcut}>
+      <View style={styles.shortcutIcon}><Ionicons name={icon} size={18} color={palette.jade} /></View>
+      <AppText variant="caption" align="center" numberOfLines={1}>{label}</AppText>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
   rowReverse: { flexDirection: 'row-reverse' },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },
-  greeting: { gap: 1, paddingTop: 2, paddingHorizontal: 2 },
-  heroTop: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  kicker: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-    paddingHorizontal: 11,
-    paddingVertical: 7,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: 'rgba(55, 225, 165, 0.18)',
-    backgroundColor: 'rgba(55, 225, 165, 0.07)',
-  },
-  kickerDot: { width: 5, height: 5, borderRadius: 999, backgroundColor: palette.jade },
-  statsRow: { flexDirection: 'row', gap: 9 },
-  statsRowCompact: { flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 9 },
-  statTop: { flexDirection: 'row', alignItems: 'center' },
-  serviceCard: {
-    height: 218,
-    borderRadius: 27,
-    overflow: 'hidden',
-    borderWidth: 1,
-    backgroundColor: palette.canvasDeep,
-    justifyContent: 'flex-end',
-    shadowColor: '#1E3025',
-    shadowOpacity: 0.13,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 9 },
-    elevation: 5,
-  },
-  serviceCardBottom: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  serviceCardIcon: {
-    borderRadius: 19,
-    padding: 3,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  serviceGlow: {
-    position: 'absolute',
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    right: -54,
-    top: -55,
-    opacity: 0.18,
-  },
-  servicePhoto: {
-    width: 116,
-    height: 108,
-    borderRadius: 17,
-    overflow: 'hidden',
-    backgroundColor: palette.canvasDeep,
-  },
-  serviceImageCounter: {
-    position: 'absolute',
-    top: 7,
-    left: 7,
-    paddingHorizontal: 7,
-    paddingVertical: 4,
-    borderRadius: 999,
-    backgroundColor: 'rgba(18, 27, 21, 0.46)',
-  },
-  serviceImageIcon: { position: 'absolute', right: 6, bottom: 6 },
-  serviceInfo: { flex: 1, minWidth: 0, justifyContent: 'center', gap: 5 },
-  serviceFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 2,
-  },
-  serviceArrow: {
-    width: 32,
-    height: 32,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  weekTotal: { alignItems: 'center', gap: 0, minWidth: 54 },
-  partnerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  recentRow: { flexDirection: 'row', alignItems: 'center', gap: 11 },
-  activeTitle: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
-  activeFooter: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  trackCta: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 9, flex: 1 },
+  greeting: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  locationBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 99, backgroundColor: '#EAF3FC' },
+  onlineDot: { width: 6, height: 6, borderRadius: 9, backgroundColor: '#7CC3FF' },
+  hero: { height: 192, borderRadius: 22, overflow: 'hidden', backgroundColor: palette.jadeDeep, justifyContent: 'flex-end' },
+  heroContent: { paddingHorizontal: 17, paddingVertical: 16, gap: 9 },
+  heroBadge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 7, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 6, backgroundColor: 'rgba(255,255,255,0.15)' },
+  heroBody: { opacity: 0.86, lineHeight: 17, maxWidth: 300 },
+  statRow: { flexDirection: 'row', gap: 8 },
+  serviceGrid: { flexDirection: 'row', gap: 10 },
+  serviceCard: { flex: 1, height: 138, borderRadius: 18, overflow: 'hidden', backgroundColor: palette.jadeDeep, justifyContent: 'flex-end' },
+  serviceCardContent: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, paddingBottom: 8 },
+  serviceBadge: { width: 29, height: 29, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  serviceActionLabel: { marginHorizontal: 12, marginBottom: 10, opacity: 0.8 },
+  waterAction: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFFFFF', borderRadius: 17, borderWidth: 1, borderColor: palette.lineSoft, padding: 11 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 9, flex: 1 },
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+  trackRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 12 },
+  recentRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  emptyRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
+  shortcuts: { flexDirection: 'row', justifyContent: 'space-around', gap: 8, paddingVertical: 3 },
+  shortcut: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 6 },
+  shortcutIcon: { width: 38, height: 38, borderRadius: 13, backgroundColor: '#EAF2FC', alignItems: 'center', justifyContent: 'center' },
 });
