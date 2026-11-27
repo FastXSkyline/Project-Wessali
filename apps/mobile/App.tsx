@@ -129,6 +129,7 @@ function AppRoot() {
         onOpenService={openService}
         onOpenRequests={() => navigate('requests')}
         onOpenPartner={() => navigate('partner')}
+        onOpenProfile={() => navigate('profile')}
       />
     );
   })();
