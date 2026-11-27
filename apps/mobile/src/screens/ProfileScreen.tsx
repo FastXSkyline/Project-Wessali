@@ -65,7 +65,13 @@ export function ProfileScreen({ app }: { app: WessaliApp }) {
         <View style={{ height: 13 }} />
         <Field label={ui.apiLabel} value={app.apiInput} onChangeText={app.setApiInput} placeholder={ui.apiPlaceholder} icon="link-outline" keyboardType="url" autoCapitalize="none" />
         <View style={{ height: 12 }} />
-        <PrimaryButton label={ui.saveConnection} icon="save-outline" compact onPress={app.saveConnection} />
+        <PrimaryButton
+          label={ui.saveConnection}
+          icon="save-outline"
+          compact
+          loading={app.busy}
+          onPress={() => void app.saveConnection()}
+        />
       </GlassCard>
 
       <View style={{ gap: 9 }}>

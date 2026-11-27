@@ -103,6 +103,15 @@ function AppRoot() {
   }
 
   const content = (() => {
+    if (!app.ready) {
+      return (
+        <LinearGradient colors={['#061F3A', '#0A3763', '#0E4A7D']} style={styles.splash}>
+          <StatusBar style="light" />
+          <BrandMark size={72} />
+          <Text style={styles.splashTitle}>Wessali</Text>
+        </LinearGradient>
+      );
+    }
     if (!app.session) return <SignInScreen app={app} />;
     if (bookingOpen) {
       return (

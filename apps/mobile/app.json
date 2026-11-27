@@ -41,6 +41,7 @@
     "plugins": [
       "expo-status-bar",
       "expo-font",
+      "expo-secure-store",
       [
         "expo-splash-screen",
         {

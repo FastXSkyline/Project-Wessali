@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import * as SecureStore from 'expo-secure-store';
 import { SERVICE_CATEGORIES, type ServiceKind } from '@wessali/contracts';
 import { DEFAULT_LOCALE, getDirection, type Locale } from '@wessali/i18n';
 import { apiRequest, cleanBaseUrl } from './api';
@@ -7,6 +8,34 @@ import type { Booking, ProviderProfile, Role, Session } from './types';
 import { isActive } from './utils';
 
 const DEFAULT_API = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://localhost:4000/v1';
+
+const STORAGE_KEYS = {
+  apiBaseUrl: 'wessali.api-base-url.v1',
+  session: 'wessali.session.v1',
+  rememberedCustomer: 'wessali.remembered-customer.v1',
+} as const;
+
+type RememberedCustomer = { displayName: string; phoneE164: string };
+
+function normalizeApiBase(value: string) {
+  const trimmed = value.trim();
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`;
+  const parsed = new URL(withProtocol);
+  if (!parsed.hostname || (parsed.protocol !== 'http:' && parsed.protocol !== 'https:')) {
+    throw new Error('Enter a valid HTTP or HTTPS API address.');
+  }
+  parsed.pathname = parsed.pathname.replace(/\/+$/, '') || '/v1';
+  return cleanBaseUrl(parsed.toString());
+}
+
+function readStoredJson<T>(value: string | null): T | null {
+  if (!value) return null;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+}
 
 function normalizePhone(value: string) {
   return value.replace(/[\s()-]/g, '');
@@ -20,6 +49,7 @@ export function useWessali() {
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<Role>('customer');
   const [session, setSession] = useState<Session | null>(null);
+  const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -61,6 +91,70 @@ export function useWessali() {
   const providerApproved = providerProfile?.status === 'approved';
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function restoreSecureState() {
+      try {
+        const [savedApiBase, savedSessionJson, rememberedCustomerJson] = await Promise.all([
+          SecureStore.getItemAsync(STORAGE_KEYS.apiBaseUrl),
+          SecureStore.getItemAsync(STORAGE_KEYS.session),
+          SecureStore.getItemAsync(STORAGE_KEYS.rememberedCustomer),
+        ]);
+        if (cancelled) return;
+
+        if (savedApiBase) {
+          try {
+            const normalized = normalizeApiBase(savedApiBase);
+            setApiBaseUrl(normalized);
+            setApiInput(normalized);
+          } catch {
+            // Ignore invalid values left by an older app version.
+          }
+        }
+
+        const rememberedCustomer = readStoredJson<RememberedCustomer>(rememberedCustomerJson);
+        if (
+          rememberedCustomer &&
+          typeof rememberedCustomer.displayName === 'string' &&
+          typeof rememberedCustomer.phoneE164 === 'string'
+        ) {
+          setName(rememberedCustomer.displayName);
+          setPhone(rememberedCustomer.phoneE164);
+          setRole('customer');
+        }
+
+        const storedSession = readStoredJson<Session>(savedSessionJson);
+        if (
+          storedSession &&
+          typeof storedSession.accessToken === 'string' &&
+          storedSession.user &&
+          typeof storedSession.user.id === 'string' &&
+          (storedSession.user.role === 'customer' || storedSession.user.role === 'provider')
+        ) {
+          const expiresAt = storedSession.expiresAt ? Date.parse(storedSession.expiresAt) : NaN;
+          if (Number.isFinite(expiresAt) && expiresAt <= Date.now()) {
+            await SecureStore.deleteItemAsync(STORAGE_KEYS.session);
+          } else {
+            setSession(storedSession);
+            setName(storedSession.user.displayName);
+            setPhone(storedSession.user.phoneE164);
+            setRole(storedSession.user.role);
+          }
+        }
+      } catch {
+        // Keep sign-in available if secure storage cannot be read.
+      } finally {
+        if (!cancelled) setReady(true);
+      }
+    }
+
+    void restoreSecureState();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(''), 4200);
     return () => clearTimeout(timer);
@@ -98,7 +192,16 @@ export function useWessali() {
         }
       }
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : ui.errorGeneric);
+      const message = requestError instanceof Error ? requestError.message : ui.errorGeneric;
+      setError(message);
+      if (/HTTP 401|unauthorized/i.test(message)) {
+        setSession(null);
+        setBookings([]);
+        setProviderProfile(null);
+        setProviderRequests([]);
+        setProviderJobs([]);
+        void SecureStore.deleteItemAsync(STORAGE_KEYS.session).catch(() => undefined);
+      }
     } finally {
       setBusy(false);
     }
@@ -116,7 +219,13 @@ export function useWessali() {
       setError(ui.signInRequired);
       return;
     }
-    const base = cleanBaseUrl(apiInput);
+    let base: string;
+    try {
+      base = normalizeApiBase(apiInput);
+    } catch {
+      setError(ui.connectionHint);
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -130,6 +239,18 @@ export function useWessali() {
       });
       setApiBaseUrl(base);
       setApiInput(base);
+      await Promise.all(
+        [
+          SecureStore.setItemAsync(STORAGE_KEYS.apiBaseUrl, base),
+          SecureStore.setItemAsync(STORAGE_KEYS.session, JSON.stringify(result)),
+          role === 'customer'
+            ? SecureStore.setItemAsync(
+                STORAGE_KEYS.rememberedCustomer,
+                JSON.stringify({ displayName: name.trim(), phoneE164: normalizedPhone }),
+              )
+            : Promise.resolve(),
+        ].map((write) => write.catch(() => undefined)),
+      );
       setSession(result);
       setNotice(ui.saved);
     } catch (requestError) {
@@ -147,6 +268,7 @@ export function useWessali() {
         // A local sign-out should succeed even when the API is offline.
       }
     }
+    await SecureStore.deleteItemAsync(STORAGE_KEYS.session).catch(() => undefined);
     setSession(null);
     setBookings([]);
     setProviderProfile(null);
@@ -358,10 +480,39 @@ export function useWessali() {
     );
   }
 
-  function saveConnection() {
-    setApiBaseUrl(cleanBaseUrl(apiInput));
-    setApiInput(cleanBaseUrl(apiInput));
-    setNotice(ui.connectionSaved);
+  async function saveConnection() {
+    let base: string;
+    try {
+      base = normalizeApiBase(apiInput);
+    } catch {
+      setError(ui.connectionHint);
+      return;
+    }
+
+    setBusy(true);
+    setError('');
+    try {
+      await SecureStore.setItemAsync(STORAGE_KEYS.apiBaseUrl, base);
+      if (session && base !== apiBaseUrl) {
+        // A token is valid only on the API that issued it.
+        void apiRequest(apiBaseUrl, '/auth/logout', session.accessToken, { method: 'POST' }).catch(
+          () => undefined,
+        );
+        await SecureStore.deleteItemAsync(STORAGE_KEYS.session).catch(() => undefined);
+        setSession(null);
+        setBookings([]);
+        setProviderProfile(null);
+        setProviderRequests([]);
+        setProviderJobs([]);
+      }
+      setApiBaseUrl(base);
+      setApiInput(base);
+      setNotice(ui.connectionSaved);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : ui.errorGeneric);
+    } finally {
+      setBusy(false);
+    }
   }
 
   const selectedServiceCopy = useMemo(
@@ -376,6 +527,7 @@ export function useWessali() {
   const activeBooking = activeBookings[0] ?? null;
 
   return {
+    ready,
     locale,
     setLocale,
     isRtl,

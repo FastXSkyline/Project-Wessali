@@ -4,6 +4,8 @@ export type Role = 'customer' | 'provider';
 
 export type Session = {
   accessToken: string;
+  tokenType?: 'Bearer';
+  expiresAt?: string;
   user: { id: string; displayName: string; phoneE164: string; role: Role };
 };
 
