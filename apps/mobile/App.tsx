@@ -206,7 +206,11 @@ function AppRoot() {
     <LocaleProvider locale={app.locale}>
       <View style={styles.root}>
         <StatusBar style="dark" />
-        <ScreenTransition transitionKey={screenKey} direction={motionDirection}>
+        <ScreenTransition
+          key={app.ready ? (app.session ? 'authenticated' : 'unauthenticated') : 'loading'}
+          transitionKey={screenKey}
+          direction={motionDirection}
+        >
           {content}
         </ScreenTransition>
         {app.session && !bookingOpen && !trackingBooking ? (
