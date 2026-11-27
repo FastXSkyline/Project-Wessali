@@ -85,7 +85,7 @@ export function TrackingScreen({ app, booking, onBack }: { app: WessaliApp; book
             <AppText variant="label" tone="muted" align="center">{ui.locationSection}</AppText>
           </View>
         )}
-        <View pointerEvents="none" style={styles.mapLegend}>
+        {hasMapPins ? <View pointerEvents="none" style={styles.mapLegend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#176FC2' }]} />
             <AppText variant="caption" style={{ color: palette.ink }}>{ui.pickupLabel}</AppText>
@@ -96,10 +96,12 @@ export function TrackingScreen({ app, booking, onBack }: { app: WessaliApp; book
               <AppText variant="caption" style={{ color: palette.ink }}>{ui.destinationLabel}</AppText>
             </View>
           ) : null}
-        </View>
+        </View> : null}
         {!hasMapPins ? (
           <View style={styles.mapNotice}>
-            <AppText variant="caption" tone="muted" align="center">{ui.pickupLabel}</AppText>
+            <AppText variant="caption" tone="muted" align="center">
+              {locale === 'ar' ? 'لم تُحفظ إحداثيات الطلب بعد. اختر الموقع من الخريطة عند إنشاء الطلب.' : locale === 'fr' ? 'Aucune coordonnée n’a été enregistrée. Choisissez les emplacements sur la carte lors de la demande.' : 'No map coordinates were saved. Choose locations on the map when creating the request.'}
+            </AppText>
           </View>
         ) : null}
       </View>
