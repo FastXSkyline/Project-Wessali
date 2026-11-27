@@ -10,7 +10,6 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -82,9 +81,9 @@ export function PrimaryButton({
     >
       <Animated.View style={{ transform: [{ scale }] }}>
         <RadialGlow
-          size={230}
-          color={palette.jade}
-          opacity={0.22}
+          size={180}
+          color={palette.jadeBright}
+          opacity={0.11}
           style={{ position: 'absolute', top: -55, left: '12%' }}
         />
         <LinearGradient
@@ -93,7 +92,6 @@ export function PrimaryButton({
           end={{ x: 1, y: 1 }}
           style={[styles.primaryButton, compact && styles.primaryButtonCompact]}
         >
-          <View pointerEvents="none" style={styles.primarySheen} />
           {loading ? (
             <ActivityIndicator color={palette.onAccent} />
           ) : (
@@ -181,17 +179,10 @@ export function IconButton({
       }}
       style={({ pressed }) => [
         styles.iconButton,
-        { width: size, height: size, borderRadius: size / 2 },
-        pressed && { opacity: 0.7 },
+        { width: size, height: size, borderRadius: Math.min(15, size * 0.36) },
+        pressed && styles.iconButtonPressed,
       ]}
     >
-      <BlurView
-        intensity={30}
-        tint="light"
-        blurMethod="dimezisBlurViewSdk31Plus"
-        style={[StyleSheet.absoluteFill, { borderRadius: size / 2 }]}
-      />
-      <View style={[StyleSheet.absoluteFill, styles.iconButtonFill, { borderRadius: size / 2 }]} />
       <Ionicons name={icon} size={size * 0.43} color={tint} />
     </Pressable>
   );
@@ -475,66 +466,69 @@ export const controlStyles = StyleSheet.create({});
 
 const styles = StyleSheet.create({
   primaryButton: {
-    minHeight: 56,
-    borderRadius: 999,
+    minHeight: 54,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     paddingHorizontal: 22,
-    paddingVertical: 16,
-    shadowColor: palette.jade,
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 7 },
-    elevation: 9,
+    paddingVertical: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+    shadowColor: '#0C3C66',
+    shadowOpacity: 0.11,
+    shadowRadius: 13,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
   },
-  primaryButtonCompact: { minHeight: 46, paddingVertical: 12, paddingHorizontal: 18 },
-  primarySheen: {
-    position: 'absolute',
-    top: 1,
-    left: 12,
-    right: 12,
-    height: '48%',
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.22)',
-  },
+  primaryButtonCompact: { minHeight: 46, paddingVertical: 12, paddingHorizontal: 18, borderRadius: 16 },
   buttonRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9 },
   rowReverse: { flexDirection: 'row-reverse' },
   secondaryButton: {
-    minHeight: 52,
-    borderRadius: 999,
+    minHeight: 50,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingVertical: 13,
     borderWidth: 1,
-    borderColor: palette.line,
-    backgroundColor: 'rgba(255,255,255,0.76)',
+    borderColor: 'rgba(20, 63, 105, 0.14)',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#16466C',
+    shadowOpacity: 0.035,
+    shadowRadius: 7,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
+  secondaryPressed: { backgroundColor: '#EAF3FD', transform: [{ scale: 0.985 }] },
   iconButton: {
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: palette.line,
+    borderColor: 'rgba(26, 66, 110, 0.13)',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#163E63',
+    shadowOpacity: 0.055,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
-  iconButtonFill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
-  },
+  iconButtonPressed: { opacity: 0.76, transform: [{ scale: 0.95 }] },
   fieldShell: {
     minHeight: 54,
     borderRadius: 17,
     borderWidth: 1,
     borderColor: palette.line,
-    backgroundColor: 'rgba(255, 255, 255, 0.82)',
+    backgroundColor: 'rgba(255, 255, 255, 0.86)',
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
   fieldShellFocused: {
-    borderColor: 'rgba(23, 111, 194, 0.42)',
-    backgroundColor: 'rgba(255, 255, 255, 0.96)',
+    borderColor: 'rgba(36, 124, 199, 0.42)',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
   },
   fieldShellMultiline: { alignItems: 'flex-start', paddingTop: 14, minHeight: 92 },
   input: {
@@ -551,7 +545,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: palette.lineSoft,
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    backgroundColor: 'rgba(255,255,255,0.84)',
     paddingHorizontal: 13,
     paddingVertical: 9,
     flexDirection: 'row',
@@ -565,7 +559,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: palette.lineSoft,
-    backgroundColor: 'rgba(255,255,255,0.72)',
+    backgroundColor: 'rgba(255,255,255,0.82)',
     gap: 3,
   },
   segment: {
@@ -592,16 +586,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.lineSoft,
   },
-  trackOn: { backgroundColor: palette.jade, borderColor: 'rgba(23,111,194,0.32)' },
+  trackOn: { backgroundColor: palette.jade, borderColor: 'rgba(36,124,199,0.32)' },
   knob: {
     width: 22,
     height: 22,
     borderRadius: 999,
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
   },
   statusPill: {
     flexDirection: 'row',

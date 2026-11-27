@@ -45,7 +45,7 @@ export function PartnerScreen({
           <View style={{ gap: 10 }}>
             <View style={[styles.sessionTitle, rtlStyle && styles.rowReverse]}>
               <View style={styles.sessionIcon}>
-                <Ionicons name="key-outline" size={15} color={palette.sand} />
+                <Ionicons name="key-outline" size={15} color={palette.jadeBright} />
               </View>
               <AppText variant="bodyStrong" style={{ flex: 1 }}>
                 {ui.providerSessionTitle}
@@ -138,28 +138,28 @@ function PartnerIntro({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: () =
       icon: 'map-outline' as const,
       title: ui.benefitNetworkTitle,
       body: ui.benefitNetworkBody,
-      tone: palette.sand,
+      tone: palette.jadeBright,
     },
   ];
   return (
     <>
       <GlassCard padding={20} tone="deep" radius={30} style={{ overflow: 'hidden' }}>
-        <RouteDoodle height={180} opacity={0.6} color={palette.sand} />
+        <RouteDoodle height={180} opacity={0.6} color={palette.jadeBright} />
         <RadialGlow
           size={260}
-          color={palette.sand}
+          color={palette.jadeBright}
           opacity={0.16}
           style={{ position: 'absolute', top: -140, right: -90 }}
         />
         <View style={{ gap: 13 }}>
           <View style={[styles.introTop, isRtl && styles.rowReverse]}>
             <View style={[styles.kicker, isRtl && styles.rowReverse]}>
-              <View style={[styles.kickerDot, { backgroundColor: palette.sand }]} />
-              <AppText variant="caption" style={{ color: palette.sand }}>
+              <View style={[styles.kickerDot, { backgroundColor: palette.jadeBright }]} />
+              <AppText variant="caption" style={{ color: palette.jadeBright }}>
                 {ui.brand} · {ui.partnerTitle}
               </AppText>
             </View>
-            <IconTile tone="sand" icon="account-hard-hat" size="lg" />
+            <IconTile tone="jade" icon="account-hard-hat" size="lg" />
           </View>
           <AppText variant="h1" style={{ maxWidth: '90%' }}>
             {ui.partnerIntroTitle}
@@ -444,7 +444,7 @@ function ApprovedBusiness({ app, onOpenQueue }: { app: WessaliApp; onOpenQueue: 
   const stats = [
     { label: ui.availableRequests, value: app.providerRequests.length, color: palette.jade },
     { label: ui.activeJobs, value: app.providerJobs.length, color: palette.aqua },
-    { label: ui.serviceApprovals, value: approvedServices.length, color: palette.sand },
+    { label: ui.serviceApprovals, value: approvedServices.length, color: palette.jadeBright },
   ];
   return (
     <>

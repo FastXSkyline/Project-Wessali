@@ -13,9 +13,9 @@ import { RouteProgress, TripRoute } from '../ui/trip';
 import { firstName, formatShortDate } from '../utils';
 
 const photos: Record<ServiceKind, string> = {
-  freight: 'https://images.pexels.com/photos/5410923/pexels-photo-5410923.jpeg?auto=compress&cs=tinysrgb&w=1400',
-  roadside: 'https://images.pexels.com/photos/6140995/pexels-photo-6140995.jpeg?auto=compress&cs=tinysrgb&w=1400',
-  water: 'https://images.pexels.com/photos/37899833/pexels-photo-37899833/free-photo-of-yellow-water-tanker-truck-by-seaside-in-foca.jpeg?auto=compress&cs=tinysrgb&w=1400',
+  freight: 'https://images.pexels.com/photos/15595843/pexels-photo-15595843.jpeg?auto=compress&cs=tinysrgb&w=1400',
+  roadside: 'https://images.pexels.com/photos/35580957/pexels-photo-35580957.jpeg?auto=compress&cs=tinysrgb&w=1400',
+  water: 'https://images.pexels.com/photos/25311203/pexels-photo-25311203.jpeg?auto=compress&cs=tinysrgb&w=1400',
 };
 
 type Props = {
