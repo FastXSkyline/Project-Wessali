@@ -15,13 +15,14 @@ type Props = {
   app: WessaliApp;
   onStartRequest: () => void;
   onOpenPartner: () => void;
+  onOpenTracking: (booking: Booking) => void;
 };
 
 function statusText(app: WessaliApp, status: string) {
   return (app.ui.status as Record<string, string>)[status] ?? status.replaceAll('_', ' ');
 }
 
-export function RequestsScreen({ app, onStartRequest, onOpenPartner }: Props) {
+export function RequestsScreen({ app, onStartRequest, onOpenPartner, onOpenTracking }: Props) {
   const { ui, isRtl } = app;
   const [filter, setFilter] = useState<'active' | 'closed' | 'all'>('active');
   const [queueTab, setQueueTab] = useState<'available' | 'jobs'>('available');
@@ -131,6 +132,7 @@ export function RequestsScreen({ app, onStartRequest, onOpenPartner }: Props) {
               app={app}
               booking={booking}
               onCancel={() => requestCancel(booking)}
+              onOpenTracking={() => onOpenTracking(booking)}
             />
           ))}
         </View>
@@ -143,10 +145,12 @@ function CustomerBookingCard({
   app,
   booking,
   onCancel,
+  onOpenTracking,
 }: {
   app: WessaliApp;
   booking: Booking;
   onCancel: () => void;
+  onOpenTracking: () => void;
 }) {
   const { ui, locale, isRtl } = app;
   const { isRtl: rtlStyle } = useLocaleValue();
@@ -176,8 +180,16 @@ function CustomerBookingCard({
       </View>
 
       {isActive(booking.status) ? (
-        <View style={{ gap: 7, marginTop: 14 }}>
+        <View style={{ gap: 10, marginTop: 14 }}>
           <RouteProgress status={booking.status} />
+          {(typeof booking.pickup_latitude === 'number' && typeof booking.pickup_longitude === 'number') || (typeof booking.destination_latitude === 'number' && typeof booking.destination_longitude === 'number') ? (
+            <Pressable accessibilityRole="button" onPress={onOpenTracking} style={[styles.trackAction, rtlStyle && styles.rowReverse]}>
+              <Ionicons name="map-outline" size={15} color={palette.jadeBright} />
+              <AppText variant="label" style={{ color: palette.jadeBright }}>{ui.track}</AppText>
+              <View style={{ flex: 1 }} />
+              <Ionicons name={isRtl ? 'arrow-back' : 'arrow-forward'} size={14} color={palette.jadeBright} />
+            </Pressable>
+          ) : null}
         </View>
       ) : null}
 
@@ -580,6 +592,7 @@ const styles = StyleSheet.create({
   rowReverse: { flexDirection: 'row-reverse' },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 11 },
   routeWrap: { marginTop: 14 },
+  trackAction: { minHeight: 38, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 11, borderRadius: 12, backgroundColor: '#EAF3FC' },
   mapLink: {
     flexDirection: 'row',
     alignItems: 'center',
