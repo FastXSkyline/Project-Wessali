@@ -201,11 +201,10 @@ export function TrackingScreen({
               cameraPosition={cameraPosition}
               markers={appleMarkers}
               circles={appleHalos}
-              colorScheme="DARK"
+              colorScheme={AppleMaps.MapColorScheme.DARK}
               properties={{
-                elevation: 'FLAT',
-                emphasis: 'MUTED',
-                mapType: 'STANDARD',
+                elevation: AppleMaps.MapStyleElevation.FLAT,
+                                mapType: AppleMaps.MapType.STANDARD,
                 selectionEnabled: true,
                 isTrafficEnabled: false,
               }}
@@ -217,7 +216,7 @@ export function TrackingScreen({
               cameraPosition={cameraPosition}
               markers={googleMarkers}
               circles={googleHalos}
-              colorScheme="DARK"
+              colorScheme={GoogleMaps.MapColorScheme.DARK}
               properties={{
                 mapStyleOptions: { json: JSON.stringify(NAVY_MAP_STYLE) },
                 isTrafficEnabled: false,

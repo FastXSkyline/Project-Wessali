@@ -137,10 +137,11 @@ export function SecondaryButton({
         tap();
         onPress();
       }}
-      style={[
+      style={({ pressed }) => [
         styles.secondaryButton,
         danger && { borderColor: 'rgba(255,123,123,0.32)', backgroundColor: palette.dangerSoft },
         disabled && { opacity: 0.5 },
+        pressed && !disabled && styles.secondaryPressed,
         style,
       ]}
     >
