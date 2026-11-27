@@ -25,6 +25,7 @@ type Props = {
   onOpenRequests: () => void;
   onOpenPartner: () => void;
   onOpenProfile: () => void;
+  onOpenTracking: () => void;
 };
 
 function greetingFor(app: WessaliApp) {
@@ -38,7 +39,7 @@ function statusText(app: WessaliApp, status: string) {
   return (app.ui.status as Record<string, string>)[status] ?? status.replaceAll('_', ' ');
 }
 
-export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests, onOpenPartner, onOpenProfile }: Props) {
+export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests, onOpenPartner, onOpenProfile, onOpenTracking }: Props) {
   const { isRtl, locale, ui, session, bookings, activeBookings, activeBooking } = app;
   const { isRtl: rtl } = useLocaleValue();
   const completed = bookings.filter((booking) => booking.status === 'completed').length;
@@ -86,7 +87,7 @@ export function HomeScreen({ app, onStartRequest, onOpenService, onOpenRequests,
           <TripRoute booking={activeBooking} locale={locale} />
           <View style={{ height: 12 }} />
           <RouteProgress status={activeBooking.status} />
-          <Pressable onPress={onOpenRequests} style={[styles.trackRow, rtl && styles.rowReverse]}>
+          <Pressable onPress={onOpenTracking} style={[styles.trackRow, rtl && styles.rowReverse]}>
             <AppText variant="label" style={{ color: palette.jadeBright }}>{ui.track}</AppText>
             <Ionicons name={isRtl ? 'arrow-back' : 'arrow-forward'} size={15} color={palette.jadeBright} />
           </Pressable>
