@@ -11,7 +11,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { AppleMaps, GoogleMaps } from 'expo-maps';
 import * as Location from 'expo-location';
-import { Location as PreciseLocation, LocationAccuracy, LocationProfile } from 'expo-location/next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { palette } from '../theme';
 import { AppText } from './base';
@@ -161,36 +160,8 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
   async function locate() {
     setLoading(true);
     try {
-      if (!PreciseLocation.hasLocationServicesEnabled()) {
-        if (Platform.OS === 'android') {
-          const enabled = await PreciseLocation.enableLocationServices();
-          if (!enabled) {
-            Alert.alert(copy.title, copy.servicesOff);
-            return;
-          }
-        } else {
-          Alert.alert(copy.title, copy.servicesOff, [
-            { text: copy.cancel, style: 'cancel' },
-            { text: copy.settings, onPress: () => void Linking.openSettings() },
-          ]);
-          return;
-        }
-      }
-
-      const permission = await PreciseLocation.requestForegroundPermissions();
+      const permission = await Location.requestForegroundPermissionsAsync();
       if (!permission.granted) {
-        if (!permission.canAskAgain) {
-          Alert.alert(copy.permissionTitle, copy.permission, [
-            { text: copy.cancel, style: 'cancel' },
-            { text: copy.settings, onPress: () => void Linking.openSettings() },
-          ]);
-        } else {
-          Alert.alert(copy.permissionTitle, copy.permission);
-        }
-        return;
-      }
-
-      if (permission.accuracy === LocationAccuracy.REDUCED) {
         Alert.alert(copy.permissionTitle, copy.permission, [
           { text: copy.cancel, style: 'cancel' },
           { text: copy.settings, onPress: () => void Linking.openSettings() },
@@ -198,25 +169,27 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
         return;
       }
 
-      const fix = await PreciseLocation.getPosition({
-        maxCachedAge: 0,
-        timeout: 25,
-        profile: LocationProfile.OTHER_NAVIGATION,
+      // Use a recent cached fix immediately when available. A fresh balanced
+      // fix avoids the long high-accuracy navigation wait on the booking flow.
+      const cached = await Location.getLastKnownPositionAsync({
+        maxAge: 60_000,
+        requiredAccuracy: 1_500,
       });
-      if (!fix) {
-        Alert.alert(copy.title, copy.locationFailed);
-        return;
-      }
+      const fix =
+        cached ??
+        (await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        }));
 
       const point = {
-        latitude: fix.coordinates.latitude,
-        longitude: fix.coordinates.longitude,
+        latitude: fix.coords.latitude,
+        longitude: fix.coords.longitude,
       };
       centerRef.current = point;
       setCenter(point);
       setMapStart(point);
       setUserLocation(point);
-      setLocationAccuracy(fix.horizontalAccuracy);
+      setLocationAccuracy(fix.coords.accuracy ?? null);
       setMapKey((current) => current + 1);
       await resolveAddress(point);
     } catch {
@@ -309,7 +282,7 @@ export function LocationPicker({ visible, locale, onClose, onConfirm }: Props) {
           {Platform.OS === 'ios' ? (
             <AppleMaps.View
               key={`apple-${mapKey}`}
-              style={StyleSheet.absoluteFill}
+              style={styles.nativeMap}
               cameraPosition={cameraPosition}
               markers={userMarker}
               properties={{ isMyLocationEnabled: Boolean(userLocation), selectionEnabled: true }}
@@ -419,7 +392,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.lineSoft,
   },
-  mapWrap: { flex: 1, overflow: 'hidden', backgroundColor: '#E8F0F9' },
+  mapWrap: { flex: 1, minHeight: 280, overflow: 'hidden', backgroundColor: '#E8F0F9' },
+  nativeMap: { flex: 1, width: '100%', minHeight: 280 },
   mapFallback: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   pin: {
     position: 'absolute',
